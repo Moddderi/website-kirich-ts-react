@@ -5,7 +5,7 @@ import { IoBagHandleOutline } from "react-icons/io5";
 export const Header = () => {
   return (
     <>
-      <div className="bg-stone-900 px-4 py-2.5 text-center relative overflow-hidden group">
+      <div className="bg-stone-900 p-4 px-4 py-2.5 text-center relative overflow-hidden group">
         <div className="absolute inset-0 opacity-20 bg-[linear-gradient(45deg,transparent_25%,rgba(255,255,255,0.2)_50%,transparent_75%,transparent_100%)] bg-[length:250px_250px] animate-[pulse_3s_linear_infinite] group-hover:bg-[length:300px_300px] transition-all duration-1000"></div>
         <p className="text-xs font-medium text-white tracking-widest relative z-10 uppercase  animate-reveal-up">
           Global Shipping. Створенно в Україні.
