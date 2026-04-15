@@ -1,3 +1,5 @@
+import { NavLink } from "react-router-dom";
+
 import { CiSearch } from "react-icons/ci";
 import { CiUser } from "react-icons/ci";
 import { IoBagHandleOutline } from "react-icons/io5";
@@ -5,7 +7,7 @@ import { IoBagHandleOutline } from "react-icons/io5";
 export const Header = () => {
   return (
     <>
-      <div className="bg-stone-900 px-4 py-2.5 text-center relative overflow-hidden group">
+      <div className="bg-stone-900 p-4 px-4 py-2.5 text-center relative overflow-hidden group">
         <div className="absolute inset-0 opacity-20 bg-[linear-gradient(45deg,transparent_25%,rgba(255,255,255,0.2)_50%,transparent_75%,transparent_100%)] bg-[length:250px_250px] animate-[pulse_3s_linear_infinite] group-hover:bg-[length:300px_300px] transition-all duration-1000"></div>
         <p className="text-xs font-medium text-white tracking-widest relative z-10 uppercase  animate-reveal-up">
           Global Shipping. Створенно в Україні.
@@ -34,36 +36,30 @@ export const Header = () => {
             </div>
 
             <div className="hidden md:flex md:items-center md:gap-10">
-              <a
-                href="#"
-                className="relative text-sm font-medium text-stone-500 hover:text-stone-900 transition-colors magnetic-link"
+              <NavLink
+                to="/catalog"
+                className={({ isActive }) =>
+                  `relative text-sm font-medium transition-colors magnetic-link ${
+                    isActive
+                      ? "text-stone-900 after:absolute after:left-0 after:-bottom-1 after:w-full after:h-[2px] after:bg-stone-900 after:content-['']"
+                      : "text-stone-500 hover:text-stone-900"
+                  }`
+                }
               >
-                Женщинам
-              </a>
-              <a
-                href="#"
-                className="relative text-sm font-medium text-stone-500 hover:text-stone-900 transition-colors magnetic-link"
+                Каталог
+              </NavLink>
+              <NavLink
+                to="/catalog"
+                className={({ isActive }) =>
+                  `relative text-sm font-medium transition-colors magnetic-link ${
+                    isActive
+                      ? "text-stone-900 after:absolute after:left-0 after:-bottom-1 after:w-full after:h-[2px] after:bg-stone-900 after:content-['']"
+                      : "text-stone-500 hover:text-stone-900"
+                  }`
+                }
               >
-                Мужчинам
-              </a>
-              <a
-                href="#"
-                className="relative text-sm font-medium text-stone-500 hover:text-stone-900 transition-colors magnetic-link"
-              >
-                Девочкам
-              </a>
-              <a
-                href="#"
-                className="relative text-sm font-medium text-stone-500 hover:text-stone-900 transition-colors magnetic-link"
-              >
-                Мальчикам
-              </a>
-              <a
-                href="#"
-                className="relative text-sm font-medium text-stone-500 hover:text-stone-900 transition-colors magnetic-link"
-              >
-                Аксессуары
-              </a>
+                Індивідуальне пошиття
+              </NavLink>
             </div>
 
             <div className="flex items-center gap-6">

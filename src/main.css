@@ -1,6 +1,6 @@
 @import "tailwindcss";
 
-/* Custom radio button styles logic & Micro-animations */
+/* === CUSTOM RADIO BUTTON === */
 input[type="radio"]:checked + div .radio-dot {
   opacity: 1;
   transform: scale(1);
@@ -12,7 +12,7 @@ input[type="radio"]:checked + div .radio-border {
   border-color: #1c1917;
 }
 
-/* Grid background pattern */
+/* === GRID BACKGROUND PATTERN === */
 .bg-grid-pattern {
   background-image:
     linear-gradient(to right, rgba(28, 25, 23, 0.03) 1px, transparent 1px),
@@ -20,7 +20,7 @@ input[type="radio"]:checked + div .radio-border {
   background-size: 32px 32px;
 }
 
-/* Hide scrollbar */
+/* === HIDE SCROLLBAR === */
 .no-scrollbar::-webkit-scrollbar {
   display: none;
 }
@@ -29,7 +29,7 @@ input[type="radio"]:checked + div .radio-border {
   scrollbar-width: none;
 }
 
-/* 3D Perspective for Bento Cards */
+/* === 3D PERSPECTIVE FOR BENTO CARDS === */
 .perspective-1000 {
   perspective: 1000px;
 }
@@ -45,7 +45,7 @@ input[type="radio"]:checked + div .radio-border {
   box-shadow: 10px 20px 40px rgba(0, 0, 0, 0.08);
 }
 
-/* Animation Delays */
+/* === ANIMATION DELAYS === */
 .delay-100 {
   animation-delay: 100ms;
 }
@@ -62,7 +62,7 @@ input[type="radio"]:checked + div .radio-border {
   animation-delay: 700ms;
 }
 
-/* Magnetic Hover Underline */
+/* === MAGNETIC HOVER UNDERLINE === */
 .magnetic-link::after {
   content: "";
   position: absolute;
@@ -71,7 +71,7 @@ input[type="radio"]:checked + div .radio-border {
   height: 1px;
   bottom: -4px;
   left: 0;
-  background-color: #1c1917;
+  background-color: currentColor;
   transform-origin: bottom right;
   transition: transform 0.4s cubic-bezier(0.86, 0, 0.07, 1);
 }
@@ -80,7 +80,7 @@ input[type="radio"]:checked + div .radio-border {
   transform-origin: bottom left;
 }
 
-/* Glass Reflection */
+/* === GLASS REFLECTION === */
 .glass-reflection::before {
   content: "";
   position: absolute;
@@ -95,27 +95,55 @@ input[type="radio"]:checked + div .radio-border {
     rgba(255, 255, 255, 0) 100%
   );
   transform: skewX(-25deg);
-  animation: shimmer 4s infinite 2s;
+  animation: shimmer 3s infinite;
   pointer-events: none;
 }
 
-/* Reveal animation */
+/* === KEYFRAMES === */
+@keyframes float-complex {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0deg) scale(1);
+  }
+  33% {
+    transform: translateY(-12px) rotate(2deg) scale(1.02);
+  }
+  66% {
+    transform: translateY(8px) rotate(-1deg) scale(0.98);
+  }
+}
+
+@keyframes float-slow {
+  0%,
+  100% {
+    transform: translateY(0) translateX(0);
+  }
+  50% {
+    transform: translateY(-20px) translateX(10px);
+  }
+}
+
+@keyframes float-reverse {
+  0%,
+  100% {
+    transform: translateY(0) translateX(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(15px) translateX(-15px) rotate(-2deg);
+  }
+}
+
 @keyframes reveal-up {
   0% {
     opacity: 0;
-    transform: translateY(30px);
+    transform: translateY(40px) scale(0.95);
   }
   100% {
     opacity: 1;
-    transform: translateY(0);
+    transform: translateY(0) scale(1);
   }
 }
 
-.animate-reveal-up {
-  animation: reveal-up 0.8s ease-out forwards;
-}
-
-/* Shimmer (блик) */
 @keyframes shimmer {
   0% {
     transform: translateX(-100%) skewX(-25deg);
@@ -125,6 +153,45 @@ input[type="radio"]:checked + div .radio-border {
   }
 }
 
-.glass-reflection::before {
-  animation: shimmer 3s infinite;
+@keyframes spin-slow {
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes pulse-glow {
+  0%,
+  100% {
+    opacity: 0.4;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(1.1);
+  }
+}
+
+/* === UTILITIES (анимации как в Tailwind) === */
+@layer utilities {
+  .animate-float-complex {
+    animation: float-complex 8s ease-in-out infinite;
+  }
+  .animate-float-slow {
+    animation: float-slow 12s ease-in-out infinite;
+  }
+  .animate-float-reverse {
+    animation: float-reverse 10s ease-in-out infinite;
+  }
+  .animate-reveal-up {
+    animation: reveal-up 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+  .animate-shimmer {
+    animation: shimmer 2.5s infinite;
+  }
+  .animate-spin-slow {
+    animation: spin-slow 25s linear infinite;
+  }
+  .animate-pulse-glow {
+    animation: pulse-glow 4s ease-in-out infinite;
+  }
 }

@@ -3,8 +3,11 @@ import react from "@vitejs/plugin-react";
 import path from "path";
 import tailwindcss from "@tailwindcss/vite";
 
+const repoName = "website-kirich-ts-react";
+
 // https://vite.dev/config/
 export default defineConfig({
+  base: `/${repoName}/`,
   plugins: [
     react({
       babel: {
