@@ -1,3 +1,5 @@
+import { NavLink } from "react-router-dom";
+
 import { CiSearch } from "react-icons/ci";
 import { CiUser } from "react-icons/ci";
 import { IoBagHandleOutline } from "react-icons/io5";
@@ -34,36 +36,30 @@ export const Header = () => {
             </div>
 
             <div className="hidden md:flex md:items-center md:gap-10">
-              <a
-                href="#"
-                className="relative text-sm font-medium text-stone-500 hover:text-stone-900 transition-colors magnetic-link"
+              <NavLink
+                to="/catalog"
+                className={({ isActive }) =>
+                  `relative text-sm font-medium transition-colors magnetic-link ${
+                    isActive
+                      ? "text-stone-900 after:absolute after:left-0 after:-bottom-1 after:w-full after:h-[2px] after:bg-stone-900 after:content-['']"
+                      : "text-stone-500 hover:text-stone-900"
+                  }`
+                }
               >
-                Женщинам
-              </a>
-              <a
-                href="#"
-                className="relative text-sm font-medium text-stone-500 hover:text-stone-900 transition-colors magnetic-link"
+                Каталог
+              </NavLink>
+              <NavLink
+                to="/catalog"
+                className={({ isActive }) =>
+                  `relative text-sm font-medium transition-colors magnetic-link ${
+                    isActive
+                      ? "text-stone-900 after:absolute after:left-0 after:-bottom-1 after:w-full after:h-[2px] after:bg-stone-900 after:content-['']"
+                      : "text-stone-500 hover:text-stone-900"
+                  }`
+                }
               >
-                Мужчинам
-              </a>
-              <a
-                href="#"
-                className="relative text-sm font-medium text-stone-500 hover:text-stone-900 transition-colors magnetic-link"
-              >
-                Девочкам
-              </a>
-              <a
-                href="#"
-                className="relative text-sm font-medium text-stone-500 hover:text-stone-900 transition-colors magnetic-link"
-              >
-                Мальчикам
-              </a>
-              <a
-                href="#"
-                className="relative text-sm font-medium text-stone-500 hover:text-stone-900 transition-colors magnetic-link"
-              >
-                Аксессуары
-              </a>
+                Індивідуальне пошиття
+              </NavLink>
             </div>
 
             <div className="flex items-center gap-6">

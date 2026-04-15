@@ -91,7 +91,7 @@ export const MainPage = () => {
             </div>
             <div>
               <p className="text-sm font-semibold tracking-tight text-stone-900">
-                Kyiv, Ukraine
+                Poltava, Ukraine
               </p>
               <p className="text-xs text-stone-500 mt-1 font-medium">
                 Создано вручную
