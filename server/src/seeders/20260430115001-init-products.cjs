@@ -6,7 +6,7 @@ require("dotenv").config();
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    const jsonPath = path.resolve(__dirname, "../products.json");
+    const jsonPath = path.resolve(__dirname, "../../products.json");
 
     if (!fs.existsSync(jsonPath)) {
       console.error(`Ошибка: Файл не найден по пути ${jsonPath}`);

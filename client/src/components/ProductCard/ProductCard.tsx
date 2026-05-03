@@ -4,9 +4,9 @@ export const ProductCard = () => {
       <div className="relative aspect-[3/4] w-full overflow-hidden rounded-[2rem] bg-stone-200 border border-stone-200/60">
         <div className="absolute inset-0 overflow-hidden">
           <img
-            src="src/assets/header-left-standart.svg"
+            src="src/assets/b1.jpg"
             alt="Силуэт Aria"
-            className="w-full h-full object-cover scale-110 group-hover:scale-100 transition-transform duration-1000 ease-[cubic-bezier(0.25,1,0.5,1)]"
+            className="w-full h-full object-cover scale-100 group-hover:scale-110 transition-transform duration-1000 ease-[cubic-bezier(0.25,1,0.5,1)]"
           />
         </div>
 
