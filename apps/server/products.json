@@ -1,0 +1,219 @@
+[
+  {
+    "name": "Сорочка-боді ST",
+    "price": 3000,
+    "category": "top",
+    "stock": 10,
+    "product_code": "3010"
+  },
+  {
+    "name": "Сорочка-боді ST фактурна",
+    "price": 3200,
+    "category": "top",
+    "stock": 10,
+    "product_code": "3042"
+  },
+  {
+    "name": "Сорочка TR ST короткий рукав",
+    "price": 2500,
+    "category": "top",
+    "stock": 10,
+    "product_code": "3033"
+  },
+  {
+    "name": "Сорочка TR ST довгий рукав",
+    "price": 2700,
+    "category": "top",
+    "stock": 15,
+    "product_code": "3011"
+  },
+  {
+    "name": "Сорочка ST контраст",
+    "price": 2800,
+    "category": "top",
+    "stock": 10,
+    "product_code": "3040"
+  },
+  {
+    "name": "Футболка поло короткий рукав",
+    "price": 2000,
+    "category": "top",
+    "stock": 20,
+    "product_code": "3013"
+  },
+  {
+    "name": "Футболка поло довгий рукав",
+    "price": 2300,
+    "category": "top",
+    "stock": 15,
+    "product_code": "3014"
+  },
+  {
+    "name": "Футболка поло контраст",
+    "price": 2100,
+    "category": "top",
+    "stock": 10,
+    "product_code": "3041"
+  },
+  {
+    "name": "Футболка LAT короткий рукав",
+    "price": 1600,
+    "category": "top",
+    "stock": 20,
+    "product_code": "3015"
+  },
+  {
+    "name": "Футболка LAT діагональ",
+    "price": 1800,
+    "category": "top",
+    "stock": 15,
+    "product_code": "3039"
+  },
+  {
+    "name": "Лонгслів LAT довгий рукав",
+    "price": 2000,
+    "category": "top",
+    "stock": 12,
+    "product_code": "3016"
+  },
+  {
+    "name": "Лонгслів 'крило кажана'",
+    "price": 2200,
+    "category": "top",
+    "stock": 10,
+    "product_code": "3034"
+  },
+  {
+    "name": "Лонгслів з манжетами на кнопках",
+    "price": 2100,
+    "category": "top",
+    "stock": 10,
+    "product_code": "3045"
+  },
+  {
+    "name": "Сорочка TR LAT довгий рукав",
+    "price": 3000,
+    "category": "top",
+    "stock": 10,
+    "product_code": "3035"
+  },
+  {
+    "name": "Сорочка-боді фрачна",
+    "price": 6100,
+    "category": "top",
+    "stock": 5,
+    "product_code": "3047"
+  },
+  {
+    "name": "Штани ST",
+    "price": 2500,
+    "category": "bottom",
+    "stock": 15,
+    "product_code": "3019"
+  },
+  {
+    "name": "Штани ST зі шльовками під ремінь",
+    "price": 2600,
+    "category": "bottom",
+    "stock": 15,
+    "product_code": "3038"
+  },
+  {
+    "name": "Штани LAT",
+    "price": 2500,
+    "category": "bottom",
+    "stock": 10,
+    "product_code": "3023"
+  },
+  {
+    "name": "Штани ST фрачні",
+    "price": 4700,
+    "category": "bottom",
+    "stock": 8,
+    "product_code": "3048"
+  },
+  {
+    "name": "Краватка-метелик атласна",
+    "price": 400,
+    "category": "accessories",
+    "stock": 50,
+    "product_code": "3027"
+  },
+  {
+    "name": "Краватка-метелик вишиванка",
+    "price": 600,
+    "category": "accessories",
+    "stock": 30,
+    "product_code": "3036"
+  },
+  {
+    "name": "Краватка атласна",
+    "price": 500,
+    "category": "accessories",
+    "stock": 40,
+    "product_code": "3029"
+  },
+  {
+    "name": "Краватка вишиванка",
+    "price": 700,
+    "category": "accessories",
+    "stock": 30,
+    "product_code": "3037"
+  },
+  {
+    "name": "Ремінь шкіряний",
+    "price": 1200,
+    "category": "accessories",
+    "stock": 25,
+    "product_code": "3032"
+  },
+  {
+    "name": "Регулювання довжини ременя",
+    "price": 350,
+    "category": "accessories",
+    "stock": 100,
+    "product_code": "3044"
+  },
+  {
+    "name": "Магніти для кріплення номеру",
+    "price": 290,
+    "category": "accessories",
+    "stock": 100,
+    "product_code": "3046"
+  },
+  {
+    "name": "Шкарпетки чоловічі",
+    "price": 100,
+    "category": "accessories",
+    "stock": 100,
+    "product_code": "3043"
+  },
+  {
+    "name": "Хустинка нагрудна фрачна",
+    "price": 650,
+    "category": "accessories",
+    "stock": 40,
+    "product_code": "3049"
+  },
+  {
+    "name": "Метелик фрачний",
+    "price": 1100,
+    "category": "accessories",
+    "stock": 20,
+    "product_code": "3050"
+  },
+  {
+    "name": "Пояс до фраку",
+    "price": 1300,
+    "category": "accessories",
+    "stock": 15,
+    "product_code": "3051"
+  },
+  {
+    "name": "Комірець фрачний",
+    "price": 1100,
+    "category": "accessories",
+    "stock": 15,
+    "product_code": "3052"
+  }
+]
