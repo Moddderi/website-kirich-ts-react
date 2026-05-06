@@ -1,0 +1,15 @@
+{
+  "name": "web-kirich-react",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "npm run dev --workspaces --if-present",
+    "build": "npm run build --workspaces --if-present"
+  },
+  "dependencies": {
+    "zod": "^4.4.3"
+  }
+}

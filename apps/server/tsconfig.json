@@ -1,0 +1,23 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "outDir": "./dist",
+
+    /*rootDir указываем на корень всего проекта (на два уровня выше), 
+      чтобы захватить и сервер, и общие пакеты */
+    "rootDir": "../../",
+
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "ignoreDeprecations": "5.0",
+
+    "paths": {
+      "@project/shared": ["./../../packages/shared/index.ts"]
+    }
+  },
+  "include": ["src/**/*", "../../packages/shared/index.ts"]
+}
