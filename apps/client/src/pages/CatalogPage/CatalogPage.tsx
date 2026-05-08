@@ -1,6 +1,27 @@
+import { useState, useEffect } from "react";
 import { ProductCard } from "../../components/ProductCard/ProductCard";
+import type { ProductInput } from "@project/shared";
 
 export const CatalogPage = () => {
+  const [products, setProducts] = useState<ProductInput[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const loadProducts = async () => {
+      try {
+        const response = await fetch("http://localhost:5005/api/products"); // Твой URL бэкенда
+        const data = await response.json();
+        setProducts(data);
+      } catch (error) {
+        console.error("Ошибка загрузки:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadProducts();
+  }, []);
+
   return (
     <main className="flex-grow pb-32">
       <section className="relative pb-16 overflow-hidden">
@@ -71,15 +92,21 @@ export const CatalogPage = () => {
 
       <section className="mx-auto max-w-7xl px-6 lg:px-8 mt-8">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-16 auto-rows-max perspective-1000">
-          <ProductCard />
-          <ProductCard />
-          <ProductCard />
-          <ProductCard />
-          <ProductCard />
-          <ProductCard />
-          <ProductCard />
-          <ProductCard />
+          {isLoading ? (
+            <p>Загрузка товаров...</p>
+          ) : (
+            // 3. Рендерим реальные данные вместо пустых карточек
+            products.map((item) => (
+              <ProductCard key={item.product_code} product={item} />
+            ))
+          )}
         </div>
+
+        {!isLoading && products.length === 0 && (
+          <div className="text-center py-20 text-stone-500">
+            Товары не найдены
+          </div>
+        )}
 
         <div className="mt-24 flex justify-center text-center">
           <p className="text-sm font-medium text-stone-500 max-w-lg">

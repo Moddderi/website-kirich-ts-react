@@ -19,6 +19,10 @@ class Product extends Model<
   declare imageUrl: string;
   declare product_code: string;
 
+  declare main_category: string;
+  declare sub_type: string;
+  declare stock: number;
+
   // Даты тоже обычно генерирует БД автоматически
   declare createdAt: CreationOptional<Date>;
   declare updatedAt: CreationOptional<Date>;
@@ -57,6 +61,19 @@ export default (sequelize: Sequelize) => {
         type: DataTypes.STRING,
         allowNull: false, // или true, если не у всех товаров есть код
         unique: true, // обычно коды товаров уникальны
+      },
+      main_category: {
+        type: DataTypes.STRING,
+        allowNull: false, // Обязательно для фильтрации
+      },
+      sub_type: {
+        type: DataTypes.STRING,
+        allowNull: false, // Обязательно для фильтрации
+      },
+      stock: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        defaultValue: 0,
       },
 
       createdAt: DataTypes.DATE,

@@ -22,14 +22,17 @@ module.exports = {
     const dataToInsert = products.map((product) => ({
       name: product.name,
       price: product.price,
-      category: product.category,
-      stock: product.stock,
       product_code: product.product_code,
+      // Заменяем старую категорию на новые поля из JSON
+      main_category: product.main_category,
+      sub_type: product.sub_type,
+      stock: product.stock || 0,
       imageUrl: `${CLOUD_BASE_URL}${product.product_code}.jpg`,
       createdAt: new Date(),
       updatedAt: new Date(),
     }));
 
+    // Очищаем таблицу перед заливкой, чтобы не было дублей по product_code
     await queryInterface.bulkDelete("Products", null, {});
 
     if (dataToInsert.length > 0) {

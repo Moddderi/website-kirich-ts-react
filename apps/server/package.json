@@ -9,6 +9,7 @@
     "start": "node dist/app.js"
   },
   "dependencies": {
+    "@project/shared": "*",
     "cloudinary": "^2.10.0",
     "cors": "^2.8.5",
     "dotenv": "^16.6.1",
@@ -16,8 +17,7 @@
     "pg": "^8.20.0",
     "pg-hstore": "^2.3.4",
     "sequelize": "^6.37.8",
-    "zod": "3.23.8",
-    "@project/shared": "*"
+    "zod": "3.23.8"
   },
   "devDependencies": {
     "@types/cors": "^2.8.17",
