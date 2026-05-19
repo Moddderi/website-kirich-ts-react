@@ -49,7 +49,7 @@ export const Header = () => {
                 Каталог
               </NavLink>
               <NavLink
-                to="/catalog"
+                to="/individual-tailoring"
                 className={({ isActive }) =>
                   `relative text-sm font-medium transition-colors magnetic-link ${
                     isActive
