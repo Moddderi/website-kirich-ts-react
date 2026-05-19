@@ -21,10 +21,12 @@ module.exports = {
 
     const dataToInsert = products.map((product) => ({
       name: product.name,
+      search_name: product.search_name,
       price: product.price,
       product_code: product.product_code,
       // Заменяем старую категорию на новые поля из JSON
       main_category: product.main_category,
+      dance_program: product.dance_program,
       sub_type: product.sub_type,
       stock: product.stock || 0,
       imageUrl: `${CLOUD_BASE_URL}${product.product_code}.jpg`,

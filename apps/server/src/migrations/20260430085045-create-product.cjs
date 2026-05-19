@@ -13,6 +13,10 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: false,
       },
+      search_name: {
+        type: Sequelize.TEXT,
+        allowNull: false,
+      },
       product_code: {
         type: Sequelize.STRING,
         unique: true,
@@ -22,6 +26,10 @@ module.exports = {
         type: Sequelize.DECIMAL(10, 2),
         allowNull: false,
         defaultValue: 0.0,
+      },
+      dance_program: {
+        type: Sequelize.STRING,
+        allowNull: true, // Это позволит базе принимать NULL, если программы нет
       },
       // Заменяем старую категорию на новую структуру
       main_category: {

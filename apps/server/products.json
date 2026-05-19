@@ -1,158 +1,197 @@
 [
   {
     "name": "Сорочка-боді ST",
+    "search_name": "сорочка-боді st",
     "price": 3000,
     "main_category": "clothing",
     "sub_type": "shirt",
     "stock": 10,
-    "product_code": "3010"
+    "product_code": "3010",
+    "dance_program": "ST"
   },
   {
     "name": "Сорочка-боді ST фактурна",
+    "search_name": "сорочка-боді st фактурна",
     "price": 3200,
     "main_category": "clothing",
     "sub_type": "shirt",
     "stock": 10,
-    "product_code": "3042"
+    "product_code": "3042",
+    "dance_program": "ST"
   },
   {
     "name": "Сорочка TR ST короткий рукав",
+    "search_name": "сорочка tr st короткий рукав",
     "price": 2500,
     "main_category": "clothing",
     "sub_type": "shirt",
     "stock": 10,
-    "product_code": "3033"
+    "product_code": "3033",
+    "dance_program": "ST"
   },
   {
     "name": "Сорочка TR ST довгий рукав",
+    "search_name": "сорочка tr st довгий рукав",
     "price": 2700,
     "main_category": "clothing",
     "sub_type": "shirt",
     "stock": 15,
-    "product_code": "3011"
+    "product_code": "3011",
+    "dance_program": "ST"
   },
   {
     "name": "Сорочка ST контраст",
+    "search_name": "сорочка st контраст",
     "price": 2800,
     "main_category": "clothing",
     "sub_type": "shirt",
     "stock": 10,
-    "product_code": "3040"
+    "product_code": "3040",
+    "dance_program": "ST"
   },
   {
     "name": "Футболка поло короткий рукав",
+    "search_name": "футболка поло короткий рукав",
     "price": 2000,
     "main_category": "clothing",
     "sub_type": "t-shirt",
     "stock": 20,
-    "product_code": "3013"
+    "product_code": "3013",
+    "dance_program": "ST"
   },
   {
     "name": "Футболка поло довгий рукав",
+    "search_name": "футболка поло довгий рукав",
     "price": 2300,
     "main_category": "clothing",
     "sub_type": "t-shirt",
     "stock": 15,
-    "product_code": "3014"
+    "product_code": "3014",
+    "dance_program": "ST"
   },
   {
     "name": "Футболка поло контраст",
+    "search_name": "футболка поло контраст",
     "price": 2100,
     "main_category": "clothing",
     "sub_type": "t-shirt",
     "stock": 10,
-    "product_code": "3041"
+    "product_code": "3041",
+    "dance_program": "ST"
   },
   {
     "name": "Футболка LAT короткий рукав",
+    "search_name": "футболка lat короткий рукав",
     "price": 1600,
     "main_category": "clothing",
     "sub_type": "t-shirt",
     "stock": 20,
-    "product_code": "3015"
+    "product_code": "3015",
+    "dance_program": "LAT"
   },
   {
     "name": "Футболка LAT діагональ",
+    "search_name": "футболка lat діагональ",
     "price": 1800,
     "main_category": "clothing",
     "sub_type": "t-shirt",
     "stock": 15,
-    "product_code": "3039"
+    "product_code": "3039",
+    "dance_program": "LAT"
   },
   {
     "name": "Лонгслів LAT довгий рукав",
+    "search_name": "лонгслів lat довгий рукав",
     "price": 2000,
     "main_category": "clothing",
     "sub_type": "longsleeve",
     "stock": 12,
-    "product_code": "3016"
+    "product_code": "3016",
+    "dance_program": "LAT"
   },
   {
     "name": "Лонгслів 'крило кажана'",
+    "search_name": "лонгслів 'крило кажана'",
     "price": 2200,
     "main_category": "clothing",
     "sub_type": "longsleeve",
     "stock": 10,
-    "product_code": "3034"
+    "product_code": "3034",
+    "dance_program": "LAT"
   },
   {
     "name": "Лонгслів з манжетами на кнопках",
+    "search_name": "лонгслів з манжетами на кнопках",
     "price": 2100,
     "main_category": "clothing",
     "sub_type": "longsleeve",
     "stock": 10,
-    "product_code": "3045"
+    "product_code": "3045",
+    "dance_program": "LAT"
   },
   {
     "name": "Сорочка TR LAT довгий рукав",
+    "search_name": "сорочка tr lat довгий рукав",
     "price": 3000,
     "main_category": "clothing",
     "sub_type": "shirt",
     "stock": 10,
-    "product_code": "3035"
+    "product_code": "3035",
+    "dance_program": "LAT"
   },
   {
     "name": "Сорочка-боді фрачна",
+    "search_name": "сорочка-боді фрачна",
     "price": 6100,
     "main_category": "clothing",
     "sub_type": "shirt",
     "stock": 5,
-    "product_code": "3047"
+    "product_code": "3047",
+    "dance_program": "ST"
   },
   {
     "name": "Штани ST",
+    "search_name": "штани st",
     "price": 2500,
     "main_category": "clothing",
     "sub_type": "pants",
     "stock": 15,
-    "product_code": "3019"
+    "product_code": "3019",
+    "dance_program": "ST"
   },
   {
     "name": "Штани ST зі шльовками под ремінь",
+    "search_name": "штани st зі шльовками под ремінь",
     "price": 2600,
     "main_category": "clothing",
     "sub_type": "pants",
     "stock": 15,
-    "product_code": "3038"
+    "product_code": "3038",
+    "dance_program": "ST"
   },
   {
     "name": "Штани LAT",
+    "search_name": "штани lat",
     "price": 2500,
     "main_category": "clothing",
     "sub_type": "pants",
     "stock": 10,
-    "product_code": "3023"
+    "product_code": "3023",
+    "dance_program": "LAT"
   },
   {
     "name": "Штани ST фрачні",
+    "search_name": "штани st фрачні",
     "price": 4700,
     "main_category": "clothing",
     "sub_type": "pants",
     "stock": 8,
-    "product_code": "3048"
+    "product_code": "3048",
+    "dance_program": "ST"
   },
   {
     "name": "Краватка-метелик атласна",
+    "search_name": "краватка-метелик атласна",
     "price": 400,
     "main_category": "accessories",
     "sub_type": "tie",
@@ -161,6 +200,7 @@
   },
   {
     "name": "Краватка-метелик вишиванка",
+    "search_name": "краватка-метелик вишиванка",
     "price": 600,
     "main_category": "accessories",
     "sub_type": "tie",
@@ -169,14 +209,17 @@
   },
   {
     "name": "Краватка атласна",
+    "search_name": "краватка атласна",
     "price": 500,
     "main_category": "accessories",
     "sub_type": "tie",
     "stock": 40,
-    "product_code": "3029"
+    "product_code": "3029",
+    "dance_program": "LAT"
   },
   {
     "name": "Краватка вишиванка",
+    "search_name": "краватка вишиванка",
     "price": 700,
     "main_category": "accessories",
     "sub_type": "tie",
@@ -185,6 +228,7 @@
   },
   {
     "name": "Ремінь шкіряний",
+    "search_name": "ремінь шкіряний",
     "price": 1200,
     "main_category": "accessories",
     "sub_type": "belt",
@@ -193,14 +237,16 @@
   },
   {
     "name": "Регулювання довжини ременя",
+    "search_name": "регулювання довжини ременя",
     "price": 350,
     "main_category": "accessories",
-    "sub_type": "service",
+    "sub_type": "other",
     "stock": 100,
     "product_code": "3044"
   },
   {
     "name": "Магніти для кріплення номеру",
+    "search_name": "магніти для кріплення номеру",
     "price": 290,
     "main_category": "accessories",
     "sub_type": "other",
@@ -209,6 +255,7 @@
   },
   {
     "name": "Шкарпетки чоловічі",
+    "search_name": "шкарпетки чоловічі",
     "price": 100,
     "main_category": "accessories",
     "sub_type": "socks",
@@ -217,6 +264,7 @@
   },
   {
     "name": "Хустинка нагрудна фрачна",
+    "search_name": "хустинка нагрудна фрачна",
     "price": 650,
     "main_category": "accessories",
     "sub_type": "other",
@@ -225,6 +273,7 @@
   },
   {
     "name": "Метелик фрачний",
+    "search_name": "метелик фрачний",
     "price": 1100,
     "main_category": "accessories",
     "sub_type": "tie",
@@ -233,6 +282,7 @@
   },
   {
     "name": "Пояс до фраку",
+    "search_name": "пояс до фраку",
     "price": 1300,
     "main_category": "accessories",
     "sub_type": "belt",
@@ -241,6 +291,7 @@
   },
   {
     "name": "Комірець фрачний",
+    "search_name": "комірець фрачний",
     "price": 1100,
     "main_category": "accessories",
     "sub_type": "other",
