@@ -11,31 +11,48 @@ module.exports = {
       },
       name: {
         type: Sequelize.STRING,
+        allowNull: false,
       },
-      // Змінюємо тут:
+      search_name: {
+        type: Sequelize.TEXT,
+        allowNull: false,
+      },
       product_code: {
-        type: Sequelize.STRING, // Краще STRING, щоб зберегти провідні нулі, якщо вони будуть
-        unique: true, // Код товару має бути унікальним
+        type: Sequelize.STRING,
+        unique: true,
+        allowNull: false,
       },
       price: {
         type: Sequelize.DECIMAL(10, 2),
         allowNull: false,
         defaultValue: 0.0,
       },
-      category: {
+      dance_program: {
         type: Sequelize.STRING,
-        allowNull: true,
+        allowNull: true, // Это позволит базе принимать NULL, если программы нет
+      },
+      // Заменяем старую категорию на новую структуру
+      main_category: {
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
+      sub_type: {
+        type: Sequelize.STRING,
+        allowNull: false,
       },
       stock: {
         type: Sequelize.INTEGER,
+        allowNull: false,
+        defaultValue: 0,
       },
       imageUrl: {
         type: Sequelize.STRING,
+        allowNull: true,
       },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,
-        defaultValue: Sequelize.fn("now"), // Додаємо default, щоб сиди не падали
+        defaultValue: Sequelize.fn("now"),
       },
       updatedAt: {
         allowNull: false,

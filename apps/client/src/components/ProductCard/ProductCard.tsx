@@ -1,18 +1,23 @@
-export const ProductCard = () => {
+import type { ProductInput } from "@project/shared"; // Или твой тип продукта
+interface ProductCardProps {
+  product: ProductInput;
+}
+
+export const ProductCard = ({ product }: ProductCardProps) => {
   return (
     <div className="group relative flex flex-col cursor-pointer opacity-0 animate-reveal-up delay-100">
       <div className="relative aspect-[3/4] w-full overflow-hidden rounded-[2rem] bg-stone-200 border border-stone-200/60">
         <div className="absolute inset-0 overflow-hidden">
           <img
-            src="src/assets/b1.jpg"
-            alt="Силуэт Aria"
+            src={product.imageUrl ?? ""}
+            alt={product.name}
             className="w-full h-full object-cover scale-100 group-hover:scale-110 transition-transform duration-1000 ease-[cubic-bezier(0.25,1,0.5,1)]"
           />
         </div>
 
         <div className="absolute top-5 left-5 z-20 flex gap-2">
           <span className="rounded-full bg-white/90 backdrop-blur-md px-3 py-1 text-[10px] font-semibold uppercase tracking-widest text-stone-900 shadow-sm border border-stone-200">
-            База
+            {product.main_category === "clothing" ? "Одяг" : "База"}
           </span>
         </div>
 
@@ -28,15 +33,15 @@ export const ProductCard = () => {
       <div className="mt-5">
         <div className="flex justify-between items-start gap-4">
           <h3 className="text-sm font-semibold tracking-tight text-stone-900 group-hover:text-stone-500 transition-colors">
-            Силуэт "Aria" Латина
+            {product.name}
           </h3>
           <p className="text-sm font-semibold text-stone-900 whitespace-nowrap">
-            от 15 500 ₴
+            {product.price.toLocaleString()} ₴
           </p>
         </div>
         <div className="mt-2 flex items-center justify-between">
           <span className="text-xs font-semibold text-stone-400 uppercase tracking-widest border-b border-stone-300 border-dashed">
-            По меркам
+            {product.sub_type}
           </span>
         </div>
       </div>

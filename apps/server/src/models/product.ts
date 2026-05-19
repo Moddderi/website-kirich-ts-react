@@ -15,9 +15,16 @@ class Product extends Model<
   // CreationOptional говорит TS, что при создании записи эти поля можно не передавать (их заполнит БД)
   declare id: CreationOptional<number>;
   declare name: string;
+  declare search_name: string;
   declare price: number;
   declare imageUrl: string;
   declare product_code: string;
+
+  declare main_category: string;
+  declare sub_type: string;
+  declare stock: number;
+
+  declare dance_program: CreationOptional<string | null>;
 
   // Даты тоже обычно генерирует БД автоматически
   declare createdAt: CreationOptional<Date>;
@@ -44,6 +51,10 @@ export default (sequelize: Sequelize) => {
         type: DataTypes.STRING,
         allowNull: false,
       },
+      search_name: {
+        type: DataTypes.TEXT,
+        allowNull: false,
+      },
       price: {
         type: DataTypes.DECIMAL(10, 2),
         allowNull: false,
@@ -57,6 +68,23 @@ export default (sequelize: Sequelize) => {
         type: DataTypes.STRING,
         allowNull: false, // или true, если не у всех товаров есть код
         unique: true, // обычно коды товаров уникальны
+      },
+      dance_program: {
+        type: DataTypes.STRING,
+        allowNull: true, // Это позволит базе принимать NULL, если программы нет
+      },
+      main_category: {
+        type: DataTypes.STRING,
+        allowNull: false, // Обязательно для фильтрации
+      },
+      sub_type: {
+        type: DataTypes.STRING,
+        allowNull: false, // Обязательно для фильтрации
+      },
+      stock: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        defaultValue: 0,
       },
 
       createdAt: DataTypes.DATE,

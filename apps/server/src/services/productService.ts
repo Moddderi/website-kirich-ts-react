@@ -1,31 +1,48 @@
-// 1. Фикс ошибки 7016: Импортируем из index, где собраны все модели
-// Мы используем путь к index.js (TS сам поймет, что нужно брать .ts исходник)
 import db from "../models/index.js";
+import { FilterInput } from "@project/shared";
+import { Op } from "sequelize"; // Импортируем операторы для фильтрации
 
-// Извлекаем модель из объекта db
-const { Product } = db;
+const { Product, sequelize } = db;
 
-export const getProductById = async (id: number) => {
-  // 2. Фикс ошибки 7006: добавили тип :number
+export const getAllProducts = async (filters?: FilterInput) => {
   try {
-    const product = await Product.findByPk(id);
-    return product;
-  } catch (error: unknown) {
-    // 3. Фикс ошибки 18046: обрабатываем unknown
-    if (error instanceof Error) {
-      console.error("Ошибка при получении продукта:", error.message);
-    }
-    throw error;
-  }
-};
+    const where: any = {};
 
-export const getAllProducts = async () => {
-  try {
-    return await Product.findAll();
-  } catch (error: unknown) {
-    if (error instanceof Error) {
-      console.error("Ошибка при получении списка:", error.message);
+    if (filters) {
+      // 1. Обычные фильтры (если они есть)
+      if (filters.main_category) where.main_category = filters.main_category;
+      if (filters.sub_type) where.sub_type = filters.sub_type;
+      if (filters.dance_program) where.dance_program = filters.dance_program;
+
+      // 2. Фильтр цен
+      if (filters.minPrice !== undefined || filters.maxPrice !== undefined) {
+        where.price = {};
+        if (filters.minPrice !== undefined)
+          where.price[Op.gte] = filters.minPrice;
+        if (filters.maxPrice !== undefined)
+          where.price[Op.lte] = filters.maxPrice;
+      }
+
+      // 3. Поиск (добавляем через Op.and, чтобы он не затирал другие фильтры)
+      if (filters?.search) {
+        // Важно: переводим поисковый запрос в нижний кейс
+        const s = filters.search.toLowerCase().trim();
+
+        where[Op.and] = [
+          {
+            [Op.or]: [
+              // Ищем по нормализованной колонке search_name
+              { search_name: { [Op.like]: `%${s}%` } },
+              { product_code: { [Op.like]: `%${s}%` } },
+            ],
+          },
+        ];
+      }
     }
+
+    return await Product.findAll({ where });
+  } catch (error) {
+    console.error("Ошибка при получении списка:", error);
     throw error;
   }
 };
