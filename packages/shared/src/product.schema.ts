@@ -64,3 +64,5 @@ export type ProductInput = z.infer<typeof ProductSchema>;
 export type IdParamInput = z.infer<typeof IdParamSchema>;
 // Также полезно экспортировать тип фильтров для фронтенда
 export type FilterInput = z.infer<typeof FilterSchema>;
+
+export type Product = ProductInput & { id: number };

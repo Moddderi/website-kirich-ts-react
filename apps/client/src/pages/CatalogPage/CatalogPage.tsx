@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { getProducts } from "../../api/productApi";
 import { CatalogFilters } from "../../components/CatalogFilters/CatalogFilters";
 import { ProductCard } from "../../components/ProductCard/ProductCard";
-import type { FilterInput, ProductInput } from "@project/shared";
+import type { FilterInput, Product } from "@project/shared";
 
 // 2. Импорт рантайм-объектов (твои Zod-схемы/энумы)
 import {
@@ -12,6 +12,7 @@ import {
 } from "@project/shared"; // Импортируем энумы для валидации типов
 import { useDebounce } from "use-debounce";
 import { useSearchParams } from "react-router-dom";
+import { Breadcrumbs } from "../../components/Breadcrumbs/Breadcrumbs";
 
 const ProductSkeleton = () => (
   <div className="animate-pulse">
@@ -77,8 +78,11 @@ export const CatalogPage = () => {
 
   return (
     <main className="grow pb-32">
-      <CatalogFilters filters={filters} setFilters={setFilters} />
+      <div className="flex justify-center"></div>
+
       <section className="mx-auto max-w-7xl px-6 lg:px-8 mt-12">
+        <Breadcrumbs />
+        <CatalogFilters filters={filters} setFilters={setFilters} />
         <div
           className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-16 transition-opacity duration-300 ${
             isPlaceholderData ? "opacity-50 pointer-events-none" : "opacity-100"
@@ -87,7 +91,7 @@ export const CatalogPage = () => {
           {isLoading && !isPlaceholderData ? (
             [...Array(8)].map((_, i) => <ProductSkeleton key={i} />)
           ) : products.length > 0 ? (
-            products.map((item: ProductInput) => (
+            products.map((item: Product) => (
               <ProductCard key={item.product_code} product={item} />
             ))
           ) : (

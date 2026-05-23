@@ -113,7 +113,7 @@ export const CatalogFilters = ({
       </div>
 
       {/* НИЖНИЙ РЯД: ДИНАМИЧЕСКИЕ ПОДТИПЫ И ПОИСК */}
-      <div className="flex flex-wrap items-center justify-center gap-2.5 w-full max-w-5xl px-4 text-center">
+      <div className="flex flex-wrap items-center justify-center gap-2.5 w-full max-w-5xl px-4 text-center pb-8">
         {/* Рендерим кнопки только если есть подтипы для текущего выбора */}
         {currentSubTypes.length > 0 && (
           <div className="flex flex-wrap items-center justify-center gap-2">

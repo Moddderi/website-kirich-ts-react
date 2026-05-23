@@ -1,11 +1,19 @@
-import type { ProductInput } from "@project/shared"; // Или твой тип продукта
+import type { Product } from "@project/shared"; // Или твой тип продукта
+import { Link } from "react-router-dom";
+
 interface ProductCardProps {
-  product: ProductInput;
+  product: Product;
 }
 
 export const ProductCard = ({ product }: ProductCardProps) => {
+  const productId = product.id || product.product_code;
+
   return (
-    <div className="group relative flex flex-col cursor-pointer opacity-0 animate-reveal-up delay-100">
+    <Link
+      to={`/catalog/${productId}`}
+      className="group relative flex flex-col cursor-pointer opacity-0 animate-reveal-up delay-100 block"
+    >
+      {/* ИЗОБРАЖЕНИЕ И КНОПКА КОРЗИНЫ */}
       <div className="relative aspect-[3/4] w-full overflow-hidden rounded-[2rem] bg-stone-200 border border-stone-200/60">
         <div className="absolute inset-0 overflow-hidden">
           <img
@@ -15,21 +23,28 @@ export const ProductCard = ({ product }: ProductCardProps) => {
           />
         </div>
 
+        {/* Категория (Одяг / База) */}
         <div className="absolute top-5 left-5 z-20 flex gap-2">
           <span className="rounded-full bg-white/90 backdrop-blur-md px-3 py-1 text-[10px] font-semibold uppercase tracking-widest text-stone-900 shadow-sm border border-stone-200">
             {product.main_category === "clothing" ? "Одяг" : "База"}
           </span>
         </div>
 
+        {/* Затемнение при наведении */}
         <div className="absolute inset-0 bg-stone-900/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-10 backdrop-blur-[2px]"></div>
+
+        {/* Анимированная кнопка выплывания */}
         <div className="absolute inset-x-5 bottom-5 z-20 translate-y-8 opacity-0 transition-all duration-500 ease-out group-hover:translate-y-0 group-hover:opacity-100">
-          <button className="w-full rounded-xl bg-stone-900 px-5 py-3 text-xs font-semibold uppercase tracking-widest text-white shadow-xl hover:bg-stone-800 transition-colors duration-300 active:scale-95 flex items-center justify-center gap-2">
-            {/* <iconify-icon icon="solar:ruler-linear" width="16"></iconify-icon> */}
-            Додати в кошик
+          <button
+            // Вешаем изолированный обработчик
+            className="w-full rounded-xl bg-stone-900 px-5 py-3 text-xs font-semibold uppercase tracking-widest text-white shadow-xl hover:bg-stone-800 transition-colors duration-300 active:scale-95 flex items-center justify-center gap-2"
+          >
+            Додати в вподобане
           </button>
         </div>
       </div>
 
+      {/* ИНФОРМАЦИЯ О ТОВАРЕ */}
       <div className="mt-5">
         <div className="flex justify-between items-start gap-4">
           <h3 className="text-sm font-semibold tracking-tight text-stone-900 group-hover:text-stone-500 transition-colors">
@@ -45,6 +60,6 @@ export const ProductCard = ({ product }: ProductCardProps) => {
           </span>
         </div>
       </div>
-    </div>
+    </Link>
   );
 };
