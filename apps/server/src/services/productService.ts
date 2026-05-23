@@ -46,3 +46,17 @@ export const getAllProducts = async (filters?: FilterInput) => {
     throw error;
   }
 };
+
+export const getProductById = async (id: string | number) => {
+  try {
+    // Используем встроенный метод Sequelize для поиска по Primary Key (ID)
+    const product = await Product.findByPk(id);
+
+    return product;
+    // Если товар не найден, Sequelize вернет null.
+    // Контроллер сам решит, отдавать ли 404 ошибку.
+  } catch (error) {
+    console.error(`Ошибка при получении товара по ID (${id}):`, error);
+    throw error;
+  }
+};

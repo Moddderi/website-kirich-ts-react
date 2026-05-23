@@ -10,6 +10,7 @@ import { BiSpa } from "react-icons/bi";
 import { FaArrowsAltV } from "react-icons/fa";
 import { RiShieldStarLine } from "react-icons/ri";
 import { GoArrowUpRight } from "react-icons/go";
+import { Link } from "react-router-dom";
 
 export const MainPage = () => {
   return (
@@ -170,13 +171,13 @@ export const MainPage = () => {
                   </div>
                 </div>
 
-                <a
-                  href="#"
+                <Link
+                  to="/catalog"
                   className="mt-8 flex w-full items-center justify-center gap-3 rounded-xl bg-white px-8 py-4 text-sm font-bold text-stone-900  hover:bg-stone-400  transition-all duration-300"
                 >
                   Каталог Bespoke
                   {/* <iconify-icon icon="solar:arrow-right-linear" width="18" class="transform group-hover/btn:translate-x-1 transition-transform"></iconify-icon> */}
-                </a>
+                </Link>
               </div>
             </div>
 
@@ -231,13 +232,13 @@ export const MainPage = () => {
                   </div>
                 </div>
 
-                <a
-                  href="#"
+                <Link
+                  to="/individual-tailoring"
                   className="mt-8 flex w-full items-center justify-center gap-3 rounded-xl bg-white px-8 py-4 text-sm font-bold text-stone-900  hover:bg-stone-400  transition-all duration-300"
                 >
-                  Каталог Bespoke
+                  Індивідуальне пошиття
                   {/* <iconify-icon icon="solar:arrow-right-linear" width="18" class="transform group-hover/btn:translate-x-1 transition-transform"></iconify-icon> */}
-                </a>
+                </Link>
               </div>
             </div>
           </div>
