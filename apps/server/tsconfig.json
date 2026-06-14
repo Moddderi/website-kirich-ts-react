@@ -4,10 +4,7 @@
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
     "outDir": "./dist",
-
-    /*rootDir указываем на корень всего проекта (на два уровня выше), 
-      чтобы захватить и сервер, и общие пакеты */
-    "rootDir": "../../",
+    "rootDir": "./", // <-- Компилируем относительно папки сервера
 
     "strict": true,
     "esModuleInterop": true,
@@ -16,8 +13,8 @@
     "ignoreDeprecations": "5.0",
 
     "paths": {
-      "@project/shared": ["./../../packages/shared/index.ts"]
+      "@project/shared": ["../../packages/shared/src"] // <-- Путь к исходникам shared
     }
   },
-  "include": ["src/**/*", "../../packages/shared/index.ts"]
+  "include": ["src/**/*", "../../packages/shared/src/**/*"] // <-- Захватываем файлы shared
 }
