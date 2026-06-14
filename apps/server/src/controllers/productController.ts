@@ -4,15 +4,12 @@ import { FilterSchema } from "@project/shared"; // Путь к твоему shar
 
 export const getAllProducts = async (req: Request, res: Response) => {
   try {
-    // 1. Валидируем query-параметры с помощью Zod
     const filters = FilterSchema.parse(req.query);
 
-    // 2. Передаем валидные фильтры в сервис
     const products = await productService.getAllProducts(filters);
 
     return res.json(products);
   } catch (error: any) {
-    // Если Zod выдаст ошибку валидации, можно вернуть 400
     if (error.name === "ZodError") {
       return res.status(400).json({ error: error.errors });
     }
