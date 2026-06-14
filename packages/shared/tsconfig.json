@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "outDir": "./dist",
+    "rootDir": "./",
+    "declaration": true, // Обязательно для генерации .d.ts файлов типов
+    "composite": true, // Включаем режим проектных ссылок TypeScript
+    "skipLibCheck": true
+  },
+  "include": ["src/**/*", "index.ts"]
+}

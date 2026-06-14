@@ -8,7 +8,7 @@
   "scripts": {
     "dev": "npm run dev --workspaces --if-present",
     "build": "npm run build --workspaces --if-present",
-    "build:server": "npm run build --workspace=apps/server",
+    "build:server": "tsc -b apps/server/tsconfig.json",
     "start:server": "npm run start --workspace=apps/server"
   },
   "dependencies": {

@@ -4,7 +4,7 @@
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
     "outDir": "./dist",
-    "rootDir": "./", // <-- Компилируем относительно папки сервера
+    "rootDir": "./src", // Строго папка исходников самого сервера
 
     "strict": true,
     "esModuleInterop": true,
@@ -13,8 +13,11 @@
     "ignoreDeprecations": "5.0",
 
     "paths": {
-      "@project/shared": ["../../packages/shared/src"] // <-- Путь к исходникам shared
+      "@project/shared": ["../../packages/shared"] // Ссылка на корень пакета
     }
   },
-  "include": ["src/**/*", "../../packages/shared/src/**/*"] // <-- Захватываем файлы shared
+  "include": ["src/**/*"], // Только исходники сервера
+  "references": [
+    { "path": "../../packages/shared" } // Связываем проекты
+  ]
 }
