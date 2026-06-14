@@ -15,3 +15,10 @@ export const getProducts = async (filters?: FilterInput) => {
   });
   return data;
 };
+
+// Обязательно добавь export, чтобы ESLint понял, что она будет использоваться
+// Обязательно добавь export, чтобы ESLint понял, что она будет использоваться
+export const getProductById = async (id: string | number) => {
+  const { data } = await axios.get(`${API_URL}/products/${id}`);
+  return data;
+};

@@ -12,7 +12,7 @@ import { IoBagHandleOutline } from "react-icons/io5";
 import { GrFavorite } from "react-icons/gr";
 import { IoIosArrowDown, IoMdClose } from "react-icons/io";
 
-const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5005";
+import { getProductById } from "../../api/productApi"; // импорт твоего файла
 
 const AVAILABLE_COLORS = [
   { id: "black", hex: "#000000", label: "Черный" },
@@ -22,17 +22,9 @@ const AVAILABLE_COLORS = [
 
 const AVAILABLE_SIZES = ["XS", "S", "M", "L", "XL"];
 
-const fetchProductData = async (productId: string): Promise<Product> => {
-  const res = await fetch(`${BASE_URL}/api/products/${productId}`);
-  if (!res.ok) throw new Error("Товар не найден");
-  return res.json();
-};
-
 export const ProductPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-
-  // Инициализируем Redux-диспетчер строго НА САМОМ ВЕРХУ компонента
   const dispatch = useAppDispatch();
 
   // Локальный стейт
@@ -40,14 +32,14 @@ export const ProductPage: React.FC = () => {
   const [selectedSize, setSelectedSize] = useState<string>("M");
   const [isSizeChartOpen, setIsSizeChartOpen] = useState<boolean>(false);
 
-  // Запрос данных
+  // ИСПОЛЬЗУЕМ getProductById ВМЕСТО fetchProductData
   const {
     data: product,
     isLoading,
     error,
   } = useQuery<Product, Error>({
     queryKey: ["productFull", id],
-    queryFn: () => fetchProductData(id!),
+    queryFn: () => getProductById(id!), // Теперь вызываем чистую функцию
     enabled: !!id,
     staleTime: 1000 * 60 * 10,
   });

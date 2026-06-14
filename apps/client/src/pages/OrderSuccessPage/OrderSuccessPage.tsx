@@ -1,8 +1,8 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { Breadcrumbs } from "../../components/Breadcrumbs/Breadcrumbs";
+import { getOrderById } from "../../api/orderApi";
 
-const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5005";
 interface OrderItem {
   id?: string;
   productId: string;
@@ -27,24 +27,19 @@ interface OrderData {
   items: OrderItem[];
 }
 
-const fetchOrderDetails = async (orderId: string): Promise<OrderData> => {
-  const res = await fetch(`${BASE_URL}/api/orders/${orderId}`);
-  if (!res.ok) throw new Error("Заказ не найден");
-  const result = await res.json();
-  return result.data;
-};
-
 export const OrderSuccessPage = () => {
   const { orderId } = useParams<{ orderId: string }>();
   const navigate = useNavigate();
 
+  // Мы указываем, что queryFn возвращает объект с полем data,
+  // внутри которого лежит наш OrderData.
   const {
     data: order,
     isLoading,
     error,
-  } = useQuery<OrderData, Error>({
+  } = useQuery<{ data: OrderData }, Error>({
     queryKey: ["orderDetails", orderId],
-    queryFn: () => fetchOrderDetails(orderId || ""),
+    queryFn: () => getOrderById(orderId || ""),
     enabled: !!orderId,
     staleTime: 1000 * 60 * 5,
   });
@@ -52,30 +47,32 @@ export const OrderSuccessPage = () => {
   if (isLoading) {
     return (
       <div className="flex min-h-[60vh] items-center justify-center text-stone-500 font-medium text-sm">
-        Загрузка деталей заказа...
+        Завантаження деталей замовлення...
       </div>
     );
   }
 
-  if (error || !order) {
+  // Теперь используем order.data для доступа к объекту
+  if (error || !order || !order.data) {
     return (
       <div className="flex min-h-[60vh] flex-col items-center justify-center gap-4 text-center">
         <p className="text-stone-900 font-semibold text-lg">
-          Заказ не найден или произошла ошибка.
+          Замовлення не знайдено або сталася помилка.
         </p>
         <button
           onClick={() => navigate("/")}
           className="text-sm font-semibold underline text-stone-500 hover:text-stone-900"
         >
-          Вернуться на главную
+          Повернутися на головну
         </button>
       </div>
     );
   }
 
-  // Избавляемся от 'any' при расчете суммы
+  const orderData = order.data;
+
   const itemsTotal =
-    order.items?.reduce(
+    orderData.items?.reduce(
       (acc: number, item: OrderItem) =>
         acc + Number(item.price) * item.quantity,
       0,
@@ -109,40 +106,38 @@ export const OrderSuccessPage = () => {
           </div>
 
           <h1 className="text-4xl sm:text-5xl font-semibold tracking-tighter text-stone-900 mb-6">
-            Заказ успешно передан
+            Замовлення оформлено
           </h1>
 
           <p className="text-lg font-medium text-stone-500 max-w-lg mb-8 leading-relaxed">
-            Рады сообщить, {order.firstName}, что ваши мерки и детали заказа
-            успешно переданы в наше ателье. Наш менеджер свяжется с вами в
-            ближайшее время.
+            Раді повідомити, {orderData.firstName}, ваше замовлення успішно
+            передано. Менеджер зв'яжеться з вами найближчим часом.
           </p>
 
           <button
             onClick={() => navigate("/")}
             className="mt-12 rounded-2xl border border-stone-200 bg-transparent px-8 py-4 text-sm font-semibold uppercase tracking-widest text-stone-900 hover:bg-stone-50 transition-all duration-300 active:scale-95 flex items-center justify-center gap-2 cursor-pointer"
           >
-            Вернуться в каталог
+            Повернутися в каталог
           </button>
         </div>
 
-        {/* ПРАВАЯ КОЛОНКА: ДЕТАЛИ И ШАГИ */}
+        {/* ПРАВАЯ КОЛОНКА: ДЕТАЛИ */}
         <div className="mt-10 px-2 sm:px-0 lg:mt-0 lg:col-span-5 relative">
           <div className="sticky top-32">
             <div className="mb-8 p-6 sm:p-8 rounded-4xl bg-white border border-stone-200/60 shadow-sm">
               <h2 className="text-sm font-semibold tracking-widest uppercase text-stone-900 mb-6 flex items-center justify-between">
-                <span>Детали заказа</span>
+                <span>Деталі замовлення</span>
                 <span className="text-xs font-medium text-stone-400 normal-case tracking-normal">
-                  {new Date(order.createdAt).toLocaleDateString("ru-RU", {
+                  {new Date(orderData.createdAt).toLocaleDateString("uk-UA", {
                     day: "numeric",
                     month: "long",
                   })}
                 </span>
               </h2>
 
-              {/* ИСПРАВЛЕНО И КЛАССЫ ОБНОВЛЕНЫ: max-h-87.5 и OrderItem тип */}
               <div className="space-y-6 pb-6 border-b border-stone-100 max-h-87.5 overflow-y-auto pr-1">
-                {order.items?.map((item: OrderItem, idx: number) => (
+                {orderData.items?.map((item: OrderItem, idx: number) => (
                   <div key={item.id || idx} className="flex gap-5">
                     <div className="flex flex-col justify-center gap-1">
                       <h3 className="text-sm font-semibold text-stone-900 leading-tight">
@@ -153,13 +148,13 @@ export const OrderSuccessPage = () => {
                       </h3>
                       {item.color && (
                         <p className="text-xs font-medium text-stone-500">
-                          Цвет:{" "}
+                          Колір:{" "}
                           <span className="text-stone-900">{item.color}</span>
                         </p>
                       )}
                       {item.size && (
                         <p className="text-xs font-medium text-stone-500">
-                          Размер / Пошив:{" "}
+                          Розмір:{" "}
                           <span className="text-stone-900">{item.size}</span>
                         </p>
                       )}
@@ -171,10 +166,9 @@ export const OrderSuccessPage = () => {
                 ))}
               </div>
 
-              {/* СТОИМОСТЬ СУММАРНО */}
               <div className="space-y-4 pt-6 mb-6">
                 <div className="flex justify-between text-sm font-medium text-stone-500">
-                  <span>Стоимость товаров</span>
+                  <span>Товари</span>
                   <span className="text-stone-900">
                     {itemsTotal.toLocaleString()} ₴
                   </span>
@@ -182,73 +176,21 @@ export const OrderSuccessPage = () => {
                 <div className="flex justify-between text-sm font-medium text-stone-500">
                   <span>Доставка</span>
                   <span className="text-stone-900">
-                    {order.deliveryMethod === "pickup"
-                      ? "Самовывоз"
-                      : "По тарифам НП"}
+                    {orderData.deliveryMethod === "pickup"
+                      ? "Самовивіз"
+                      : "За тарифами НП"}
                   </span>
                 </div>
               </div>
 
               <div className="flex justify-between items-center pt-6 border-t border-stone-100">
                 <span className="text-sm font-semibold uppercase tracking-widest text-stone-900">
-                  Итого
+                  Всього
                 </span>
                 <span className="text-2xl font-semibold text-stone-900">
-                  {Number(order.totalAmount).toLocaleString()} ₴
+                  {Number(orderData.totalAmount).toLocaleString()} ₴
                 </span>
               </div>
-            </div>
-
-            {/* СПОЙЛЕРЫ С ИНСТРУКЦИЯМИ */}
-            <div className="border-t border-stone-200/60 divide-y divide-stone-200/60">
-              <details className="group py-5" open>
-                <summary className="flex cursor-pointer items-center justify-between text-sm font-semibold tracking-tight text-stone-900 marker:content-none select-none">
-                  Следующие шаги
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    strokeWidth={2}
-                    stroke="currentColor"
-                    className="w-4 h-4 text-stone-400 group-open:rotate-180 transition-transform duration-200"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="m19.5 8.25-7.5 7.5-7.5-7.5"
-                    />
-                  </svg>
-                </summary>
-                <div className="mt-4 text-sm font-medium text-stone-500 leading-relaxed pr-8 animate-fade-in">
-                  Менеджер свяжется с вами для подтверждения заказа. После
-                  внесения предоплаты 50% мы приступаем к пошиву. Срок
-                  изготовления — 10-14 дней.
-                </div>
-              </details>
-
-              <details className="group py-5">
-                <summary className="flex cursor-pointer items-center justify-between text-sm font-semibold tracking-tight text-stone-900 marker:content-none select-none">
-                  Поддержка
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    strokeWidth={2}
-                    stroke="currentColor"
-                    className="w-4 h-4 text-stone-400 group-open:rotate-180 transition-transform duration-200"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="m19.5 8.25-7.5 7.5-7.5-7.5"
-                    />
-                  </svg>
-                </summary>
-                <div className="mt-4 text-sm font-medium text-stone-500 leading-relaxed pr-8 animate-fade-in">
-                  Если у вас остались вопросы, вы можете связаться с нами в
-                  Telegram или по телефону, указанному внизу страницы.
-                </div>
-              </details>
             </div>
           </div>
         </div>

@@ -6,11 +6,10 @@ import { useAppDispatch, useAppSelector } from "../../store/store";
 import { clearCart } from "../../store/cartSlice";
 import { IoIosArrowForward } from "react-icons/io";
 import { FaTelegramPlane, FaInstagram } from "react-icons/fa";
+import { createOrder } from "../../api/orderApi";
 
 import { checkoutSchema } from "@project/shared";
 import type { CheckoutFormValues } from "@project/shared";
-
-const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5005";
 
 export const CheckoutPage = () => {
   const navigate = useNavigate();
@@ -61,7 +60,6 @@ export const CheckoutPage = () => {
 
     setIsSubmitting(true);
 
-    // Формируем payload, полностью совместимый с обновленной моделью
     const orderPayload = {
       customer: {
         firstName: data.firstName,
@@ -75,11 +73,8 @@ export const CheckoutPage = () => {
         warehouse: data.deliveryMethod === "nova_poshta" ? data.warehouse : "-",
       },
       payment: data.paymentMethod,
-
-      // Поля для связи менеджера с клиентом через соцсети
       communicationMethod: data.communicationMethod,
       socialUsername: data.socialUsername,
-
       items: cartItems.map((item) => ({
         productId: item.productId,
         name: item.name,
@@ -92,40 +87,28 @@ export const CheckoutPage = () => {
     };
 
     try {
-      const response = await fetch(`${BASE_URL}/api/orders`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(orderPayload),
-      });
+      // Передаем payload напрямую
+      const result = await createOrder(
+        orderPayload as unknown as CheckoutFormValues,
+      );
 
-      const result = await response.json();
-
-      if (response.ok && result.success) {
+      if (result.success) {
         dispatch(clearCart());
-
         const orderUuid = result.data?.id || result.orderId;
 
-        if (!orderUuid) {
-          console.error(
-            "Бэкенд не вернул идентификатор заказа. Ответ сервера:",
-            result,
-          );
-          alert(
-            "Заказ создан, но не удалось получить его номер для отображения.",
-          );
+        if (orderUuid) {
+          navigate(`/order-success/${orderUuid}`);
+        } else {
           navigate("/");
-          return;
         }
-
-        navigate(`/order-success/${orderUuid}`);
-      } else {
-        alert(result.message || "Сталася помилка при збереженні замовлення.");
       }
-    } catch (error) {
+    } catch (err: unknown) {
+      // Типизируем ошибку правильно
+      const error = err as { response?: { data?: { message: string } } };
       console.error("Network error:", error);
-      alert("Не вдалося з'єднатися з сервером. Перевірте підключення.");
+      alert(
+        error.response?.data?.message || "Не вдалося з'єднатися з сервером.",
+      );
     } finally {
       setIsSubmitting(false);
     }
