@@ -68,15 +68,15 @@ export const createOrder = async (payload: CreateOrderPayload) => {
 
     //NOTE: Логика отправки тг сообщения
 
-    // try {
-    //   const fullOrder = await getOrderById(order.id);
+    try {
+      const fullOrder = await getOrderById(order.id);
 
-    //   if (fullOrder) {
-    //     sendTelegramNotification(fullOrder);
-    //   }
-    // } catch (tgError) {
-    //   console.error("Помилка відправки в ТГ:", tgError);
-    // }
+      if (fullOrder) {
+        sendTelegramNotification(fullOrder);
+      }
+    } catch (tgError) {
+      console.error("Помилка відправки в ТГ:", tgError);
+    }
 
     return order;
   } catch (error) {
