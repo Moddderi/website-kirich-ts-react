@@ -1,5 +1,3 @@
-import React from "react";
-
 export const IndividualTailoringPage = () => {
   return (
     // Контейнер, который центрирует карточку по горизонтали и вертикали
