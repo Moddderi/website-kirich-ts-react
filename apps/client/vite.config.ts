@@ -3,11 +3,11 @@ import react from "@vitejs/plugin-react";
 import path from "path";
 import tailwindcss from "@tailwindcss/vite";
 
-const repoName = "website-kirich-ts-react";
-
 // https://vite.dev/config/
 export default defineConfig({
-  base: `/${repoName}/`,
+  // Оставляем только одну base: "./", этого достаточно для Vercel
+  base: "./",
+
   plugins: [
     react({
       babel: {
@@ -21,6 +21,10 @@ export default defineConfig({
     alias: {
       "@": path.resolve(__dirname, "./src"),
       "@styles": path.resolve(__dirname, "./src/styles"),
+      "@project/shared": path.resolve(
+        __dirname,
+        "../../packages/shared/index.ts",
+      ),
     },
   },
 });

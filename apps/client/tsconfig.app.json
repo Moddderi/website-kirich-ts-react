@@ -26,7 +26,7 @@
 
     "ignoreDeprecations": "5.0",
     "paths": {
-      "@project/shared": ["./../../packages/shared/index.ts"]
+      "@project/shared": ["../../packages/shared/index.ts"]
     }
   },
 
