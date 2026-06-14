@@ -132,7 +132,7 @@ export const Header = () => {
             />
 
             {/* Панель меню — глубокое матовое стекло */}
-            <div className="relative w-full sm:w-[400px] max-w-full bg-stone-900/90 backdrop-blur-2xl h-full p-8 sm:p-10 flex flex-col justify-between shadow-[0_0_50px_rgba(0,0,0,0.5)] z-10 animate-reveal-up overflow-y-auto">
+            <div className="relative w-full sm:w-[400px] max-w-full bg-stone-900/90 backdrop-blur-2xl h-full p-8 pt-17 sm:p-10 flex flex-col justify-between shadow-[0_0_50px_rgba(0,0,0,0.5)] z-10 animate-reveal-up overflow-y-auto">
               {/* ВЕРХНЯЯ ЧАСТЬ: Навигация */}
               <div>
                 {/* Шапка меню */}
