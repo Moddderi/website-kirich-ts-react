@@ -23,12 +23,12 @@ export const ProductCard = ({ product }: ProductCardProps) => {
           />
         </div>
 
-        {/* Категория (Одяг / База) */}
+        {/* Категория (Одяг / База)
         <div className="absolute top-5 left-5 z-20 flex gap-2">
           <span className="rounded-full bg-white/90 backdrop-blur-md px-3 py-1 text-[10px] font-semibold uppercase tracking-widest text-stone-900 shadow-sm border border-stone-200">
             {product.main_category === "clothing" ? "Одяг" : "База"}
           </span>
-        </div>
+        </div> */}
 
         {/* Затемнение при наведении */}
         <div className="absolute inset-0 bg-stone-900/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-10 backdrop-blur-[2px]"></div>

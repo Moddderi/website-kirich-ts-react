@@ -1,0 +1,27 @@
+# Зависимости (скрываем во всех папках: в корне, в client и в server)
+node_modules/
+/node_modules
+apps/client/node_modules/
+apps/server/node_modules/
+
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+.env
+.env.local
+.env.*.local
+apps/server/.env
+
+dist/
+build/
+apps/client/dist/
+apps/server/dist/
+
+.DS_Store
+Thumbs.db
+
+.vscode/
+.idea/
