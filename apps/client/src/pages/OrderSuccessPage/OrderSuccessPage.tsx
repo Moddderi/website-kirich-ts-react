@@ -2,7 +2,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { Breadcrumbs } from "../../components/Breadcrumbs/Breadcrumbs";
 
-// 1. Описываем строгие интерфейсы вместо explicit any
+const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5005";
 interface OrderItem {
   id?: string;
   productId: string;
@@ -28,7 +28,7 @@ interface OrderData {
 }
 
 const fetchOrderDetails = async (orderId: string): Promise<OrderData> => {
-  const res = await fetch(`http://localhost:5005/api/orders/${orderId}`);
+  const res = await fetch(`${BASE_URL}/api/orders/${orderId}`);
   if (!res.ok) throw new Error("Заказ не найден");
   const result = await res.json();
   return result.data;

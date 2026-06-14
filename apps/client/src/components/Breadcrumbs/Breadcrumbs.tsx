@@ -5,6 +5,8 @@ import { useQuery } from "@tanstack/react-query";
 import { IoIosArrowForward } from "react-icons/io";
 import { GoHome } from "react-icons/go";
 
+const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5005";
+
 const routeLabels: Record<string, string> = {
   catalog: "Каталог",
   cart: "Кошик",
@@ -23,7 +25,7 @@ const isUUID = (str: string) =>
   );
 
 const fetchProductName = async (productId: string): Promise<string> => {
-  const res = await fetch(`http://localhost:5005/api/products/${productId}`);
+  const res = await fetch(`${BASE_URL}/api/products/${productId}`);
   if (!res.ok) throw new Error("Product not found");
   const data = await res.json();
   return data.name;

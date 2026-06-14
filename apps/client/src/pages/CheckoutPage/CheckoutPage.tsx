@@ -10,6 +10,8 @@ import { FaTelegramPlane, FaInstagram } from "react-icons/fa";
 import { checkoutSchema } from "@project/shared";
 import type { CheckoutFormValues } from "@project/shared";
 
+const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5005";
+
 export const CheckoutPage = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
@@ -90,7 +92,7 @@ export const CheckoutPage = () => {
     };
 
     try {
-      const response = await fetch("http://localhost:5005/api/orders", {
+      const response = await fetch(`${BASE_URL}/api/orders`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

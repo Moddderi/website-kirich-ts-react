@@ -12,6 +12,8 @@ import { IoBagHandleOutline } from "react-icons/io5";
 import { GrFavorite } from "react-icons/gr";
 import { IoIosArrowDown, IoMdClose } from "react-icons/io";
 
+const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5005";
+
 const AVAILABLE_COLORS = [
   { id: "black", hex: "#000000", label: "Черный" },
   { id: "burgundy", hex: "#8B0000", label: "Бордовый" },
@@ -21,7 +23,7 @@ const AVAILABLE_COLORS = [
 const AVAILABLE_SIZES = ["XS", "S", "M", "L", "XL"];
 
 const fetchProductData = async (productId: string): Promise<Product> => {
-  const res = await fetch(`http://localhost:5005/api/products/${productId}`);
+  const res = await fetch(`${BASE_URL}/api/products/${productId}`);
   if (!res.ok) throw new Error("Товар не найден");
   return res.json();
 };
