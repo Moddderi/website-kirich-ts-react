@@ -3,36 +3,40 @@ import { Link, useLocation } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { IoIosArrowForward } from "react-icons/io";
 import { GoHome } from "react-icons/go";
-
-// ИМПОРТИРУЕМ НАШ ЦЕНТРАЛИЗОВАННЫЙ МЕТОД
 import { getProductById } from "../../api/productApi";
 
 const routeLabels: Record<string, string> = {
   catalog: "Каталог",
   cart: "Кошик",
+  favorite: "Вподобання",
   "individual-tailoring": "Індивідуальне пошиття",
   checkout: "Оформлення замовлення",
   "order-success": "Замовлення оформлено",
   studio: "Студія",
   women: "Жінкам",
   latina: "Латина",
+  "step-1": "Вибір типу",
+  "step-2": "Зняття мірок",
+  "step-3": "Завершення",
+  "delivery-and-payment": "Доставка та оплата",
+  "privacy-policy": "Політика безпеки",
 };
 
-const isUUID = (str: string) =>
-  /^[0-9a-f]{8}-[0-9a-f]{4}-[4][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
-    str,
-  );
+const tailoringSteps = [
+  { path: "/individual-tailoring", label: "Індивідуальне пошиття" },
+  { path: "/individual-tailoring/step-1", label: "Вибір типу" },
+  { path: "/individual-tailoring/step-2", label: "Зняття мірок" },
+  { path: "/individual-tailoring/step-3", label: "Завершення" },
+];
 
 export const Breadcrumbs: React.FC = () => {
   const location = useLocation();
   const pathnames = location.pathname.split("/").filter((x) => x);
+
+  const isTailoringPath = location.pathname.includes("/individual-tailoring");
   const lastSegment = pathnames[pathnames.length - 1] || "";
+  const isDynamicProductParam = !!lastSegment && !routeLabels[lastSegment];
 
-  const isOrderSuccessPage = pathnames.includes("order-success");
-  const isDynamicProductParam =
-    !!lastSegment && !routeLabels[lastSegment] && !isOrderSuccessPage;
-
-  // ИСПОЛЬЗУЕМ getProductById
   const { data: product, isLoading } = useQuery({
     queryKey: ["productName", lastSegment],
     queryFn: () => getProductById(lastSegment),
@@ -44,56 +48,66 @@ export const Breadcrumbs: React.FC = () => {
 
   return (
     <nav className="flex items-center gap-2 mb-10 text-xs font-medium text-stone-500 select-none">
-      <Link
-        to="/"
-        className="flex items-center gap-1 transition-colors hover:text-stone-900"
-      >
+      <Link to="/" className="flex items-center gap-1 hover:text-stone-900">
         <GoHome size={14} className="text-stone-900" />
         Головна
       </Link>
-      <IoIosArrowForward className="text-stone-400 shrink-0" />
 
-      {pathnames.map((value, index) => {
-        const isLast = index === pathnames.length - 1;
-        const to = `/${pathnames.slice(0, index + 1).join("/")}`;
+      {isTailoringPath
+        ? tailoringSteps.map((step, index) => {
+            const currentIndex = tailoringSteps.findIndex(
+              (s) => s.path === location.pathname,
+            );
 
-        if (isOrderSuccessPage && isUUID(value)) return null;
+            // Скрываем будущие шаги
+            if (index > currentIndex) return null;
 
-        let label: string = routeLabels[value] || decodeURIComponent(value);
+            const isActive = index === currentIndex;
+            const isCompleted = currentIndex >= index;
 
-        if (value === "order-success" && pathnames[index + 1]) {
-          label = "Замовлення оформлено";
-        }
+            return (
+              <React.Fragment key={step.path}>
+                <IoIosArrowForward className="text-stone-400 shrink-0" />
+                {isActive ? (
+                  <span className="font-semibold text-stone-900">
+                    {step.label}
+                  </span>
+                ) : (
+                  <Link
+                    to={isCompleted ? step.path : "#"}
+                    className={`hover:text-stone-900 ${!isCompleted ? "pointer-events-none opacity-50" : ""}`}
+                  >
+                    {step.label}
+                  </Link>
+                )}
+              </React.Fragment>
+            );
+          })
+        : pathnames.map((value, index) => {
+            const to = `/${pathnames.slice(0, index + 1).join("/")}`;
+            const label =
+              routeLabels[value] ||
+              (isDynamicProductParam && index === pathnames.length - 1
+                ? isLoading
+                  ? "..."
+                  : product?.name
+                : decodeURIComponent(value));
 
-        // Берем имя из полученного объекта товара
-        if (isLast && isDynamicProductParam) {
-          label = isLoading ? "Завантаження..." : product?.name || label;
-        }
-
-        const isVisualLast =
-          isLast ||
-          (isOrderSuccessPage && index === pathnames.indexOf("order-success"));
-
-        return (
-          <React.Fragment key={to}>
-            {isVisualLast ? (
-              <span className="font-semibold text-stone-900 truncate max-w-[200px]">
-                {label}
-              </span>
-            ) : (
-              <>
-                <Link
-                  to={to}
-                  className="transition-colors hover:text-stone-900 whitespace-nowrap"
+            return (
+              <React.Fragment key={to}>
+                <IoIosArrowForward className="text-stone-400 shrink-0" />
+                <span
+                  className={
+                    index === pathnames.length - 1
+                      ? "font-semibold text-stone-900"
+                      : ""
+                  }
                 >
                   {label}
-                </Link>
-                <IoIosArrowForward className="text-stone-400 shrink-0" />
-              </>
-            )}
-          </React.Fragment>
-        );
-      })}
+                </span>
+              </React.Fragment>
+            );
+          })}
     </nav>
   );
 };

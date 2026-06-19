@@ -1,5 +1,6 @@
 import { FaInstagram } from "react-icons/fa";
 import { MdOutlineMailOutline } from "react-icons/md";
+import { Link } from "react-router-dom";
 
 export function Footer() {
   return (
@@ -160,15 +161,21 @@ export function Footer() {
             © {new Date().getFullYear()} K.I.RICH POLTAVA. Global Excellence.
           </p>
           <div className="mt-6 md:mt-0 flex gap-8 text-xs font-semibold text-stone-500 uppercase tracking-widest">
-            <a href="#" className="hover:text-white transition-colors">
-              Privacy
-            </a>
-            <a href="#" className="hover:text-white transition-colors">
-              Terms
-            </a>
+            <Link
+              to="delivery-and-payment"
+              className="hover:text-white transition-colors"
+            >
+              Доставка та оплата
+            </Link>
+            <Link
+              to="privacy-policy"
+              className="hover:text-white transition-colors"
+            >
+              Політика безпеки
+            </Link>
             <span className="flex items-center gap-1.5 text-stone-400">
               <span className="h-1.5 w-1.5 rounded-full bg-white animate-pulse"></span>
-              Designed in Ukraine
+              Створенно в Україні
             </span>
           </div>
         </div>

@@ -7,24 +7,29 @@ import { GiHamburgerMenu } from "react-icons/gi";
 import { IoMdClose } from "react-icons/io";
 import { MdFavoriteBorder } from "react-icons/md";
 
-import { useAppSelector } from "../../store/store"; // Проверь относительный путь до папки store
+import { useAppSelector } from "../../store/store";
 import type { CartItem } from "../../store/cartSlice";
+// Подключаем селектор для получения списка избранного (созданный ранее)
+import { selectFavoriteItems } from "../../store/favoriteSlice";
 
 export const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const closeMenu = () => setIsMenuOpen(false);
 
-  // Получаем массив товаров из Redux-стейта
+  // Получаем массив товаров из Redux-стейта корзины
   const cartItems = useAppSelector(
     (state: { cart: { items: CartItem[] } }) => state.cart.items,
   );
 
-  // Считаем общее количество вещей (суммируем quantity каждого товара)
+  // Считаем общее количество вещей в корзине
   const totalItemsCount = cartItems.reduce(
     (acc: number, item: CartItem) => acc + item.quantity,
     0,
   );
+
+  // Получаем список избранного для подсчета реального количества
+  const favoriteItems = useAppSelector(selectFavoriteItems);
 
   return (
     <>
@@ -32,7 +37,7 @@ export const Header = () => {
       <div className="bg-stone-900 p-4 px-4 py-2.5 text-center relative overflow-hidden group">
         <div className="absolute inset-0 opacity-20 bg-[linear-gradient(45deg,transparent_25%,rgba(255,255,255,0.2)_50%,transparent_75%,transparent_100%)] bg-[length:250px_250px] animate-[pulse_3s_linear_infinite] group-hover:bg-[length:300px_300px] transition-all duration-1000"></div>
         <p className="text-xs font-medium text-white tracking-widest relative z-10 uppercase animate-reveal-up">
-          Global Shipping. Створенно в Україні.
+          Global Shipping. Створено в Україні.
           <a
             href="#"
             className="underline underline-offset-4 decoration-stone-500 hover:decoration-white transition-colors ml-2"
@@ -90,12 +95,20 @@ export const Header = () => {
 
             {/* ИКОНКИ ДЕЙСТВИЙ */}
             <div className="flex items-center gap-6">
-              <button className="text-stone-400 hover:text-stone-900 transition-colors flex items-center relative transform hover:scale-110 duration-300 group">
+              {/* Ссылка на страницу избранного. При нажатии перенаправляет на /favorites */}
+              <Link
+                to="/favorite"
+                className="text-stone-400 hover:text-stone-900 transition-colors flex items-center relative transform hover:scale-110 duration-300 group"
+              >
                 <MdFavoriteBorder size={26} />
-                <span className="absolute -top-1 -right-2 flex h-4 w-4 items-center justify-center rounded-full bg-stone-900 text-xs font-semibold text-white ring-2 ring-beige-50 group-hover:scale-125 transition-transform duration-500">
-                  3
-                </span>
-              </button>
+                {/* Отображаем кружок с количеством только если там есть товары */}
+                {favoriteItems.length > 0 && (
+                  <span className="absolute -top-1 -right-2 flex h-4 w-4 items-center justify-center rounded-full bg-stone-900 text-[10px] font-semibold text-white ring-2 ring-beige-50 group-hover:scale-125 transition-transform duration-500">
+                    {favoriteItems.length}
+                  </span>
+                )}
+              </Link>
+
               <Link
                 to="/cart"
                 className="text-stone-400 hover:text-stone-900 transition-colors flex items-center relative transform hover:scale-110 duration-300 group"
@@ -163,7 +176,6 @@ export const Header = () => {
                     }
                   >
                     <span className="relative z-10">Каталог</span>
-                    {/* Элегантная линия подчеркивания при ховере или активном статусе */}
                     <span className="absolute left-0 bottom-0 h-[1px] bg-white transition-all duration-500 w-0 group-hover:w-full [.active_&]:w-full" />
                   </NavLink>
 
@@ -189,25 +201,18 @@ export const Header = () => {
                 {/* Дополнительные информационные ссылки */}
                 <div className="flex flex-col gap-3.5">
                   <NavLink
-                    to="/delivery-and-payment"
+                    to="delivery-and-payment"
                     onClick={closeMenu}
                     className="text-xs font-medium text-stone-400 hover:text-white tracking-wider transition-colors duration-300"
                   >
                     Доставка та оплата
                   </NavLink>
                   <NavLink
-                    to="/privacy-policy"
+                    to="privacy-policy"
                     onClick={closeMenu}
                     className="text-xs font-medium text-stone-400 hover:text-white tracking-wider transition-colors duration-300"
                   >
-                    Політика конфиденційності
-                  </NavLink>
-                  <NavLink
-                    to="/public-offer"
-                    onClick={closeMenu}
-                    className="text-xs font-medium text-stone-400 hover:text-white tracking-wider transition-colors duration-300"
-                  >
-                    Публічна оферта
+                    Політика безпеки
                   </NavLink>
                 </div>
 

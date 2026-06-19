@@ -26,6 +26,8 @@ class Order extends Model<
   declare communicationMethod: string | null; // "telegram" | "instagram" | "phone"
   declare socialUsername: string | null; // "@username"
 
+  declare orderType: "ready-made" | "custom";
+
   declare createdAt: CreationOptional<Date>;
   declare updatedAt: CreationOptional<Date>;
 
@@ -91,6 +93,11 @@ export default (sequelize: Sequelize) => {
       socialUsername: {
         type: DataTypes.STRING,
         allowNull: true, // true, если выбран телефон, никнейм не нужен
+      },
+      orderType: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        defaultValue: "ready-made", // По умолчанию обычные товары
       },
       createdAt: DataTypes.DATE,
       updatedAt: DataTypes.DATE,

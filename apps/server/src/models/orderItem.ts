@@ -13,12 +13,14 @@ class OrderItem extends Model<
 > {
   declare id: CreationOptional<string>;
   declare orderId: string; // Внешний ключ для связи с Orders
-  declare productId: number; // Ссылка на сам товар
+  declare productId: number | null; // Ссылка на сам товар
   declare name: string;
   declare quantity: number;
   declare price: number;
   declare color: string | null;
   declare size: string | null;
+
+  declare measurements: CreationOptional<object | null>;
 
   declare createdAt: CreationOptional<Date>;
   declare updatedAt: CreationOptional<Date>;
@@ -43,7 +45,7 @@ export default (sequelize: Sequelize) => {
       },
       productId: {
         type: DataTypes.INTEGER,
-        allowNull: false,
+        allowNull: true,
       },
       name: {
         type: DataTypes.STRING,
@@ -63,6 +65,10 @@ export default (sequelize: Sequelize) => {
       },
       size: {
         type: DataTypes.STRING,
+        allowNull: true,
+      },
+      measurements: {
+        type: DataTypes.JSONB, // Идеально для динамических мерок
         allowNull: true,
       },
       createdAt: DataTypes.DATE,
