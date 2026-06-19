@@ -12,6 +12,12 @@ import { CartPage } from "./pages/CartPage/CartPage";
 import { store } from "./store/store";
 import { CheckoutPage } from "./pages/CheckoutPage/CheckoutPage";
 import { OrderSuccessPage } from "./pages/OrderSuccessPage/OrderSuccessPage";
+import { SelectTypePage } from "./pages/SelectTypePage/SelectTypePage";
+import { TailoringLayout } from "./components/TailoringLayout/TailoringLayout";
+import { MeasurementsPage } from "./pages/MeasurementsPage/MeasurementsPage";
+import { FavoritesPage } from "./pages/FavoritesPage/FavoritesPage";
+import { DeliveryAndPaymentPage } from "./pages/DeliveryAndPaymentPage/DeliveryAndPaymentPage";
+import { PrivacyPolicyPage } from "./pages/PrivacyPolicyPage/PrivacyPolicyPage";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -34,14 +40,21 @@ export const Root = () => {
               <Route index element={<MainPage />} />
               <Route path="catalog" element={<CatalogPage />} />
 
-              {/* ИСПРАВЛЕНО: убрали слэш в начале */}
               <Route path="catalog/:id" element={<ProductPage />} />
 
-              <Route
-                path="individual-tailoring"
-                element={<IndividualTailoringPage />}
-              />
+              <Route path="individual-tailoring" element={<TailoringLayout />}>
+                {/* Основная страница "Как это работает" */}
+                <Route index element={<IndividualTailoringPage />} />
+
+                {/* Отдельные страницы шагов */}
+                <Route path="step-1" element={<SelectTypePage />} />
+                <Route path="step-2" element={<MeasurementsPage />} />
+                {/* <Route path="step-3" element={<ReviewPage />} /> */}
+              </Route>
+
               <Route path="cart" element={<CartPage />} />
+              <Route path="favorite" element={<FavoritesPage />} />
+
               <Route path="checkout" element={<CheckoutPage />} />
 
               {/* ИСПРАВЛЕНО: убрали слэш в начале */}
@@ -49,6 +62,12 @@ export const Root = () => {
                 path="order-success/:orderId"
                 element={<OrderSuccessPage />}
               />
+
+              <Route
+                path="delivery-and-payment"
+                element={<DeliveryAndPaymentPage />}
+              />
+              <Route path="privacy-policy" element={<PrivacyPolicyPage />} />
             </Route>
           </Routes>
         </HashRouter>

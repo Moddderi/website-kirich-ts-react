@@ -1,20 +1,35 @@
-import type { Product } from "@project/shared"; // Или твой тип продукта
+import type { Product } from "@project/shared";
 import { Link } from "react-router-dom";
+import { useAppDispatch, useAppSelector } from "../../store/store";
+import { toggleFavorite, selectIsFavorite } from "../../store/favoriteSlice";
+
+import { IoHeart, IoHeartOutline } from "react-icons/io5";
 
 interface ProductCardProps {
   product: Product;
 }
 
 export const ProductCard = ({ product }: ProductCardProps) => {
+  const dispatch = useAppDispatch();
+
+  // Проверяем, находится ли этот товар в избранном
+  const isFavorite = useAppSelector(selectIsFavorite(product.id));
+
   const productId = product.id || product.product_code;
+
+  const handleToggleFavorite = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    dispatch(toggleFavorite(product));
+  };
 
   return (
     <Link
       to={`/catalog/${productId}`}
-      className="group relative flex flex-col cursor-pointer opacity-0 animate-reveal-up delay-100 block"
+      className="group relative flex flex-col cursor-pointer opacity-0 animate-reveal-up delay-100"
     >
       {/* ИЗОБРАЖЕНИЕ И КНОПКА КОРЗИНЫ */}
-      <div className="relative aspect-[3/4] w-full overflow-hidden rounded-[2rem] bg-stone-200 border border-stone-200/60">
+      <div className="relative aspect-3/4 w-full overflow-hidden rounded-4xl bg-stone-200 border border-stone-200/60">
         <div className="absolute inset-0 overflow-hidden">
           <img
             src={product.imageUrl ?? ""}
@@ -23,23 +38,30 @@ export const ProductCard = ({ product }: ProductCardProps) => {
           />
         </div>
 
-        {/* Категория (Одяг / База)
-        <div className="absolute top-5 left-5 z-20 flex gap-2">
-          <span className="rounded-full bg-white/90 backdrop-blur-md px-3 py-1 text-[10px] font-semibold uppercase tracking-widest text-stone-900 shadow-sm border border-stone-200">
-            {product.main_category === "clothing" ? "Одяг" : "База"}
-          </span>
-        </div> */}
-
         {/* Затемнение при наведении */}
         <div className="absolute inset-0 bg-stone-900/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-10 backdrop-blur-[2px]"></div>
 
         {/* Анимированная кнопка выплывания */}
         <div className="absolute inset-x-5 bottom-5 z-20 translate-y-8 opacity-0 transition-all duration-500 ease-out group-hover:translate-y-0 group-hover:opacity-100">
           <button
-            // Вешаем изолированный обработчик
-            className="w-full rounded-xl bg-stone-900 px-5 py-3 text-xs font-semibold uppercase tracking-widest text-white shadow-xl hover:bg-stone-800 transition-colors duration-300 active:scale-95 flex items-center justify-center gap-2"
+            onClick={handleToggleFavorite}
+            className={`w-full rounded-xl px-5 py-3 text-xs font-semibold uppercase tracking-widest shadow-xl transition-all duration-300 active:scale-95 flex items-center justify-center gap-2 ${
+              isFavorite
+                ? "bg-red-50 text-red-600 border border-red-100 hover:bg-red-100"
+                : "bg-stone-900 text-white hover:bg-stone-800"
+            }`}
           >
-            Додати в вподобане
+            {isFavorite ? (
+              <>
+                <IoHeart size={16} className="text-red-500" />
+                Видалити
+              </>
+            ) : (
+              <>
+                <IoHeartOutline size={16} />
+                Вподобати
+              </>
+            )}
           </button>
         </div>
       </div>

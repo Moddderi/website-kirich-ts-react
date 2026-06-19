@@ -60,6 +60,11 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: true, // true, если никнейм не заполнен
       },
+      orderType: {
+        type: Sequelize.STRING,
+        allowNull: false,
+        defaultValue: "ready-made",
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,
@@ -89,8 +94,8 @@ module.exports = {
         onUpdate: "CASCADE",
       },
       productId: {
-        type: Sequelize.INTEGER, // Оставляем INTEGER, если у вас ID товаров числовые
-        allowNull: false,
+        type: Sequelize.INTEGER,
+        allowNull: true,
       },
       name: {
         type: Sequelize.STRING,
@@ -110,6 +115,10 @@ module.exports = {
       },
       size: {
         type: Sequelize.STRING,
+        allowNull: true,
+      },
+      measurements: {
+        type: Sequelize.JSONB,
         allowNull: true,
       },
       createdAt: {

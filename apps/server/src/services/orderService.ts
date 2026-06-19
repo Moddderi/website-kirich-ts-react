@@ -2,6 +2,16 @@ import db from "../models/index.js";
 // 1. ИМПОРТИРУЕМ НАШУ УТИЛИТУ (проверь правильность пути к файлу!)
 import { sendTelegramNotification } from "../utils/telegram.js";
 
+interface OrderItemPayload {
+  productId: number | null; // null для индивидуального пошива
+  name: string;
+  quantity: number;
+  price: number;
+  color?: string | null;
+  size?: string | null;
+  measurements?: object | null; // Новое поле для мерок
+}
+
 interface CreateOrderPayload {
   customer: {
     firstName: string;
@@ -11,16 +21,10 @@ interface CreateOrderPayload {
   };
   delivery: { method: string; city: string; warehouse: string };
   payment: string;
+  orderType: "ready-made" | "custom";
   communicationMethod: "telegram" | "instagram"; // Добавили
   socialUsername: string; // Добавили
-  items: Array<{
-    productId: number;
-    name: string;
-    quantity: number;
-    price: number;
-    color?: string | null;
-    size?: string | null;
-  }>;
+  items: OrderItemPayload[];
   totalAmount: number;
 }
 
@@ -46,6 +50,7 @@ export const createOrder = async (payload: CreateOrderPayload) => {
         paymentMethod: payload.payment,
         totalAmount: payload.totalAmount,
         status: "pending",
+        orderType: payload.orderType,
         communicationMethod: payload.communicationMethod, // Записываем метод связи
         socialUsername: payload.socialUsername, // Записываем ник
       },
@@ -60,6 +65,7 @@ export const createOrder = async (payload: CreateOrderPayload) => {
       price: item.price,
       color: item.color || null,
       size: item.size || null,
+      measurements: item.measurements || null,
     }));
 
     await db.OrderItem.bulkCreate(orderItemsData, { transaction });
@@ -68,15 +74,15 @@ export const createOrder = async (payload: CreateOrderPayload) => {
 
     //NOTE: Логика отправки тг сообщения
 
-    try {
-      const fullOrder = await getOrderById(order.id);
+    // try {
+    //   const fullOrder = await getOrderById(order.id);
 
-      if (fullOrder) {
-        sendTelegramNotification(fullOrder);
-      }
-    } catch (tgError) {
-      console.error("Помилка відправки в ТГ:", tgError);
-    }
+    //   if (fullOrder) {
+    //     sendTelegramNotification(fullOrder);
+    //   }
+    // } catch (tgError) {
+    //   console.error("Помилка відправки в ТГ:", tgError);
+    // }
 
     return order;
   } catch (error) {

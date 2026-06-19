@@ -15,7 +15,7 @@ import { Link } from "react-router-dom";
 export const MainPage = () => {
   return (
     <main className="flex-grow">
-      <section className="relative overflow-hidden pt-24 pb-32 sm:pt-32 sm:pb-48">
+      <section className="relative overflow-hidden pt-6 pb-32 sm:pt-14 sm:pb-48">
         <div className="absolute inset-0 -z-20 bg-grid-pattern mask-image:linear-gradient(to_bottom,white,transparent)"></div>
         <div className="absolute left-1/2 top-1/2 -z-10 -translate-x-1/2 -translate-y-1/2 w-[1000px] h-[600px] animate-spin-slow opacity-60 mix-blend-multiply">
           <div className="absolute inset-0 bg-gradient-to-tr from-beige-200/60 via-transparent to-stone-200/40 blur-[100px] rounded-full"></div>
