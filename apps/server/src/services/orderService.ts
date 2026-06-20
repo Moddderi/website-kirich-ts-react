@@ -12,6 +12,9 @@ interface OrderItemPayload {
   measurements?: object | null; // Новое поле для мерок
 }
 
+// Обновленный тип для метода коммуникации, включающий whatsapp
+type CommunicationMethod = "telegram" | "instagram" | "whatsapp";
+
 interface CreateOrderPayload {
   customer: {
     firstName: string;
@@ -22,8 +25,8 @@ interface CreateOrderPayload {
   delivery: { method: string; city: string; warehouse: string };
   payment: string;
   orderType: "ready-made" | "custom";
-  communicationMethod: "telegram" | "instagram"; // Добавили
-  socialUsername: string; // Добавили
+  communicationMethod: CommunicationMethod; // Варианты: telegram, instagram, whatsapp
+  socialUsername: string;
   items: OrderItemPayload[];
   totalAmount: number;
 }
@@ -52,7 +55,7 @@ export const createOrder = async (payload: CreateOrderPayload) => {
         status: "pending",
         orderType: payload.orderType,
         communicationMethod: payload.communicationMethod, // Записываем метод связи
-        socialUsername: payload.socialUsername, // Записываем ник
+        socialUsername: payload.socialUsername, // Записываем ник/телефон
       },
       { transaction },
     );

@@ -1,18 +1,19 @@
 import React, { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { Breadcrumbs } from "../../components/Breadcrumbs/Breadcrumbs";
 import type { Product } from "@project/shared";
 import { SUBTYPE_LABELS } from "@project/shared";
 import { Portal } from "../../components/shared/Portal/Portal";
-import { useAppDispatch } from "../../store/store";
+import { useAppDispatch, useAppSelector } from "../../store/store";
 import { addToCart } from "../../store/cartSlice";
+import { toggleFavorite, selectIsFavorite } from "../../store/favoriteSlice";
 
 import { IoBagHandleOutline } from "react-icons/io5";
-import { GrFavorite } from "react-icons/gr";
+import { IoHeart, IoHeartOutline } from "react-icons/io5";
 import { IoIosArrowDown, IoMdClose } from "react-icons/io";
+import { HiOutlineArrowLeft } from "react-icons/hi"; // Иконка для кнопки назад
 
-import { getProductById } from "../../api/productApi"; // импорт твоего файла
+import { getProductById } from "../../api/productApi";
 
 const AVAILABLE_COLORS = [
   { id: "black", hex: "#000000", label: "Черный" },
@@ -32,19 +33,21 @@ export const ProductPage: React.FC = () => {
   const [selectedSize, setSelectedSize] = useState<string>("M");
   const [isSizeChartOpen, setIsSizeChartOpen] = useState<boolean>(false);
 
-  // ИСПОЛЬЗУЕМ getProductById ВМЕСТО fetchProductData
   const {
     data: product,
     isLoading,
     error,
   } = useQuery<Product, Error>({
     queryKey: ["productFull", id],
-    queryFn: () => getProductById(id!), // Теперь вызываем чистую функцию
+    queryFn: () => getProductById(id!),
     enabled: !!id,
     staleTime: 1000 * 60 * 10,
   });
 
-  // ОБРАБОТЧИК КЛИКА «ДОБАВИТЬ В КОРЗИНУ»
+  // Проверяем, находится ли текущий товар в избранном
+  const isFavorite = useAppSelector(selectIsFavorite(product?.id ?? 0));
+
+  // Обработчик клика «ДОБАВИТЬ В КОРЗИНУ»
   const handleAddToCart = () => {
     if (!product) return;
 
@@ -53,7 +56,7 @@ export const ProductPage: React.FC = () => {
 
     dispatch(
       addToCart({
-        productId: product.id.toString(), // Приводим number к string, фиксируя ошибку TS2322
+        productId: product.id.toString(),
         name: product.name,
         price: product.price,
         imageUrl: product.imageUrl ?? "",
@@ -66,6 +69,12 @@ export const ProductPage: React.FC = () => {
     );
 
     navigate("/cart");
+  };
+
+  // Обработчик добавления/удаления из избранного
+  const handleToggleFavorite = () => {
+    if (!product) return;
+    dispatch(toggleFavorite(product));
   };
 
   if (isLoading) {
@@ -91,8 +100,15 @@ export const ProductPage: React.FC = () => {
 
   return (
     <div className="mx-auto max-w-7xl px-6 lg:px-8 py-12 lg:py-16 animate-reveal-up">
+      {/* КНОПКА НАЗАД ВМЕСТО ХЛЕБНЫХ КРОШЕК */}
       <div className="mb-8">
-        <Breadcrumbs />
+        <button
+          onClick={() => navigate(-1)}
+          className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-stone-600 bg-stone-50 border border-stone-200/60 hover:bg-white hover:border-stone-900 hover:text-stone-900 px-5 py-3.5 rounded-2xl transition-all duration-300 active:scale-95 shadow-xs"
+        >
+          <HiOutlineArrowLeft size={16} />
+          Назад до каталогу
+        </button>
       </div>
 
       <div className="lg:grid lg:grid-cols-12 lg:items-start lg:gap-x-12 xl:gap-x-16">
@@ -222,11 +238,23 @@ export const ProductPage: React.FC = () => {
               >
                 <IoBagHandleOutline size={18} /> Добавить в корзину
               </button>
+
+              {/* КНОПКА ИЗБРАННОГО С ПОДДЕРЖКОЙ СТИЛЕЙ */}
               <button
                 type="button"
-                className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border border-stone-200 bg-white text-stone-400 hover:text-stone-900 hover:border-stone-900 transition-all duration-300 active:scale-95 shadow-sm"
+                onClick={handleToggleFavorite}
+                className={`flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border transition-all duration-300 active:scale-95 shadow-sm ${
+                  isFavorite
+                    ? "border-red-200 bg-red-50 text-red-600 hover:bg-red-100"
+                    : "border-stone-200 bg-white text-stone-400 hover:text-stone-900 hover:border-stone-900"
+                }`}
+                title={isFavorite ? "Видалити з вподобань" : "Вподобати"}
               >
-                <GrFavorite size={20} />
+                {isFavorite ? (
+                  <IoHeart size={22} className="text-red-500" />
+                ) : (
+                  <IoHeartOutline size={22} />
+                )}
               </button>
             </div>
 

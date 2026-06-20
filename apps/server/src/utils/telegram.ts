@@ -15,7 +15,7 @@ export const sendTelegramNotification = async (order: any) => {
     return;
   }
 
-  // 1. Форматуємо список товарів у гарний список із буллетами
+  // 1. Форматуємо список товарів у гарний список із буллетами (додано код товару)
   const itemsList =
     order.items && order.items.length > 0
       ? order.items
@@ -28,21 +28,28 @@ export const sendTelegramNotification = async (order: any) => {
               .join(", ");
 
             const detailsStr = details ? ` (${details})` : "";
+
             return `• 🛍️ *${item.name}*${detailsStr}\n  _${item.quantity} шт. х ${parseFloat(item.price).toLocaleString()} ₴_`;
           })
           .join("\n")
       : "Товари не знайдено";
 
-  // 2. Очищаємо нікнейм від знака @, якщо користувач його ввів, щоб посилання не ламалося
-  const cleanUsername = order.socialUsername
+  // 2. Очищаємо нікнейм/телефон від зайвих символів, якщо користувач його ввів
+  const cleanValue = order.socialUsername
     ? order.socialUsername.replace("@", "").trim()
     : "";
 
-  // Створюємо клікабельне посилання для менеджера
-  const clientSocialLink =
-    order.communicationMethod === "telegram"
-      ? `[Написати в Telegram](https://t.me/${cleanUsername})`
-      : `[Відкрити Instagram](https://instagram.com/${cleanUsername})`;
+  // Створюємо клікабельне посилання для менеджера з урахуванням WhatsApp
+  let clientSocialLink = "";
+  if (order.communicationMethod === "telegram") {
+    clientSocialLink = `[Написати в Telegram](https://t.me/${cleanValue})`;
+  } else if (order.communicationMethod === "instagram") {
+    clientSocialLink = `[Відкрити Instagram](https://instagram.com/${cleanValue})`;
+  } else if (order.communicationMethod === "whatsapp") {
+    // Убираем все нечисловые символы для ссылки на WhatsApp (оставляем только плюс и цифры)
+    const cleanPhone = cleanValue.replace(/[^+\d]/g, "");
+    clientSocialLink = `[Написати в WhatsApp](https://wa.me/${cleanPhone})`;
+  }
 
   // 3. Збираємо шаблон повідомлення українською мовою
   const message = `
@@ -53,7 +60,7 @@ export const sendTelegramNotification = async (order: any) => {
 📧 *Email:* ${order.email}
 
 💬 *Зв'язок:* ${order.communicationMethod ? order.communicationMethod.toUpperCase() : "НЕ ВКАЗАНО"}
-🔗 *Посилання на клієнта:* ${cleanUsername ? clientSocialLink : "Нікнейм не вказано"}
+🔗 *Контакт клієнта:* ${cleanValue ? clientSocialLink : "Дані не вказані"}
 
 📦 *Доставка:* ${
     order.deliveryMethod === "nova_poshta"
@@ -80,7 +87,7 @@ ${itemsList}
           chat_id: chatId,
           text: message,
           parse_mode: "Markdown", // Щоб працював жирний текст та посилання []()
-          disable_web_page_preview: true, // Щоб не генерувалося прев'ю інстаграму під текстом
+          disable_web_page_preview: true, // Щоб не генерувалося прев'ю месенджерів під текстом
         }),
       },
     );

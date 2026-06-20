@@ -16,11 +16,11 @@ export const checkoutSchema = z
     warehouse: z.string().optional(),
     paymentMethod: z.enum(["online", "cod"]),
 
-    // Оставляем только две соцсети
-    communicationMethod: z.enum(["telegram", "instagram"]),
+    // Добавляем whatsapp в валидатор z.enum
+    communicationMethod: z.enum(["telegram", "instagram", "whatsapp"]),
     socialUsername: z
       .string()
-      .min(1, "Будь ласка, вкажіть ваш нікнейм для зв'язку"),
+      .min(1, "Будь ласка, вкажіть ваш нікнейм або телефон для зв'язку"),
   })
   .refine(
     (data) => {
