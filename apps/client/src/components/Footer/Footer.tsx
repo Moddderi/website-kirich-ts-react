@@ -1,5 +1,6 @@
 import { FaInstagram } from "react-icons/fa";
 import { MdOutlineMailOutline } from "react-icons/md";
+import { RiExternalLinkLine } from "react-icons/ri";
 import { Link } from "react-router-dom";
 
 export function Footer() {
@@ -36,6 +37,31 @@ export function Footer() {
               >
                 <span className="sr-only">Telegram</span>
                 <MdOutlineMailOutline />
+              </a>
+            </div>
+
+            {/* Блок авторства в бежевом стильном квадрате */}
+            <div className="mt-12 pt-8 border-t border-stone-800/60 max-w-xs">
+              <a
+                href="https://my-portfolio-app-two-hazel.vercel.app/" // !!! ЗАМЕНИТЕ НА ВАШ URL !!!
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group/author flex flex-col gap-3 p-4 bg-stone-900/50 border border-stone-800 rounded-3xl hover:bg-stone-800/60 hover:border-stone-700 transition-all duration-300"
+              >
+                <span className="text-[10px] font-bold uppercase tracking-widest text-stone-500 group-hover/author:text-stone-400 transition-colors">
+                  Сайт розробив
+                </span>
+
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold uppercase tracking-wider text-white group-hover/author:text-stone-200 transition-colors underline decoration-stone-600 underline-offset-4 group-hover/author:decoration-stone-300">
+                    Kyrychenko Oleh
+                  </span>
+
+                  {/* Иконка внешней ссылки в красивой рамочке */}
+                  <span className="flex h-7 w-7 items-center justify-center rounded-xl bg-stone-800 border border-stone-700 text-stone-400 group-hover/author:bg-[#e0d5c1] group-hover/author:border-[#e0d5c1] group-hover/author:text-stone-950 transition-all duration-300">
+                    <RiExternalLinkLine size={12} />
+                  </span>
+                </div>
               </a>
             </div>
           </div>
@@ -124,7 +150,7 @@ export function Footer() {
           </div>
 
           <div className="mt-20 xl:mt-0 xl:col-span-1">
-            <div className="bg-stone-900 rounded-[2rem] p-8 border border-stone-800 relative overflow-hidden group">
+            <div className="bg-stone-900 rounded-4xl p-8 border border-stone-800 relative overflow-hidden group">
               <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.05),transparent)] z-0"></div>
               <h3 className="text-xs font-bold text-white uppercase tracking-widest relative z-10">
                 Vanguard Club
@@ -156,7 +182,7 @@ export function Footer() {
           </div>
         </div>
 
-        <div className="mt-24 flex flex-col md:flex-row items-center justify-between border-t border-stone-800 pt-10">
+        <div className="mt-8 flex flex-col md:flex-row items-center justify-between border-t border-stone-800 pt-10">
           <p className="text-xs font-semibold text-stone-500 uppercase tracking-widest">
             © {new Date().getFullYear()} K.I.RICH POLTAVA. Global Excellence.
           </p>
@@ -175,7 +201,7 @@ export function Footer() {
             </Link>
             <span className="flex items-center gap-1.5 text-stone-400">
               <span className="h-1.5 w-1.5 rounded-full bg-white animate-pulse"></span>
-              Створенно в Україні
+              Створено в Україні
             </span>
           </div>
         </div>

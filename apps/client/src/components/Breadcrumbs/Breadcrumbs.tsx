@@ -31,7 +31,14 @@ const tailoringSteps = [
 
 export const Breadcrumbs: React.FC = () => {
   const location = useLocation();
-  const pathnames = location.pathname.split("/").filter((x) => x);
+
+  // Присікаємо шлях до order-success на етапі розбиття, обрізаючи все, що йде після нього
+  const rawPathnames = location.pathname.split("/").filter((x) => x);
+  const orderSuccessIndex = rawPathnames.indexOf("order-success");
+  const pathnames =
+    orderSuccessIndex !== -1
+      ? rawPathnames.slice(0, orderSuccessIndex + 1)
+      : rawPathnames;
 
   const isTailoringPath = location.pathname.includes("/individual-tailoring");
   const lastSegment = pathnames[pathnames.length - 1] || "";
@@ -40,14 +47,14 @@ export const Breadcrumbs: React.FC = () => {
   const { data: product, isLoading } = useQuery({
     queryKey: ["productName", lastSegment],
     queryFn: () => getProductById(lastSegment),
-    enabled: isDynamicProductParam,
+    enabled: isDynamicProductParam && !pathnames.includes("order-success"),
     staleTime: 1000 * 60 * 10,
   });
 
   if (pathnames.length === 0) return null;
 
   return (
-    <nav className="flex items-center gap-2 mb-10 text-xs font-medium text-stone-500 select-none">
+    <nav className="flex items-center gap-2 mb-10 text-xs font-medium text-stone-500 select-none flex-wrap">
       <Link to="/" className="flex items-center gap-1 hover:text-stone-900">
         <GoHome size={14} className="text-stone-900" />
         Головна
@@ -85,9 +92,10 @@ export const Breadcrumbs: React.FC = () => {
           })
         : pathnames.map((value, index) => {
             const to = `/${pathnames.slice(0, index + 1).join("/")}`;
+            const isLast = index === pathnames.length - 1;
             const label =
               routeLabels[value] ||
-              (isDynamicProductParam && index === pathnames.length - 1
+              (isDynamicProductParam && isLast
                 ? isLoading
                   ? "..."
                   : product?.name
@@ -96,15 +104,13 @@ export const Breadcrumbs: React.FC = () => {
             return (
               <React.Fragment key={to}>
                 <IoIosArrowForward className="text-stone-400 shrink-0" />
-                <span
-                  className={
-                    index === pathnames.length - 1
-                      ? "font-semibold text-stone-900"
-                      : ""
-                  }
-                >
-                  {label}
-                </span>
+                {isLast ? (
+                  <span className="font-semibold text-stone-900">{label}</span>
+                ) : (
+                  <Link to={to} className="hover:text-stone-900">
+                    {label}
+                  </Link>
+                )}
               </React.Fragment>
             );
           })}

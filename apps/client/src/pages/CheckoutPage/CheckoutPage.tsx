@@ -5,7 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useAppDispatch, useAppSelector } from "../../store/store";
 import { clearCart } from "../../store/cartSlice";
 import { IoIosArrowForward } from "react-icons/io";
-import { FaTelegramPlane, FaInstagram } from "react-icons/fa";
+import { FaTelegramPlane, FaInstagram, FaWhatsapp } from "react-icons/fa"; // Добавили FaWhatsapp
 import { createOrder } from "../../api/orderApi";
 
 import { checkoutSchema } from "@project/shared";
@@ -50,6 +50,14 @@ export const CheckoutPage = () => {
   // Отслеживаем методы для динамического UI
   const deliveryMethod = watch("deliveryMethod");
   const communicationMethod = watch("communicationMethod");
+
+  // Получаем красивое название выбранного мессенджера для плейсхолдера или подсказки
+  const getSocialNetworkLabel = () => {
+    if (communicationMethod === "telegram") return "Telegram";
+    if (communicationMethod === "instagram") return "Instagram";
+    if (communicationMethod === "whatsapp") return "WhatsApp";
+    return "";
+  };
 
   // Обработчик отправки формы на бэкенд
   const onSubmit = async (data: CheckoutFormValues) => {
@@ -224,17 +232,17 @@ export const CheckoutPage = () => {
                 </div>
               </div>
 
-              {/* БЛОК ВЫБОРА КАНАЛА СВЯЗИ ДЛЯ МЕНЕДЖЕРА */}
+              {/* БЛОК ВЫБОРА КАНАЛА СВЯЗИ ДЛЯ МЕНЕДЖЕРА (Telegram, Instagram, WhatsApp) */}
               <div className="mt-8 pt-6 border-t border-stone-100">
                 <h3 className="text-sm font-semibold tracking-widest uppercase text-stone-900 mb-4">
                   Куди вам написати?
                 </h3>
                 <p className="text-xs text-stone-500 mb-4">
-                  Менеджер зв'яжеться з вами у обраній соцмережі для
+                  Менеджер зв'яжеться з вами у обраному месенджері для
                   підтвердження деталей замовлення.
                 </p>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-5">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-5">
                   <label
                     className={`flex items-center gap-3 p-3.5 rounded-xl border-2 cursor-pointer transition-all ${
                       communicationMethod === "telegram"
@@ -272,31 +280,59 @@ export const CheckoutPage = () => {
                       Instagram
                     </span>
                   </label>
+
+                  <label
+                    className={`flex items-center gap-3 p-3.5 rounded-xl border-2 cursor-pointer transition-all ${
+                      communicationMethod === "whatsapp"
+                        ? "border-stone-900 bg-stone-50"
+                        : "border-stone-200 bg-white"
+                    }`}
+                  >
+                    <input
+                      type="radio"
+                      value="whatsapp"
+                      {...register("communicationMethod")}
+                      className="h-4 w-4 text-stone-900 accent-stone-900"
+                    />
+                    <FaWhatsapp size={16} className="text-[#25d366]" />
+                    <span className="text-sm font-semibold text-stone-900">
+                      WhatsApp
+                    </span>
+                  </label>
                 </div>
 
-                {/* Поле ввода никнейма (отображается всегда) */}
+                {/* Поле ввода юзернейма/телефона (отображается динамически) */}
                 <div>
                   <label className="block text-xs font-semibold uppercase tracking-widest text-stone-900 mb-2.5">
-                    Нікнейм{" "}
-                    {communicationMethod === "telegram"
-                      ? "Telegram"
-                      : "Instagram"}
+                    {communicationMethod === "whatsapp"
+                      ? "Номер телефону у WhatsApp"
+                      : `Нікнейм ${getSocialNetworkLabel()}`}
                   </label>
                   <div className="relative rounded-xl shadow-sm">
-                    <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
-                      <span className="text-sm font-semibold text-stone-400">
-                        @
-                      </span>
-                    </div>
+                    {communicationMethod !== "whatsapp" && (
+                      <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
+                        <span className="text-sm font-semibold text-stone-400">
+                          @
+                        </span>
+                      </div>
+                    )}
                     <input
                       type="text"
                       {...register("socialUsername")}
-                      className={`block w-full rounded-xl border-0 bg-white py-3.5 pl-9 pr-4 text-sm font-medium text-stone-900 ring-1 ring-inset transition-all placeholder:text-stone-400 focus:ring-2 ${
+                      className={`block w-full rounded-xl border-0 bg-white py-3.5 text-sm font-medium text-stone-900 ring-1 ring-inset transition-all placeholder:text-stone-400 focus:ring-2 ${
+                        communicationMethod !== "whatsapp"
+                          ? "pl-9 pr-4"
+                          : "px-4"
+                      } ${
                         errors.socialUsername
                           ? "ring-red-500 focus:ring-red-500"
                           : "ring-stone-200 focus:ring-stone-900"
                       }`}
-                      placeholder="username"
+                      placeholder={
+                        communicationMethod === "whatsapp"
+                          ? "+380..."
+                          : "username"
+                      }
                     />
                   </div>
                   {errors.socialUsername && (
