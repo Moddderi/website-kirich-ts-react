@@ -32,19 +32,18 @@ export const MainPage = () => {
           </div>
 
           <h1 className=" animate-reveal-up delay-300 mx-auto max-w-5xl text-5xl font-semibold tracking-tighter text-stone-900 sm:text-7xl lg:text-8xl leading-[1.1]">
-            Абсолютная форма <br className="hidden sm:block" />
+            Абсолютна форма <br className="hidden sm:block" />
             <span className="relative inline-block">
               <span className="relative z-10 text-transparent bg-clip-text bg-gradient-to-r from-stone-900 via-stone-700 to-stone-400">
-                вашего движения
+                вашого руху
               </span>
               <div className="absolute -bottom-2 left-0 right-0 h-3 bg-beige-200/50 -z-10 -rotate-1 origin-left scale-x-0 animate-[shimmer_2s_forwards_1s] delay-700"></div>
             </span>
           </h1>
 
           <p className=" animate-reveal-up delay-500 mx-auto mt-8 max-w-2xl text-lg text-stone-500 leading-relaxed font-medium">
-            Бескомпромиссная бальная одежда мирового уровня. Создана в Киеве с
-            маниакальным вниманием к каждой детали, чтобы вы доминировали на
-            паркете.
+            Безкомпромісний бальний одяг світового рівня. Створена в Києві з
+            маніакальною увагою до кожної деталі, щоб ви домінували на паркет.
           </p>
 
           <div className=" animate-reveal-up delay-700 mt-12 flex flex-col sm:flex-row items-center justify-center gap-5 w-full sm:w-auto">
@@ -53,7 +52,7 @@ export const MainPage = () => {
               className="group relative w-full sm:w-auto rounded-xl bg-stone-900 px-8 py-4 text-sm font-semibold text-white shadow-2xl shadow-stone-900/30 hover:bg-stone-800 hover:-translate-y-1 transition-all duration-500 overflow-hidden flex items-center justify-center gap-3"
             >
               <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-out"></div>
-              <span className="relative z-10">Исследовать коллекцию</span>
+              <span className="relative z-10">Перейти до колекції</span>
               {/* <iconify-icon icon="solar:arrow-right-linear" width="18" stroke-width="1.5" className="relative z-10 transform group-hover:translate-x-2 transition-transform duration-500"></iconify-icon> */}
             </a>
             <a
@@ -66,7 +65,7 @@ export const MainPage = () => {
               }}
               className="group w-full sm:w-auto rounded-xl border border-stone-200/80 bg-white/40 backdrop-blur-md px-8 py-4 text-sm font-semibold text-stone-900 shadow-sm hover:border-stone-900 hover:bg-white transition-all duration-500 flex items-center justify-center gap-2"
             >
-              Философия бренда
+              Філософія бренда
               <div className="h-1.5 w-1.5 rounded-full bg-stone-300 group-hover:bg-stone-900 transition-colors duration-500 ml-1"></div>
             </a>
           </div>
@@ -78,10 +77,10 @@ export const MainPage = () => {
             </div>
             <div>
               <p className="text-sm font-semibold tracking-tight text-stone-900">
-                Точность до 1 мм
+                Точність до 1 мм
               </p>
               <p className="text-xs text-stone-500 mt-1 font-medium">
-                Безупречная архитектура кроя
+                Бездоганна архітектура крою
               </p>
             </div>
           </div>
@@ -95,7 +94,7 @@ export const MainPage = () => {
                 Poltava, Ukraine
               </p>
               <p className="text-xs text-stone-500 mt-1 font-medium">
-                Создано вручную
+                Створено вручну
               </p>
             </div>
           </div>
