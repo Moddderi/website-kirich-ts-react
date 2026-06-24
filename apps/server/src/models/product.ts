@@ -7,38 +7,34 @@ import {
   CreationOptional,
 } from "sequelize";
 
-// 1. Описываем класс модели с использованием дженериков для полной типизации
+// 1. Описываем класс модели
 class Product extends Model<
   InferAttributes<Product>,
   InferCreationAttributes<Product>
 > {
-  // CreationOptional говорит TS, что при создании записи эти поля можно не передавать (их заполнит БД)
   declare id: CreationOptional<number>;
   declare name: string;
   declare search_name: string;
   declare price: number;
-  declare imageUrl: string;
-  declare product_code: string;
 
+  // ИЗМЕНЕНО: Тема с массивом строк для типизации TypeScript
+  declare imageUrl: string[];
+
+  declare product_code: string;
   declare main_category: string;
   declare sub_type: string;
   declare stock: number;
-
   declare dance_program: CreationOptional<string | null>;
 
-  // Даты тоже обычно генерирует БД автоматически
   declare createdAt: CreationOptional<Date>;
   declare updatedAt: CreationOptional<Date>;
 
-  // 2. Фикс ошибки 7006: явно указываем тип для models
-  // Мы используем Record<string, any>, чтобы не было конфликтов с другими моделями
   static associate(models: Record<string, any>) {
-    // Здесь будут твои связи, например:
-    // Product.belongsTo(models.Category);
+    // Здесь будут твои связи
   }
 }
 
-// 3. Экспортируем функцию инициализации (как того требует твой index.ts)
+// 2. Экспортируем функцию инициализации
 export default (sequelize: Sequelize) => {
   Product.init(
     {
@@ -59,34 +55,53 @@ export default (sequelize: Sequelize) => {
         type: DataTypes.DECIMAL(10, 2),
         allowNull: false,
       },
+
+      // ИЗМЕНЕНО: Поле images вместо imageUrl
       imageUrl: {
-        // <--- 2. И ОБЯЗАТЕЛЬНО СЮДА
-        type: DataTypes.STRING,
-        allowNull: true,
+        type: DataTypes.ARRAY(DataTypes.STRING),
+        allowNull: false,
+        defaultValue: [],
+        get() {
+          // Явно указываем as any, чтобы избежать Property does not exist on type 'never'
+          const rawValue = this.getDataValue("imageUrl") as any;
+
+          // Если драйвер вернул массив в виде строки '{url1,url2}'
+          if (typeof rawValue === "string" && rawValue.startsWith("{")) {
+            const cleaned = rawValue.replace(/^\{/, "").replace(/\}$/, "");
+            return cleaned ? cleaned.split(",") : [];
+          }
+
+          // Если это уже массив строк — возвращаем как есть
+          if (Array.isArray(rawValue)) {
+            return rawValue;
+          }
+
+          return [];
+        },
       },
+
       product_code: {
         type: DataTypes.STRING,
-        allowNull: false, // или true, если не у всех товаров есть код
-        unique: true, // обычно коды товаров уникальны
+        allowNull: false,
+        unique: true,
       },
       dance_program: {
         type: DataTypes.STRING,
-        allowNull: true, // Это позволит базе принимать NULL, если программы нет
+        allowNull: true,
       },
       main_category: {
         type: DataTypes.STRING,
-        allowNull: false, // Обязательно для фильтрации
+        allowNull: false,
       },
       sub_type: {
         type: DataTypes.STRING,
-        allowNull: false, // Обязательно для фильтрации
+        allowNull: false,
       },
       stock: {
         type: DataTypes.INTEGER,
         allowNull: false,
         defaultValue: 0,
       },
-
       createdAt: DataTypes.DATE,
       updatedAt: DataTypes.DATE,
     },
@@ -94,6 +109,24 @@ export default (sequelize: Sequelize) => {
       sequelize,
       modelName: "Product",
       tableName: "Products",
+      indexes: [
+        {
+          name: "products_main_category_idx",
+          fields: ["main_category"],
+        },
+        {
+          name: "products_dance_program_idx",
+          fields: ["dance_program"],
+        },
+        {
+          name: "products_sub_type_idx",
+          fields: ["sub_type"],
+        },
+        {
+          name: "products_filters_composite_idx",
+          fields: ["main_category", "dance_program", "sub_type"],
+        },
+      ],
     },
   );
 
