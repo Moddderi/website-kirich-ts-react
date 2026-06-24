@@ -11,7 +11,7 @@ import { toggleFavorite, selectIsFavorite } from "../../store/favoriteSlice";
 import { IoBagHandleOutline } from "react-icons/io5";
 import { IoHeart, IoHeartOutline } from "react-icons/io5";
 import { IoIosArrowDown, IoMdClose } from "react-icons/io";
-import { HiOutlineArrowLeft } from "react-icons/hi"; // Иконка для кнопки назад
+import { HiOutlineArrowLeft } from "react-icons/hi";
 
 import { getProductById } from "../../api/productApi";
 
@@ -33,6 +33,9 @@ export const ProductPage: React.FC = () => {
   const [selectedSize, setSelectedSize] = useState<string>("M");
   const [isSizeChartOpen, setIsSizeChartOpen] = useState<boolean>(false);
 
+  // Стейт для активной (выбранной) картинки в галерее
+  const [activeImageIndex, setActiveImageIndex] = useState<number>(0);
+
   const {
     data: product,
     isLoading,
@@ -47,6 +50,14 @@ export const ProductPage: React.FC = () => {
   // Проверяем, находится ли текущий товар в избранном
   const isFavorite = useAppSelector(selectIsFavorite(product?.id ?? 0));
 
+  // Безопасное извлечение массива картинок
+  const images =
+    product && Array.isArray(product.imageUrl) ? product.imageUrl : [];
+  const defaultImage =
+    "https://res.cloudinary.com/dqe2odzsc/image/upload/default.jpg";
+  const displayImages = images.length > 0 ? images : [defaultImage];
+
+  // Обработчик клика «ДОБАВИТЬ В КОРЗИНУ»
   // Обработчик клика «ДОБАВИТЬ В КОРЗИНУ»
   const handleAddToCart = () => {
     if (!product) return;
@@ -59,7 +70,9 @@ export const ProductPage: React.FC = () => {
         productId: product.id.toString(),
         name: product.name,
         price: product.price,
-        imageUrl: product.imageUrl ?? "",
+        // Передаем массив из одного элемента (текущую выбранную картинку),
+        // чтобы соответствовать типу string[] в CartItem
+        imageUrl: [displayImages[activeImageIndex]],
         productCode: product.product_code,
         options: {
           color: colorLabel,
@@ -112,18 +125,47 @@ export const ProductPage: React.FC = () => {
       </div>
 
       <div className="lg:grid lg:grid-cols-12 lg:items-start lg:gap-x-12 xl:gap-x-16">
-        {/* ЛЕВАЯ ЧАСТЬ — ГАЛЕРЕЯ */}
+        {/* ЛЕВАЯ ЧАСТЬ — ГАЛЕРЕЯ С ПРЕВЬЮ */}
         <div className="lg:col-span-7 flex flex-col gap-4 relative">
+          {/* Главное изображение */}
           <div className="aspect-3/4 w-full overflow-hidden rounded-[2.5rem] bg-stone-200 border border-stone-200/60 relative group">
-            <div className="absolute inset-0 bg-stone-300 transition-transform duration-1000 group-hover:scale-105">
+            <div className="absolute inset-0 bg-stone-300 transition-transform duration-1000">
               <div className="w-full h-full bg-[linear-gradient(to_right,#e5e5e5_1px,transparent_1px),linear-gradient(to_bottom,#e5e5e5_1px,transparent_1px)] bg-size-[2rem_2rem] mix-blend-multiply opacity-50"></div>
               <img
                 className="w-full h-full absolute inset-0 object-cover"
-                src={product.imageUrl ?? ""}
-                alt={product.name}
+                src={displayImages[activeImageIndex]}
+                alt={`${product.name} — ракурс ${activeImageIndex + 1}`}
+                crossOrigin="anonymous"
               />
             </div>
           </div>
+
+          {/* Превью (отображаются только если картинок больше одной) */}
+          {displayImages.length > 1 && (
+            <div className="grid grid-cols-4 gap-3 w-full">
+              {displayImages.map((url, index) => {
+                const isActive = activeImageIndex === index;
+                return (
+                  <button
+                    key={index}
+                    onClick={() => setActiveImageIndex(index)}
+                    className={`aspect-3/4 w-full rounded-2xl overflow-hidden bg-stone-200 border-2 relative transition-all ${
+                      isActive
+                        ? "border-stone-900 shadow-md"
+                        : "border-transparent hover:border-stone-300 opacity-80 hover:opacity-100"
+                    }`}
+                  >
+                    <img
+                      src={url}
+                      alt={`Превью ${index + 1}`}
+                      className="w-full h-full object-cover"
+                      crossOrigin="anonymous"
+                    />
+                  </button>
+                );
+              })}
+            </div>
+          )}
         </div>
 
         {/* ПРАВАЯ ЧАСТЬ — ИНФОРМАЦИЯ И ОПЦИИ */}
@@ -148,7 +190,7 @@ export const ProductPage: React.FC = () => {
                 {product.name}
               </h1>
               <p className="text-2xl font-semibold text-stone-900 mb-6">
-                от {Number(product.price).toLocaleString()} ₴
+                від {Number(product.price).toLocaleString()} ₴
               </p>
               <p className="text-sm font-medium text-stone-500 leading-relaxed">
                 Описание товара...
@@ -239,7 +281,7 @@ export const ProductPage: React.FC = () => {
                 <IoBagHandleOutline size={18} /> Добавить в корзину
               </button>
 
-              {/* КНОПКА ИЗБРАННОГО С ПОДДЕРЖКОЙ СТИЛЕЙ */}
+              {/* КНОПКА ИЗБРАННОГО */}
               <button
                 type="button"
                 onClick={handleToggleFavorite}

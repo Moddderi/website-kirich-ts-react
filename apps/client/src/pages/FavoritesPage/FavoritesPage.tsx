@@ -24,12 +24,23 @@ export const FavoritesPage: React.FC = () => {
   };
 
   const handleMoveToCart = (item: Product) => {
+    // Безопасно получаем массив картинок (массив или пустой массив)
+    const images = Array.isArray(item.imageUrl)
+      ? item.imageUrl
+      : item.imageUrl
+        ? [item.imageUrl]
+        : [];
+
     // Превращаем Product в Omit<CartItem, "quantity" | "cartItemId">
     const cartItemPayload = {
       productId: String(item.id), // Превращаем числовой id из Zod в string
       name: item.name,
       price: item.price,
-      imageUrl: item.imageUrl || "", // Обработка возможного null
+      // Передаем в корзину массив картинок, соответствующий типу string[]
+      imageUrl:
+        images.length > 0
+          ? images
+          : ["https://res.cloudinary.com/dqe2odzsc/image/upload/default.jpg"],
       productCode: item.product_code,
       options: {
         color: "Стандартний", // Укажите дефолтный цвет или логику выбора
@@ -39,6 +50,13 @@ export const FavoritesPage: React.FC = () => {
 
     dispatch(addToCart(cartItemPayload));
     dispatch(removeFromFavorites(item.id));
+  };
+
+  // Вспомогательная функция для отображения первой картинки товара
+  const getDisplayImage = (imageUrl: string | string[] | undefined) => {
+    if (!imageUrl)
+      return "https://res.cloudinary.com/dqe2odzsc/image/upload/default.jpg";
+    return Array.isArray(imageUrl) ? imageUrl[0] : imageUrl;
   };
 
   return (
@@ -70,20 +88,16 @@ export const FavoritesPage: React.FC = () => {
                 className="flex flex-col bg-white border border-stone-200/60 rounded-3xl overflow-hidden group animate-reveal-up relative transition-all duration-500 hover:-translate-y-1 hover:shadow-[0_20px_40px_-15px_rgba(28,25,23,0.1)]"
               >
                 {/* ИЗОБРАЖЕНИЕ ТОВАРА */}
-                {/* Используем фиксированные пропорции (например, aspect-3/4 или aspect-square) 
-                  и object-contain, чтобы фото помещалось целиком без обрезки 
-                */}
                 <div
                   onClick={() => navigate(`/catalog/${item.id}`)}
                   className="relative aspect-3/4 w-full bg-stone-100 flex items-center justify-center overflow-hidden cursor-pointer"
                 >
-                  {item.imageUrl && (
-                    <img
-                      src={item.imageUrl}
-                      alt={item.name}
-                      className="w-full h-full group-hover:scale-105 transition-transform duration-500 "
-                    />
-                  )}
+                  <img
+                    src={getDisplayImage(item.imageUrl)}
+                    alt={item.name}
+                    className="w-full h-full group-hover: transition-duration-500 object-cover"
+                    crossOrigin="anonymous"
+                  />
                   <div className="w-full h-full absolute bg-linear-to-tr from-stone-400/10 via-beige-100/30 to-white/40 mix-blend-overlay pointer-events-none"></div>
                 </div>
 
