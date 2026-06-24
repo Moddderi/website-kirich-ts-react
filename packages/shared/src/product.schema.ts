@@ -34,9 +34,11 @@ export const SUBTYPE_LABELS: Record<string, string> = {
 export const ProductSchema = z.object({
   name: z.string().min(2, "Название слишком короткое"),
   price: z.coerce.number().positive("Цена должна быть больше 0"),
-  imageUrl: z.string().url("Некорректная ссылка").nullable().optional(),
+
+  // ТЕПЕРЬ ЭТО МАССИВ СТРОК (Каждая строка должна быть валидным URL)
+  imageUrl: z.array(z.string().url("Некорректная ссылка")).default([]),
+
   product_code: z.string().min(1, "Артикул обязателен"),
-  // Добавляем новые поля
   main_category: MainCategoryEnum,
   sub_type: SubTypeEnum,
   stock: z.number().int().min(0).default(0),

@@ -44,6 +44,11 @@ export const CartPage: React.FC = () => {
     navigate("/checkout", { state: { items: cartItems, totalPrice } });
   };
 
+  // Вспомогательная функция, чтобы безопасно достать картинку для отображения
+  const getDisplayImage = (imageUrl: string | string[]) => {
+    return Array.isArray(imageUrl) ? imageUrl[0] : imageUrl;
+  };
+
   return (
     <div className="mx-auto max-w-7xl px-6 lg:px-8 py-12 lg:py-24 animate-reveal-up">
       <Breadcrumbs />
@@ -77,11 +82,11 @@ export const CartPage: React.FC = () => {
                   {/* Изображение */}
                   <div className="h-40 w-32 shrink-0 overflow-hidden rounded-2xl bg-stone-200 border border-stone-200/60 relative">
                     <img
-                      src={item.imageUrl}
+                      src={getDisplayImage(item.imageUrl)}
                       alt={item.name}
                       className="w-full h-full object-cover"
                     />
-                    <div className="w-full h-full absolute  bg-linear-to-tr from-stone-400/20 via-beige-100 to-white/60 mix-blend-overlay"></div>
+                    <div className="w-full h-full absolute bg-linear-to-tr from-stone-400/20 via-beige-100 to-white/60 mix-blend-overlay"></div>
                     <div className="w-full h-full absolute mix-blend-multiply opacity-50"></div>
                   </div>
 
