@@ -1,6 +1,5 @@
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { Breadcrumbs } from "../../components/Breadcrumbs/Breadcrumbs";
 import { getOrderById } from "../../api/orderApi";
 
 interface OrderItem {
@@ -28,11 +27,16 @@ interface OrderData {
 }
 
 export const OrderSuccessPage = () => {
-  const { orderId } = useParams<{ orderId: string }>();
+  const { orderId } = useParams<{ orderId?: string }>();
   const navigate = useNavigate();
+  const location = useLocation();
 
-  // Мы указываем, что queryFn возвращает объект с полем data,
-  // внутри которого лежит наш OrderData.
+  // Перевіряємо, чи ми знаходимось на сторінці успіху пошиття
+  const isCustomTailoring = location.pathname.includes(
+    "/individual-tailoring/order-success",
+  );
+
+  // Запитуємо деталі з бекенду тільки якщо є orderId (для готових товарів)
   const {
     data: order,
     isLoading,
@@ -44,7 +48,8 @@ export const OrderSuccessPage = () => {
     staleTime: 1000 * 60 * 5,
   });
 
-  if (isLoading) {
+  // Рендер для завантаження даних (тільки для замовлень з кошика)
+  if (orderId && isLoading) {
     return (
       <div className="flex min-h-[60vh] items-center justify-center text-stone-500 font-medium text-sm">
         Завантаження деталей замовлення...
@@ -52,8 +57,8 @@ export const OrderSuccessPage = () => {
     );
   }
 
-  // Теперь используем order.data для доступа к объекту
-  if (error || !order || !order.data) {
+  // Якщо це замовлення з кошика, але сталася помилка
+  if (orderId && (error || !order || !order.data)) {
     return (
       <div className="flex min-h-[60vh] flex-col items-center justify-center gap-4 text-center">
         <p className="text-stone-900 font-semibold text-lg">
@@ -69,7 +74,54 @@ export const OrderSuccessPage = () => {
     );
   }
 
-  const orderData = order.data;
+  // Стан для індивідуального пошиття (статичний успішний екран)
+  if (isCustomTailoring) {
+    return (
+      <div className="mx-auto max-w-7xl px-6 lg:px-8 py-12 lg:py-24 animate-reveal-up">
+        <div className="flex flex-col items-center justify-center text-center py-10 lg:py-20 relative min-h-[50vh]">
+          <div className="relative mb-10">
+            <div className="absolute inset-0 animate-pulse-glow rounded-full bg-stone-200/50 blur-xl"></div>
+            <div className="flex h-24 w-24 items-center justify-center rounded-full bg-stone-900 text-white relative z-10 shadow-xl">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={1.5}
+                stroke="currentColor"
+                className="w-12 h-12"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+                />
+              </svg>
+            </div>
+          </div>
+
+          <h1 className="text-4xl sm:text-5xl font-semibold tracking-tighter text-stone-900 mb-6">
+            Замовлення на пошив оформлено
+          </h1>
+
+          <p className="text-lg font-medium text-stone-500 max-w-lg mb-8 leading-relaxed">
+            Раді повідомити, ваше замовлення успішно передано. Менеджер
+            зв'яжеться з вами найближчим часом для уточнення мірок та деталей.
+          </p>
+
+          <button
+            onClick={() => navigate("/")}
+            className="mt-6 rounded-2xl border border-stone-200 bg-transparent px-8 py-4 text-sm font-semibold uppercase tracking-widest text-stone-900 hover:bg-stone-50 transition-all duration-300 active:scale-95 flex items-center justify-center gap-2 cursor-pointer"
+          >
+            Повернутися на головну
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // Рендер для звичайного замовлення з кошика (якщо є orderId)
+  const orderData = order?.data;
+  if (!orderData) return null;
 
   const itemsTotal =
     orderData.items?.reduce(
@@ -80,10 +132,8 @@ export const OrderSuccessPage = () => {
 
   return (
     <div className="mx-auto max-w-7xl px-6 lg:px-8 py-12 lg:py-24 animate-reveal-up">
-      <Breadcrumbs />
-
       <div className="lg:grid lg:grid-cols-12 lg:items-start lg:gap-x-12 xl:gap-x-16">
-        {/* ЛЕВАЯ КОЛОНКА: СТАТУС */}
+        {/* ЛЕВА КОЛОНКА: СТАТУС */}
         <div className="lg:col-span-7 flex flex-col items-center justify-center text-center py-10 lg:py-20 relative">
           <div className="relative mb-10">
             <div className="absolute inset-0 animate-pulse-glow rounded-full bg-stone-200/50 blur-xl"></div>
@@ -122,7 +172,7 @@ export const OrderSuccessPage = () => {
           </button>
         </div>
 
-        {/* ПРАВАЯ КОЛОНКА: ДЕТАЛИ */}
+        {/* ПРАВА КОЛОНКА: ДЕТАЛІ */}
         <div className="mt-10 px-2 sm:px-0 lg:mt-0 lg:col-span-5 relative">
           <div className="sticky top-32">
             <div className="mb-8 p-6 sm:p-8 rounded-4xl bg-white border border-stone-200/60 shadow-sm">

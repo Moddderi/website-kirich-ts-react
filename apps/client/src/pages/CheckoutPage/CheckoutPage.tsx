@@ -1,25 +1,32 @@
+/* eslint-disable react-hooks/incompatible-library */
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import axios from "axios";
 import { useAppDispatch, useAppSelector } from "../../store/store";
 import { clearCart } from "../../store/cartSlice";
 import { IoIosArrowForward } from "react-icons/io";
-import { FaTelegramPlane, FaInstagram, FaWhatsapp } from "react-icons/fa"; // Добавили FaWhatsapp
+import { FaTelegramPlane, FaInstagram, FaWhatsapp } from "react-icons/fa";
 import { createOrder } from "../../api/orderApi";
 
 import { checkoutSchema } from "@project/shared";
-import type { CheckoutFormValues } from "@project/shared";
+import type { CheckoutFormValues, OrderPayload } from "@project/shared";
 
 export const CheckoutPage = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Получаем данные из корзины Redux
   const cartItems = useAppSelector((state) => state.cart.items);
+  const { type: tailoringType, measurements } = useAppSelector(
+    (state) => state.tailoring,
+  );
 
-  // Калькуляция количества товаров и общей суммы
+  const orderType: "ready-made" | "custom" = tailoringType
+    ? "custom"
+    : "ready-made";
+
   const totalQuantity = cartItems.reduce((acc, item) => acc + item.quantity, 0);
   const totalPrice = cartItems.reduce(
     (acc, item) => acc + item.price * item.quantity,
@@ -42,16 +49,14 @@ export const CheckoutPage = () => {
       email: "",
       city: "",
       warehouse: "",
-      communicationMethod: "telegram", // Telegram по умолчанию
+      communicationMethod: "telegram",
       socialUsername: "",
     },
   });
 
-  // Отслеживаем методы для динамического UI
   const deliveryMethod = watch("deliveryMethod");
   const communicationMethod = watch("communicationMethod");
 
-  // Получаем красивое название выбранного мессенджера для плейсхолдера или подсказки
   const getSocialNetworkLabel = () => {
     if (communicationMethod === "telegram") return "Telegram";
     if (communicationMethod === "instagram") return "Instagram";
@@ -59,64 +64,104 @@ export const CheckoutPage = () => {
     return "";
   };
 
-  // Обработчик отправки формы на бэкенд
   const onSubmit = async (data: CheckoutFormValues) => {
-    if (cartItems.length === 0) {
+    if (orderType === "ready-made" && cartItems.length === 0) {
       alert("Ваша корзина пуста!");
+      return;
+    }
+
+    if (orderType === "custom" && !tailoringType) {
+      alert("Не вибрано тип виробу для пошиття!");
+      navigate("/individual-tailoring");
       return;
     }
 
     setIsSubmitting(true);
 
-    const orderPayload = {
-      customer: {
-        firstName: data.firstName,
-        lastName: data.lastName,
-        phone: data.phone,
-        email: data.email,
-      },
-      delivery: {
-        method: data.deliveryMethod,
-        city: data.deliveryMethod === "nova_poshta" ? data.city : "Самовивіз",
-        warehouse: data.deliveryMethod === "nova_poshta" ? data.warehouse : "-",
-      },
-      payment: data.paymentMethod,
-      communicationMethod: data.communicationMethod,
-      socialUsername: data.socialUsername,
-      items: cartItems.map((item) => ({
-        productId: item.productId,
-        name: item.name,
-        quantity: item.quantity,
-        price: item.price,
-        color: item.options?.color || null,
-        size: item.options?.size || null,
-      })),
-      totalAmount: totalPrice,
-    };
+    // Базова конструкція items (без жодних measurements всередині елементів)
+    const itemsPayload =
+      orderType === "ready-made"
+        ? cartItems.map((item) => ({
+            productId: item.productId ? String(item.productId) : null,
+            name: item.name,
+            quantity: item.quantity,
+            price: item.price,
+            color: item.options?.color || null,
+            size: item.options?.size || null,
+          }))
+        : [
+            {
+              productId: null,
+              name: `Індивідуальний пошив: ${tailoringType}`,
+              quantity: 1,
+              price: 0,
+              color: null,
+              size: null,
+            },
+          ];
+
+    // Суворо типізований об'єкт відправки адаптований під Zod/Union схему
+    let orderPayload: OrderPayload;
+
+    if (orderType === "ready-made") {
+      orderPayload = {
+        ...data,
+        totalAmount: totalPrice,
+        status: "pending",
+        orderType: "ready-made",
+        items: itemsPayload,
+      };
+    } else {
+      orderPayload = {
+        ...data,
+        totalAmount: 0,
+        status: "pending",
+        orderType: "custom",
+        // 🟢 Виносимо мірки на рівень об'єкта замовлення, як того вимагає схема з packages/shared/src/order.schema.ts
+        measurements: (measurements as Record<string, string>) || {},
+        items: itemsPayload,
+      };
+    }
 
     try {
-      // Передаем payload напрямую
-      const result = await createOrder(
-        orderPayload as unknown as CheckoutFormValues,
-      );
+      const result = await createOrder(orderPayload);
 
       if (result.success) {
-        dispatch(clearCart());
+        if (orderType === "ready-made") {
+          dispatch(clearCart());
+        }
+
         const orderUuid = result.data?.id || result.orderId;
 
-        if (orderUuid) {
-          navigate(`/order-success/${orderUuid}`);
+        if (orderUuid || orderType === "custom") {
+          const successPath =
+            orderType === "custom"
+              ? "/individual-tailoring/order-success"
+              : `/order-success/${orderUuid}`;
+          navigate(successPath);
         } else {
           navigate("/");
         }
       }
     } catch (err: unknown) {
-      // Типизируем ошибку правильно
-      const error = err as { response?: { data?: { message: string } } };
-      console.error("Network error:", error);
-      alert(
-        error.response?.data?.message || "Не вдалося з'єднатися з сервером.",
-      );
+      if (axios.isAxiosError(err)) {
+        console.error(
+          "Network error details:",
+          err.response?.data || err.message,
+        );
+
+        if (err.response?.data?.issues) {
+          console.error("Zod validation issues:", err.response.data.issues);
+        }
+
+        alert(
+          err.response?.data?.message || "Не вдалося з'єднатися з сервером.",
+        );
+      } else {
+        const genericError = err as Error;
+        console.error("Unexpected error:", genericError.message);
+        alert("Сталася непередбачувана мережева помилка.");
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -128,22 +173,28 @@ export const CheckoutPage = () => {
         onSubmit={handleSubmit(onSubmit)}
         className="lg:grid lg:grid-cols-12 lg:items-start lg:gap-x-12 xl:gap-x-16 mt-4"
       >
-        {/* ЛЕВАЯ КОЛОНКА — ФОРМЫ СБОРА ДАННЫХ */}
+        {/* ЛЕВА КОЛОНКА — ЗБІР ДАНИХ */}
         <div className="lg:col-span-7 xl:col-span-8">
-          <div className="mb-8 border-b border-stone-200/60 pb-6">
+          <div className="mb-8 border-b border-stone-200/60 pb-6 flex items-center justify-between">
             <h1 className="text-3xl sm:text-4xl font-semibold tracking-tighter text-stone-900">
-              Оформлення замовлення
+              {orderType === "custom"
+                ? "Оформлення замовлення (Індивідуальний пошив)"
+                : "Оформлення замовлення"}
             </h1>
+            {orderType === "custom" && (
+              <span className="rounded-full bg-stone-900 px-3 py-1 text-[10px] font-semibold uppercase tracking-widest text-white shadow-sm border border-stone-800">
+                Індивідуальний пошив
+              </span>
+            )}
           </div>
 
           <div className="space-y-8">
-            {/* Контактные данные */}
-            <div className="bg-white p-6 sm:p-8 rounded-[2rem] border border-stone-200/60 shadow-sm">
+            {/* Контактні дані */}
+            <div className="bg-white p-6 sm:p-8 rounded-4xl border border-stone-200/60 shadow-sm">
               <h2 className="text-lg font-semibold tracking-tight text-stone-900 mb-6">
                 Контактні дані
               </h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                {/* Имя */}
                 <div>
                   <label className="block text-xs font-semibold uppercase tracking-widest text-stone-900 mb-2.5">
                     Ім'я
@@ -165,7 +216,6 @@ export const CheckoutPage = () => {
                   )}
                 </div>
 
-                {/* Прізвище */}
                 <div>
                   <label className="block text-xs font-semibold uppercase tracking-widest text-stone-900 mb-2.5">
                     Прізвище
@@ -187,7 +237,6 @@ export const CheckoutPage = () => {
                   )}
                 </div>
 
-                {/* Телефон */}
                 <div>
                   <label className="block text-xs font-semibold uppercase tracking-widest text-stone-900 mb-2.5">
                     Телефон
@@ -209,7 +258,6 @@ export const CheckoutPage = () => {
                   )}
                 </div>
 
-                {/* Email */}
                 <div>
                   <label className="block text-xs font-semibold uppercase tracking-widest text-stone-900 mb-2.5">
                     Email
@@ -232,14 +280,14 @@ export const CheckoutPage = () => {
                 </div>
               </div>
 
-              {/* БЛОК ВЫБОРА КАНАЛА СВЯЗИ ДЛЯ МЕНЕДЖЕРА (Telegram, Instagram, WhatsApp) */}
+              {/* Блок вибору каналу зв'язку */}
               <div className="mt-8 pt-6 border-t border-stone-100">
                 <h3 className="text-sm font-semibold tracking-widest uppercase text-stone-900 mb-4">
                   Куди вам написати?
                 </h3>
                 <p className="text-xs text-stone-500 mb-4">
                   Менеджер зв'яжеться з вами у обраному месенджері для
-                  підтвердження деталей замовлення.
+                  підтвердження деталей.
                 </p>
 
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-5">
@@ -301,7 +349,6 @@ export const CheckoutPage = () => {
                   </label>
                 </div>
 
-                {/* Поле ввода юзернейма/телефона (отображается динамически) */}
                 <div>
                   <label className="block text-xs font-semibold uppercase tracking-widest text-stone-900 mb-2.5">
                     {communicationMethod === "whatsapp"
@@ -345,7 +392,7 @@ export const CheckoutPage = () => {
             </div>
 
             {/* Доставка */}
-            <div className="bg-white p-6 sm:p-8 rounded-[2rem] border border-stone-200/60 shadow-sm">
+            <div className="bg-white p-6 sm:p-8 rounded-4xl border border-stone-200/60 shadow-sm">
               <h2 className="text-lg font-semibold tracking-tight text-stone-900 mb-6">
                 Доставка
               </h2>
@@ -386,7 +433,6 @@ export const CheckoutPage = () => {
                 </label>
               </div>
 
-              {/* Поля Новой Почты */}
               {deliveryMethod === "nova_poshta" && (
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 animate-fade-in">
                   <div>
@@ -435,47 +481,82 @@ export const CheckoutPage = () => {
           </div>
         </div>
 
-        {/* ПРАВАЯ КОЛОНКА — ИТОГО ЗАКАЗА */}
+        {/* ПРАВА КОЛОНКА — ПІДСУМОК ЗАМОВЛЕННЯ */}
         <div className="mt-12 lg:mt-0 lg:col-span-5 xl:col-span-4 relative">
           <div className="sticky top-32 space-y-6">
-            <div className="p-6 sm:p-8 rounded-[2rem] bg-white border border-stone-200/60 shadow-sm">
+            <div className="p-6 sm:p-8 rounded-4xl bg-white border border-stone-200/60 shadow-sm">
               <h2 className="text-sm font-semibold tracking-widest uppercase text-stone-900 mb-6">
-                Ваше замовлення
+                {orderType === "custom"
+                  ? "Підсумок пошиття"
+                  : "Ваше замовлення"}
               </h2>
 
-              <div className="space-y-4 pb-6 border-b border-stone-100">
-                <div className="flex justify-between text-sm font-medium text-stone-500">
-                  <span>Товари ({totalQuantity})</span>
-                  <span className="text-stone-900">
-                    {totalPrice.toLocaleString()} ₴
-                  </span>
+              {orderType === "ready-made" && (
+                <div className="space-y-4 pb-6 border-b border-stone-100">
+                  <div className="flex justify-between text-sm font-medium text-stone-500">
+                    <span>Товари ({totalQuantity})</span>
+                    <span className="text-stone-900">
+                      {totalPrice.toLocaleString()} ₴
+                    </span>
+                  </div>
+                  <div className="flex justify-between text-sm font-medium text-stone-500">
+                    <span>Доставка</span>
+                    <span className="text-stone-900">
+                      {deliveryMethod === "pickup"
+                        ? "Безкоштовно"
+                        : "За тарифами НП"}
+                    </span>
+                  </div>
                 </div>
-                <div className="flex justify-between text-sm font-medium text-stone-500">
-                  <span>Знижка</span>
-                  <span className="text-stone-900">0 ₴</span>
+              )}
+
+              {orderType === "custom" && (
+                <div className="space-y-4 pb-6 border-b border-stone-100">
+                  <div className="flex justify-between text-sm font-medium text-stone-500">
+                    <span>Категорія:</span>
+                    <span className="text-stone-900 font-semibold">
+                      {tailoringType}
+                    </span>
+                  </div>
+                  <div className="flex justify-between text-sm font-medium text-stone-500">
+                    <span>Тип замовлення:</span>
+                    <span className="text-stone-900">Індивідуальний пошив</span>
+                  </div>
+                  <div className="flex justify-between text-sm font-medium text-stone-500">
+                    <span>Доставка:</span>
+                    <span className="text-stone-900">
+                      {deliveryMethod === "pickup"
+                        ? "Самовивіз"
+                        : "За тарифами НП"}
+                    </span>
+                  </div>
                 </div>
-                <div className="flex justify-between text-sm font-medium text-stone-500">
-                  <span>Доставка</span>
-                  <span className="text-stone-900">
-                    {deliveryMethod === "pickup"
-                      ? "Безкоштовно"
-                      : "За тарифами НП"}
-                  </span>
-                </div>
-              </div>
+              )}
 
               <div className="flex justify-between items-end py-6">
                 <span className="text-sm font-semibold uppercase tracking-widest text-stone-900">
                   Всього
                 </span>
                 <span className="text-2xl font-semibold text-stone-900 leading-none">
-                  {totalPrice.toLocaleString()} ₴
+                  {orderType === "ready-made"
+                    ? `${totalPrice.toLocaleString()} ₴`
+                    : "Розраховується"}
                 </span>
               </div>
 
+              {orderType === "custom" && (
+                <p className="text-xs text-stone-500 leading-relaxed mb-6">
+                  Після підтвердження замовлення менеджер зв'яжеться з вами для
+                  уточнення вартості пошиття за вашими мірками.
+                </p>
+              )}
+
               <button
                 type="submit"
-                disabled={cartItems.length === 0 || isSubmitting}
+                disabled={
+                  (orderType === "ready-made" && cartItems.length === 0) ||
+                  isSubmitting
+                }
                 className="w-full rounded-2xl bg-stone-900 px-8 py-4 text-sm font-semibold uppercase tracking-widest text-white hover:bg-stone-800 transition-all duration-300 active:scale-95 flex items-center justify-center gap-2 group disabled:opacity-50 disabled:pointer-events-none"
               >
                 {isSubmitting ? "Обробка..." : "Підтвердити замовлення"}

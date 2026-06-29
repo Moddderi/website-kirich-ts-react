@@ -1,7 +1,9 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
+import type { MeasurementType } from "@project/shared";
 
 interface TailoringState {
-  type: "top" | "bottom" | "set" | null;
+  // Разрешаем любой из 4 актуальных типов индивидуального пошива
+  type: MeasurementType | null;
   measurements: Record<string, string>;
 }
 
@@ -14,7 +16,8 @@ const tailoringSlice = createSlice({
   name: "tailoring",
   initialState,
   reducers: {
-    setType: (state, action: PayloadAction<"top" | "bottom" | "set">) => {
+    // Принимаем MeasurementType вместо устаревших строк
+    setType: (state, action: PayloadAction<MeasurementType>) => {
       state.type = action.payload;
       state.measurements = {};
     },

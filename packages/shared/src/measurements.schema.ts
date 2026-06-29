@@ -1,35 +1,230 @@
 import { z } from "zod";
 
-export const MeasurementFields = {
-  chest: z.string().min(1, "Обов'язкове поле"),
-  waist: z.string().min(1, "Обов'язкове поле"),
-  hips: z.string().min(1, "Обов'язкове поле"),
-  shoulders: z.string().min(1, "Обов'язкове поле"),
-  sleeve: z.string().min(1, "Обов'язкове поле"),
-  inseam: z.string().min(1, "Обов'язкове поле"),
-};
+// Вспомогательная функция для обязательного поля
+const requiredField = () => z.string().min(1, "Обов'язкове поле");
 
+// 1. Определяем все возможные мерки с их описаниями и превью-изображениями
+export const MEASUREMENTS_CATALOG = {
+  waist_definition: {
+    name: "Визначаємо лінію талії",
+    description:
+      "Зав’язуємо резинку, щоб визначити розташування найтоншого місця тулуба – талії. Більшість мірок вимірюється до/від цієї лінії",
+    imageUrl:
+      "https://res.cloudinary.com/dqe2odzsc/image/upload/v1782633245/Photoroom_20260622_182320-Photoroom.png",
+    validator: z.any().optional(), // для информационных блоков без ввода
+  },
+  chest: {
+    name: "Обхват грудей",
+    description:
+      "Мірка вимірюється по самим виступаючим точкам грудей, зі сторони спини проходячи через лопатки. При знятті даної мірки не варто занадто сильно натягувати чи послаблювати сантиметрову стрічку, вона повинна щільно, але без стягування, охоплювати грудну клітину",
+    imageUrl:
+      "https://res.cloudinary.com/dqe2odzsc/image/upload/v1782633162/Photoroom_20260622_181549-Photoroom.jpg",
+    validator: requiredField(),
+  },
+  waist: {
+    name: "Обхват талії",
+    description:
+      "Мірка вимірюється по самому вузькому місцю на тулубі, щільно обхопивши талію сантиметровою стрічкою, але не стягуючи її",
+    imageUrl:
+      "https://res.cloudinary.com/dqe2odzsc/image/upload/v1782633162/Photoroom_20260622_181526-Photoroom.png",
+    validator: requiredField(),
+  },
+  hips: {
+    name: "Обхват стегон",
+    description: "Мірка вимірюється через найвипукліші зони сідниць",
+    imageUrl:
+      "https://res.cloudinary.com/dqe2odzsc/image/upload/v1782633165/Photoroom_20260622_181449-Photoroom.png",
+    validator: requiredField(),
+  },
+  shoulders: {
+    name: "А2Т2",
+    description:
+      "Мірка вимірюється від основи шиї на рівні уявного плечевого шва через центр грудей до лінії талії вертикально",
+    imageUrl:
+      "https://res.cloudinary.com/dqe2odzsc/image/upload/v1782633244/Photoroom_20260622_182008-Photoroom.jpg",
+    validator: requiredField(),
+  },
+  shoulders_back: {
+    name: "А8Т8",
+    description:
+      "Мірка вимірюється по спині від основи шиї на рівні уявного плечевого шва до лінії талії вертикально вниз",
+    imageUrl:
+      "https://res.cloudinary.com/dqe2odzsc/image/upload/v1782633244/Photoroom_20260622_181944-Photoroom.jpg",
+    validator: requiredField(),
+  },
+  side_height: {
+    name: "Висота бока",
+    description: "Мірка вимірюється по боковому шву від пахви до лінії талії",
+    imageUrl:
+      "https://res.cloudinary.com/dqe2odzsc/image/upload/v1782633243/Photoroom_20260622_181831-Photoroom.png",
+    validator: requiredField(),
+  },
+  seat_height: {
+    name: "Висота сидіння",
+    description:
+      "Для зняття мірки необхідно посадити людину на стілець, спина при цьому рівна. Мірка вимірюється двічі: одне значення ззаду від талії до сидіння стільця, друге значення збоку від талії до сидіння стільця. Записується те значення, що більше",
+    imageUrl:
+      "https://res.cloudinary.com/dqe2odzsc/image/upload/v1782633245/Photoroom_20260622_182958-Photoroom.png",
+    validator: requiredField(),
+  },
+  arm_length: {
+    name: "Довжина руки",
+    description:
+      "Мірка вимірюється вертикально від краю плеча до зап’ястя уздовж зовнішньої сторони руки. При знятті даної мірки рука повинна бути випрямлена уздовж тулуба",
+    imageUrl:
+      "https://res.cloudinary.com/dqe2odzsc/image/upload/v1782633243/Photoroom_20260622_181809-Photoroom.jpg",
+    validator: requiredField(),
+  },
+  wrist: {
+    name: "Обхват зап'ястя",
+    description:
+      "Мірка знімається горизонтальним обхватом по лінії зап’ястя, в місці передбачуваного манжета",
+    imageUrl:
+      "https://res.cloudinary.com/dqe2odzsc/image/upload/v1782633161/Photoroom_20260622_181427-Photoroom.jpg",
+    validator: requiredField(),
+  },
+  arm_girth: {
+    name: "Обхват руки",
+    description:
+      "Мірка вимірюється горизонтальним обхватом по найширшій верхній частині руки, при цьому рука вільно опущена вниз",
+    imageUrl:
+      "https://res.cloudinary.com/dqe2odzsc/image/upload/v1782633161/Photoroom_20260622_181327-Photoroom.jpg",
+    validator: requiredField(),
+  },
+  seat_length: {
+    name: "Довжина сидіння",
+    description: "Мірка вимірюється напівдугою від талії до талії через пах",
+    imageUrl:
+      "https://res.cloudinary.com/dqe2odzsc/image/upload/v1782633174/Photoroom_20260622_181707-Photoroom.png",
+    validator: requiredField(),
+  },
+  arch: {
+    name: "Дуга",
+    description:
+      "Мірка вимірюється шляхом обхвату тулуба через пах до основи шиї",
+    imageUrl:
+      "https://res.cloudinary.com/dqe2odzsc/image/upload/v1782633243/Photoroom_20260622_181920-Photoroom.jpg",
+    validator: requiredField(),
+  },
+  neck: {
+    name: "Обхват шиї",
+    description:
+      "Мірка вимірюється навкруги шиї в місці передбачуваного комірця, сантиметрова стрічка замикається на яремній западині",
+    imageUrl:
+      "https://res.cloudinary.com/dqe2odzsc/image/upload/v1782633161/Photoroom_20260622_181350-Photoroom.jpg",
+    validator: requiredField(),
+  },
+  product_length: {
+    name: "Довжина виробу",
+    description:
+      "Мірка вимірюється від лінії талії до бажаного низу майбутнього виробу",
+    imageUrl:
+      "https://res.cloudinary.com/dqe2odzsc/image/upload/v1782633243/Photoroom_20260622_181809-Photoroom.jpg",
+    validator: requiredField(),
+  },
+  pants_length: {
+    name: "Довжина штанів",
+    description:
+      "Мірка вимірюється від лінії талії до низу штанів уздовж зовнішньої сторони ноги. Для цієї мірки краще взути танцювальні туфлі та вимірювати довжину з урахуванням висоти підборів",
+    imageUrl:
+      "https://res.cloudinary.com/dqe2odzsc/image/upload/v1782633246/Photoroom_20260622_183505-Photoroom.jpg",
+    validator: requiredField(),
+  },
+  pants_bottom_width: {
+    name: "Ширина штанів по низу",
+    description:
+      "Мірка вимірюється шляхом підбору бажаної ширини штанів по низу. Ця мірка вимірюється у взутті",
+    imageUrl:
+      "https://res.cloudinary.com/dqe2odzsc/image/upload/v1782633246/Photoroom_20260622_183234-Photoroom.jpg",
+    validator: requiredField(),
+  },
+} as const;
+
+// 2. Конфигурация типов изделий (4 штуки) с массивами ключей мерок
 export const MEASUREMENT_CONFIG = {
-  top: {
-    label: "Верх",
-    fields: ["chest", "waist", "shoulders", "sleeve"],
+  body: {
+    label: "Боді",
+    fields: [
+      "waist_definition",
+      "waist",
+      "chest",
+      "hips",
+      "shoulders",
+      "shoulders_back",
+      "side_height",
+      "seat_height",
+      "arm_length",
+      "wrist",
+      "arm_girth",
+      "seat_length",
+      "arch",
+      "neck",
+    ],
   },
-  bottom: {
-    label: "Низ",
-    fields: ["hips", "inseam"],
+  jacket: {
+    label: "Піджак / жилет",
+    fields: [
+      "waist_definition",
+      "waist",
+      "chest",
+      "hips",
+      "shoulders",
+      "shoulders_back",
+      "arm_girth",
+      "arm_length",
+      "side_height",
+      "product_length",
+    ],
   },
-  set: {
-    label: "Комплект",
-    fields: ["chest", "waist", "hips", "shoulders", "sleeve", "inseam"],
+  pants: {
+    label: "Штани",
+    fields: [
+      "waist_definition",
+      "waist",
+      "hips",
+      "seat_height",
+      "pants_length",
+      "pants_bottom_width",
+    ],
   },
-};
+  suit: {
+    label: "Костюм",
+    fields: [
+      "waist_definition",
+      "waist",
+      "chest",
+      "hips",
+      "shoulders",
+      "shoulders_back",
+      "side_height",
+      "seat_height",
+      "arm_length",
+      "wrist",
+      "arm_girth",
+      "seat_length",
+      "arch",
+      "neck",
+      "product_length",
+      "pants_length",
+      "pants_bottom_width",
+    ],
+  },
+} as const;
 
+// Динамический генератор Zod-схемы для валидации на бэкенде/фронте
 export const getMeasurementSchema = (type: keyof typeof MEASUREMENT_CONFIG) => {
   const fields = MEASUREMENT_CONFIG[type].fields;
-  const schema: Record<string, z.ZodString> = {};
+  const schema: Record<string, z.ZodTypeAny> = {};
 
-  fields.forEach((field) => {
-    schema[field] = MeasurementFields[field as keyof typeof MeasurementFields];
+  fields.forEach((fieldKey) => {
+    const measurement =
+      MEASUREMENTS_CATALOG[fieldKey as keyof typeof MEASUREMENTS_CATALOG];
+    const validator = measurement.validator;
+
+    // Проверяем, что валидатор существует и это объект Zod, а не информационная пустышка
+    if (validator && typeof validator === "object" && "parse" in validator) {
+      schema[fieldKey] = validator as z.ZodTypeAny;
+    }
   });
 
   return z.object(schema);

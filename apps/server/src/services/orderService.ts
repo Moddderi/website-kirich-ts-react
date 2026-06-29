@@ -1,74 +1,57 @@
+import type { OrderPayload } from "@project/shared";
 import db from "../models/index.js";
 // 1. ИМПОРТИРУЕМ НАШУ УТИЛИТУ (проверь правильность пути к файлу!)
 import { sendTelegramNotification } from "../utils/telegram.js";
 
-interface OrderItemPayload {
-  productId: number | null; // null для индивидуального пошива
-  name: string;
-  quantity: number;
-  price: number;
-  color?: string | null;
-  size?: string | null;
-  measurements?: object | null; // Новое поле для мерок
-}
+export const createOrder = async (payload: OrderPayload) => {
+  // 🟢 ЗАХИСТ: Перевіряємо наявність масиву товарів перед його використанням.
+  // Це на 100% виправляє помилку TS18048 та захищає від падіння програми.
+  if (!payload.items || !Array.isArray(payload.items)) {
+    throw new Error(
+      "Тіло замовлення не містить масиву товарів (items) або він пустий.",
+    );
+  }
 
-// Обновленный тип для метода коммуникации, включающий whatsapp
-type CommunicationMethod = "telegram" | "instagram" | "whatsapp";
-
-interface CreateOrderPayload {
-  customer: {
-    firstName: string;
-    lastName: string;
-    phone: string;
-    email: string;
-  };
-  delivery: { method: string; city: string; warehouse: string };
-  payment: string;
-  orderType: "ready-made" | "custom";
-  communicationMethod: CommunicationMethod; // Варианты: telegram, instagram, whatsapp
-  socialUsername: string;
-  items: OrderItemPayload[];
-  totalAmount: number;
-}
-
-export const createOrder = async (payload: CreateOrderPayload) => {
   const transaction = await db.sequelize.transaction();
   try {
+    const customMeasurements =
+      payload.orderType === "custom" ? payload.measurements : null;
+
     // Создаем заказ в БД
     const order = await db.Order.create(
       {
-        firstName: payload.customer.firstName,
-        lastName: payload.customer.lastName,
-        phone: payload.customer.phone,
-        email: payload.customer.email,
-        deliveryMethod: payload.delivery.method,
+        firstName: payload.firstName,
+        lastName: payload.lastName,
+        phone: payload.phone,
+        email: payload.email,
+        deliveryMethod: payload.deliveryMethod,
         city:
-          payload.delivery.method === "nova_poshta"
-            ? payload.delivery.city
+          payload.deliveryMethod === "nova_poshta"
+            ? (payload.city ?? null)
             : null,
         warehouse:
-          payload.delivery.method === "nova_poshta"
-            ? payload.delivery.warehouse
+          payload.deliveryMethod === "nova_poshta"
+            ? (payload.warehouse ?? null)
             : null,
-        paymentMethod: payload.payment,
+        paymentMethod: payload.paymentMethod,
         totalAmount: payload.totalAmount,
         status: "pending",
         orderType: payload.orderType,
-        communicationMethod: payload.communicationMethod, // Записываем метод связи
-        socialUsername: payload.socialUsername, // Записываем ник/телефон
+        communicationMethod: payload.communicationMethod,
+        socialUsername: payload.socialUsername,
       },
       { transaction },
     );
 
     const orderItemsData = payload.items.map((item) => ({
       orderId: order.id,
-      productId: item.productId,
+      productId: item.productId ? Number(item.productId) : null,
       name: item.name,
       quantity: item.quantity,
       price: item.price,
       color: item.color || null,
       size: item.size || null,
-      measurements: item.measurements || null,
+      measurements: customMeasurements,
     }));
 
     await db.OrderItem.bulkCreate(orderItemsData, { transaction });
@@ -77,15 +60,15 @@ export const createOrder = async (payload: CreateOrderPayload) => {
 
     //NOTE: Логика отправки тг сообщения
 
-    // try {
-    //   const fullOrder = await getOrderById(order.id);
+    try {
+      const fullOrder = await getOrderById(order.id);
 
-    //   if (fullOrder) {
-    //     sendTelegramNotification(fullOrder);
-    //   }
-    // } catch (tgError) {
-    //   console.error("Помилка відправки в ТГ:", tgError);
-    // }
+      if (fullOrder) {
+        sendTelegramNotification(fullOrder);
+      }
+    } catch (tgError) {
+      console.error("Помилка відправки в ТГ:", tgError);
+    }
 
     return order;
   } catch (error) {
