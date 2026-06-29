@@ -4,6 +4,14 @@ import db from "../models/index.js";
 import { sendTelegramNotification } from "../utils/telegram.js";
 
 export const createOrder = async (payload: OrderPayload) => {
+  // 🟢 ЗАХИСТ: Перевіряємо наявність масиву товарів перед його використанням.
+  // Це на 100% виправляє помилку TS18048 та захищає від падіння програми.
+  if (!payload.items || !Array.isArray(payload.items)) {
+    throw new Error(
+      "Тіло замовлення не містить масиву товарів (items) або він пустий.",
+    );
+  }
+
   const transaction = await db.sequelize.transaction();
   try {
     const customMeasurements =
