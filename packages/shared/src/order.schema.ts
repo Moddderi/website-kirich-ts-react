@@ -29,6 +29,7 @@ export const orderItemSchema = z.object({
   price: z.number().nonnegative(),
   color: z.string().nullable().optional(),
   size: z.string().nullable().optional(),
+  measurements: z.record(z.string()).nullable().optional(),
 });
 
 // 2. Схема с проверкой заполнения города и отделения

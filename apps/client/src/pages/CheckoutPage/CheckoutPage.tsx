@@ -78,7 +78,7 @@ export const CheckoutPage = () => {
 
     setIsSubmitting(true);
 
-    // Формуємо масив товарів, адаптований під схему (items)
+    // Базова конструкція items (без жодних measurements всередині елементів)
     const itemsPayload =
       orderType === "ready-made"
         ? cartItems.map((item) => ({
@@ -100,7 +100,7 @@ export const CheckoutPage = () => {
             },
           ];
 
-    // Суворо типізований об'єкт відправки (згідно з Zod)
+    // Суворо типізований об'єкт відправки адаптований під Zod/Union схему
     let orderPayload: OrderPayload;
 
     if (orderType === "ready-made") {
@@ -117,6 +117,7 @@ export const CheckoutPage = () => {
         totalAmount: 0,
         status: "pending",
         orderType: "custom",
+        // 🟢 Виносимо мірки на рівень об'єкта замовлення, як того вимагає схема з packages/shared/src/order.schema.ts
         measurements: (measurements as Record<string, string>) || {},
         items: itemsPayload,
       };
