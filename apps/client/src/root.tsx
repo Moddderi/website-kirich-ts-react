@@ -49,7 +49,8 @@ export const Root = () => {
                 {/* Отдельные страницы шагов */}
                 <Route path="step-1" element={<SelectTypePage />} />
                 <Route path="step-2" element={<MeasurementsPage />} />
-                {/* <Route path="step-3" element={<ReviewPage />} /> */}
+                <Route path="checkout" element={<CheckoutPage />} />
+                <Route path="order-success" element={<OrderSuccessPage />} />
               </Route>
 
               <Route path="cart" element={<CartPage />} />

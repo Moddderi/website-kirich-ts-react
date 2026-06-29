@@ -1,9 +1,9 @@
 import axios from "axios";
-import type { CheckoutFormValues } from "@project/shared";
+import type { OrderPayload } from "@project/shared";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5005/api";
 
-export const createOrder = async (orderPayload: CheckoutFormValues) => {
+export const createOrder = async (orderPayload: OrderPayload) => {
   const { data } = await axios.post(`${API_URL}/orders`, orderPayload);
   return data;
 };
