@@ -1,14 +1,15 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
-import type { MeasurementType } from "@project/shared";
+import type { MeasurementType, MeasurementUnit } from "@project/shared";
 
 interface TailoringState {
-  // Разрешаем любой из 4 актуальных типов индивидуального пошива
   type: MeasurementType | null;
+  measurementUnit: MeasurementUnit;
   measurements: Record<string, string>;
 }
 
 const initialState: TailoringState = {
   type: null,
+  measurementUnit: "cm",
   measurements: {},
 };
 
@@ -16,9 +17,13 @@ const tailoringSlice = createSlice({
   name: "tailoring",
   initialState,
   reducers: {
-    // Принимаем MeasurementType вместо устаревших строк
     setType: (state, action: PayloadAction<MeasurementType>) => {
       state.type = action.payload;
+      state.measurements = {};
+      state.measurementUnit = "cm";
+    },
+    setMeasurementUnit: (state, action: PayloadAction<MeasurementUnit>) => {
+      state.measurementUnit = action.payload;
       state.measurements = {};
     },
     setMeasurement: (
@@ -30,5 +35,6 @@ const tailoringSlice = createSlice({
   },
 });
 
-export const { setType, setMeasurement } = tailoringSlice.actions;
+export const { setType, setMeasurementUnit, setMeasurement } =
+  tailoringSlice.actions;
 export default tailoringSlice.reducer;
