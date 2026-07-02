@@ -2,25 +2,35 @@ import type { Product } from "@project/shared";
 import { Link } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../store/store";
 import { toggleFavorite, selectIsFavorite } from "../../store/favoriteSlice";
+import { optimizeCloudinaryUrl } from "../../utils/cloudinary";
+import { ProductImage } from "../shared/ProductImage/ProductImage";
 
 import { IoHeart, IoHeartOutline } from "react-icons/io5";
 
 interface ProductCardProps {
   product: Product;
+  imageLoading?: "eager" | "lazy";
+  enterDelayMs?: number;
 }
 
-export const ProductCard = ({ product }: ProductCardProps) => {
+export const ProductCard = ({
+  product,
+  imageLoading = "lazy",
+  enterDelayMs = 0,
+}: ProductCardProps) => {
   const dispatch = useAppDispatch();
 
   const isFavorite = useAppSelector(selectIsFavorite(product.id));
   const productId = product.id || product.product_code;
 
-  const defaultImage =
-    "https://res.cloudinary.com/dqe2odzsc/image/upload/default.jpg";
+  const defaultImage = optimizeCloudinaryUrl(
+    "https://res.cloudinary.com/dqe2odzsc/image/upload/default.jpg",
+  );
 
-  // Безопасно забираем массив картинок (теперь он всегда массив)
   const images = Array.isArray(product.imageUrl) ? product.imageUrl : [];
-  const displayImages = images.length > 0 ? images : [defaultImage];
+  const displayImages = (images.length > 0 ? images : [defaultImage]).map(
+    (url) => optimizeCloudinaryUrl(url),
+  );
 
   const handleToggleFavorite = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
@@ -31,36 +41,34 @@ export const ProductCard = ({ product }: ProductCardProps) => {
   return (
     <Link
       to={`/catalog/${productId}`}
-      className="group relative flex flex-col cursor-pointer opacity-0 animate-reveal-up delay-100"
+      className="product-card-enter group relative flex flex-col cursor-pointer"
+      style={{ animationDelay: `${enterDelayMs}ms` }}
     >
-      {/* ИЗОБРАЖЕНИЕ И КНОПКА ИЗБРАННОГО */}
       <div className="relative aspect-3/4 w-full overflow-hidden rounded-4xl bg-stone-200 border border-stone-200/60">
         <div className="absolute inset-0 overflow-hidden">
-          {/* Главная картинка товара */}
-          <img
+          <ProductImage
             src={displayImages[0]}
             alt={product.name}
-            crossOrigin="anonymous"
-            className={`w-full h-full object-cover scale-100 group-hover:scale-110 transition-all duration-1000 ease-[cubic-bezier(0.25,1,0.5,1)] ${
+            loading={imageLoading}
+            className={`scale-100 group-hover:scale-110 transition-transform duration-1000 ease-[cubic-bezier(0.25,1,0.5,1)] ${
               displayImages.length > 1 ? "group-hover:opacity-0" : ""
             }`}
           />
 
-          {/* Дополнительная картинка при ховере */}
           {displayImages.length > 1 && displayImages[1] !== defaultImage && (
-            <img
-              src={displayImages[1]}
-              alt={`${product.name} - ракурс 2`}
-              crossOrigin="anonymous"
-              className="absolute inset-0 w-full h-full object-cover scale-100 group-hover:scale-110 transition-all duration-1000 ease-[cubic-bezier(0.25,1,0.5,1)] opacity-0 group-hover:opacity-100"
-            />
+            <div className="absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100">
+              <ProductImage
+                src={displayImages[1]}
+                alt={`${product.name} - ракурс 2`}
+                loading="lazy"
+                className="scale-100 group-hover:scale-110 transition-transform duration-1000 ease-[cubic-bezier(0.25,1,0.5,1)]"
+              />
+            </div>
           )}
         </div>
 
-        {/* Затемнение при наведении */}
         <div className="absolute inset-0 bg-stone-900/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-10 backdrop-blur-[2px]"></div>
 
-        {/* Анимированная кнопка */}
         <div className="absolute inset-x-5 bottom-5 z-20 translate-y-8 opacity-0 transition-all duration-500 ease-out group-hover:translate-y-0 group-hover:opacity-100">
           <button
             onClick={handleToggleFavorite}
@@ -85,7 +93,6 @@ export const ProductCard = ({ product }: ProductCardProps) => {
         </div>
       </div>
 
-      {/* ИНФОРМАЦИЯ О ТОВАРЕ */}
       <div className="mt-5">
         <div className="flex justify-between items-start gap-4">
           <h3 className="text-sm font-semibold tracking-tight text-stone-900 group-hover:text-stone-500 transition-colors">

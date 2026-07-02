@@ -49,6 +49,8 @@ export const IdParamSchema = z.object({
   id: z.coerce.number().int().positive("ID должен быть положительным числом"),
 });
 
+export const CATALOG_PAGE_SIZE = 8;
+
 // 3. Обновленная схема для фильтров
 export const FilterSchema = z.object({
   main_category: MainCategoryEnum.optional(),
@@ -60,11 +62,21 @@ export const FilterSchema = z.object({
     .string()
     .optional()
     .transform((val) => val?.trim()),
+  page: z.coerce.number().int().positive().optional(),
+  limit: z.coerce.number().int().min(1).max(24).optional(),
+});
+
+export const ProductsPageSchema = z.object({
+  items: z.array(ProductSchema.extend({ id: z.number() })),
+  total: z.number().int().nonnegative(),
+  page: z.number().int().positive(),
+  limit: z.number().int().positive(),
+  totalPages: z.number().int().nonnegative(),
 });
 
 export type ProductInput = z.infer<typeof ProductSchema>;
 export type IdParamInput = z.infer<typeof IdParamSchema>;
-// Также полезно экспортировать тип фильтров для фронтенда
 export type FilterInput = z.infer<typeof FilterSchema>;
+export type ProductsPage = z.infer<typeof ProductsPageSchema>;
 
 export type Product = ProductInput & { id: number };

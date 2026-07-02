@@ -1,8 +1,48 @@
 import dotenv from "dotenv";
 dotenv.config();
 
-// Імпортуємо ваш каталог мірок, де прописані назви українською (name)
-import { MEASUREMENTS_CATALOG } from "@project/shared"; // ⚠️ Вкажіть правильний шлях до файлу каталогу
+import {
+  MEASUREMENTS_CATALOG,
+  MEASUREMENT_UNIT_LABELS,
+  type MeasurementUnit,
+} from "@project/shared";
+
+type MeasurementsPayload =
+  | Record<string, string>
+  | {
+      unit?: MeasurementUnit;
+      values?: Record<string, string>;
+    };
+
+const parseMeasurementsPayload = (measurementsData: unknown) => {
+  if (!measurementsData) {
+    return { unit: "cm" as MeasurementUnit, values: {} as Record<string, string> };
+  }
+
+  let parsed: MeasurementsPayload = measurementsData as MeasurementsPayload;
+
+  if (typeof measurementsData === "string") {
+    parsed = JSON.parse(measurementsData) as MeasurementsPayload;
+  }
+
+  if (
+    parsed &&
+    typeof parsed === "object" &&
+    "unit" in parsed &&
+    "values" in parsed &&
+    parsed.values
+  ) {
+    return {
+      unit: (parsed.unit ?? "cm") as MeasurementUnit,
+      values: parsed.values,
+    };
+  }
+
+  return {
+    unit: "cm" as MeasurementUnit,
+    values: parsed as Record<string, string>,
+  };
+};
 
 /**
  * Функція для відправки сповіщення в Telegram-чат менеджерів
@@ -18,41 +58,40 @@ export const sendTelegramNotification = async (order: any) => {
     return;
   }
 
-  // Визначаємо тип замовлення
   const isCustomOrder = order.orderType === "custom";
 
-  // 1. Форматуємо список товарів або мірки для пошиття
   let itemsList = "";
   if (isCustomOrder) {
     itemsList = `• 🧵 *Індивідуальний пошив*\n`;
 
-    // Дістаємо мірки з масиву items (з першого елемента)
     const customItem = order.items?.[0];
     const measurementsData = customItem?.measurements;
 
-    // Безпечний парсинг на випадок, якщо вони прийдуть як рядок JSON з бази
-    let measurementsObj = null;
+    let measurementsObj: Record<string, string> = {};
+    let measurementUnit: MeasurementUnit = "cm";
+
     try {
-      measurementsObj =
-        typeof measurementsData === "string"
-          ? JSON.parse(measurementsData)
-          : measurementsData;
+      const parsedMeasurements = parseMeasurementsPayload(measurementsData);
+      measurementsObj = parsedMeasurements.values;
+      measurementUnit = parsedMeasurements.unit;
     } catch (e) {
       console.error("❌ Не вдалося розпарсити мірки для Telegram:", e);
     }
 
+    const unitLabel = MEASUREMENT_UNIT_LABELS[measurementUnit];
+
     if (measurementsObj && Object.keys(measurementsObj).length > 0) {
       itemsList +=
+        `  *Одиниці виміру:* ${unitLabel}\n` +
         `  *Усі мірки клієнта:*\n` +
         Object.entries(measurementsObj)
+          .filter(([key]) => key !== "waist_definition")
           .map(([key, value]) => {
-            // Отримуємо назву мірки з вашого каталогу MEASUREMENTS_CATALOG,
-            // якщо її там немає (наприклад, кастомний ключ) — залишаємо оригінальний ключ
             const measurementInfo =
               MEASUREMENTS_CATALOG[key as keyof typeof MEASUREMENTS_CATALOG];
             const nameUkr = measurementInfo ? measurementInfo.name : key;
 
-            return `  - *${nameUkr}:* ${value} см`;
+            return `  - *${nameUkr}:* ${value} ${unitLabel}`;
           })
           .join("\n");
     } else {
@@ -77,12 +116,10 @@ export const sendTelegramNotification = async (order: any) => {
     itemsList = "Товари не знайдено";
   }
 
-  // 2. Очищаємо нікнейм/телефон від зайвих символів, якщо користувач його ввів
   const cleanValue = order.socialUsername
     ? order.socialUsername.replace("@", "").trim()
     : "";
 
-  // Створюємо клікабельне посилання для менеджера з урахуванням WhatsApp
   let clientSocialLink = "";
   if (order.communicationMethod === "telegram") {
     clientSocialLink = `[Написати в Telegram](https://t.me/${cleanValue})`;
@@ -93,7 +130,6 @@ export const sendTelegramNotification = async (order: any) => {
     clientSocialLink = `[Написати в WhatsApp](https://wa.me/${cleanPhone})`;
   }
 
-  // 3. Збираємо шаблон повідомлення українською мовою
   const orderIdPrefix = order.id
     ? order.id.split("-")[0].toUpperCase()
     : "CUSTOM";
@@ -126,7 +162,6 @@ ${itemsList}
   }*
 `;
 
-  // 4. Відправляємо POST-запит на API Telegram
   try {
     const response = await fetch(
       `https://api.telegram.org/bot${token}/sendMessage`,

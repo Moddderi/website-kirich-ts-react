@@ -12,6 +12,10 @@ import { createOrder } from "../../api/orderApi";
 
 import { checkoutSchema } from "@project/shared";
 import type { CheckoutFormValues, OrderPayload } from "@project/shared";
+import {
+  MEASUREMENTS_CATALOG,
+  MEASUREMENT_UNIT_LABELS,
+} from "@project/shared";
 
 export const CheckoutPage = () => {
   const navigate = useNavigate();
@@ -19,7 +23,7 @@ export const CheckoutPage = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const cartItems = useAppSelector((state) => state.cart.items);
-  const { type: tailoringType, measurements } = useAppSelector(
+  const { type: tailoringType, measurements, measurementUnit } = useAppSelector(
     (state) => state.tailoring,
   );
 
@@ -118,7 +122,10 @@ export const CheckoutPage = () => {
         status: "pending",
         orderType: "custom",
         // 🟢 Виносимо мірки на рівень об'єкта замовлення, як того вимагає схема з packages/shared/src/order.schema.ts
-        measurements: (measurements as Record<string, string>) || {},
+        measurements: {
+          unit: measurementUnit,
+          values: measurements,
+        },
         items: itemsPayload,
       };
     }
@@ -518,6 +525,30 @@ export const CheckoutPage = () => {
                       {tailoringType}
                     </span>
                   </div>
+                  <div className="flex justify-between text-sm font-medium text-stone-500">
+                    <span>Одиниці виміру:</span>
+                    <span className="text-stone-900 font-semibold">
+                      {MEASUREMENT_UNIT_LABELS[measurementUnit]}
+                    </span>
+                  </div>
+                  {Object.entries(measurements)
+                    .filter(([key]) => key !== "waist_definition")
+                    .map(([key, value]) => (
+                      <div
+                        key={key}
+                        className="flex justify-between gap-4 text-xs font-medium text-stone-500"
+                      >
+                        <span>
+                          {MEASUREMENTS_CATALOG[
+                            key as keyof typeof MEASUREMENTS_CATALOG
+                          ]?.name ?? key}
+                          :
+                        </span>
+                        <span className="text-stone-900 whitespace-nowrap">
+                          {value} {MEASUREMENT_UNIT_LABELS[measurementUnit]}
+                        </span>
+                      </div>
+                    ))}
                   <div className="flex justify-between text-sm font-medium text-stone-500">
                     <span>Тип замовлення:</span>
                     <span className="text-stone-900">Індивідуальний пошив</span>
