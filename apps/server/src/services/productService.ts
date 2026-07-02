@@ -1,46 +1,68 @@
 import db from "../models/index.js";
-import { FilterInput } from "@project/shared";
-import { Op } from "sequelize"; // Импортируем операторы для фильтрации
+import { CATALOG_PAGE_SIZE, FilterInput } from "@project/shared";
+import { Op } from "sequelize";
 
-const { Product, sequelize } = db;
+const { Product } = db;
+
+const buildWhereClause = (filters?: FilterInput) => {
+  const where: Record<string | symbol, unknown> = {};
+
+  if (!filters) {
+    return where;
+  }
+
+  if (filters.main_category) where.main_category = filters.main_category;
+  if (filters.sub_type) where.sub_type = filters.sub_type;
+  if (filters.dance_program) where.dance_program = filters.dance_program;
+
+  if (filters.minPrice !== undefined || filters.maxPrice !== undefined) {
+    where.price = {};
+    if (filters.minPrice !== undefined) {
+      (where.price as Record<symbol, number>)[Op.gte] = filters.minPrice;
+    }
+    if (filters.maxPrice !== undefined) {
+      (where.price as Record<symbol, number>)[Op.lte] = filters.maxPrice;
+    }
+  }
+
+  if (filters.search) {
+    const s = filters.search.toLowerCase().trim();
+
+    where[Op.and] = [
+      {
+        [Op.or]: [
+          { search_name: { [Op.like]: `%${s}%` } },
+          { product_code: { [Op.like]: `%${s}%` } },
+        ],
+      },
+    ];
+  }
+
+  return where;
+};
 
 export const getAllProducts = async (filters?: FilterInput) => {
   try {
-    const where: any = {};
+    const page = filters?.page ?? 1;
+    const limit = filters?.limit ?? CATALOG_PAGE_SIZE;
+    const offset = (page - 1) * limit;
+    const where = buildWhereClause(filters);
 
-    if (filters) {
-      // 1. Обычные фильтры (если они есть)
-      if (filters.main_category) where.main_category = filters.main_category;
-      if (filters.sub_type) where.sub_type = filters.sub_type;
-      if (filters.dance_program) where.dance_program = filters.dance_program;
+    const { rows, count } = await Product.findAndCountAll({
+      where,
+      attributes: { exclude: ["search_name"] },
+      limit,
+      offset,
+      order: [["id", "ASC"]],
+    });
 
-      // 2. Фильтр цен
-      if (filters.minPrice !== undefined || filters.maxPrice !== undefined) {
-        where.price = {};
-        if (filters.minPrice !== undefined)
-          where.price[Op.gte] = filters.minPrice;
-        if (filters.maxPrice !== undefined)
-          where.price[Op.lte] = filters.maxPrice;
-      }
-
-      // 3. Поиск (добавляем через Op.and, чтобы он не затирал другие фильтры)
-      if (filters?.search) {
-        // Важно: переводим поисковый запрос в нижний кейс
-        const s = filters.search.toLowerCase().trim();
-
-        where[Op.and] = [
-          {
-            [Op.or]: [
-              // Ищем по нормализованной колонке search_name
-              { search_name: { [Op.like]: `%${s}%` } },
-              { product_code: { [Op.like]: `%${s}%` } },
-            ],
-          },
-        ];
-      }
-    }
-
-    return await Product.findAll({ where });
+    return {
+      items: rows,
+      total: count,
+      page,
+      limit,
+      totalPages: Math.ceil(count / limit) || 1,
+    };
   } catch (error) {
     console.error("Ошибка при получении списка:", error);
     throw error;

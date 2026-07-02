@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { getProducts } from "../../api/productApi";
 import { CatalogFilters } from "../../components/CatalogFilters/CatalogFilters";
 import { ProductCard } from "../../components/ProductCard/ProductCard";
-import type { FilterInput } from "@project/shared";
+import type { FilterInput, Product } from "@project/shared";
 
 import {
   CATALOG_PAGE_SIZE,
@@ -128,7 +128,7 @@ export const CatalogPage = () => {
               <ProductSkeleton key={i} />
             ))
           ) : displayedProducts.length > 0 ? (
-            displayedProducts.map((item, index) => (
+            displayedProducts.map((item: Product, index: number) => (
               <ProductCard
                 key={item.product_code || item.id}
                 product={item}

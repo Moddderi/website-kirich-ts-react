@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { customMeasurementsSchema } from "./measurements.schema.js";
 
 // 1. Базовый объект полей формы
 export const checkoutFieldsSchema = z.object({
@@ -59,7 +60,7 @@ export const customOrderSchema = checkoutFieldsSchema.extend({
   orderType: z.literal("custom"),
   totalAmount: z.number().nonnegative(),
   status: z.string(),
-  measurements: z.record(z.string(), z.string()),
+  measurements: customMeasurementsSchema,
   items: z.array(orderItemSchema), // <-- Добавлено
 });
 
