@@ -27,6 +27,16 @@ input[type="radio"]:checked + div .radio-border {
   background-size: 32px 32px;
 }
 
+/* === HIDE NUMBER INPUT SPINNERS === */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
 /* === HIDE SCROLLBAR === */
 .no-scrollbar::-webkit-scrollbar {
   display: none;
