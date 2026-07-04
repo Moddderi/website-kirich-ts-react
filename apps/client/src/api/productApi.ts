@@ -10,10 +10,21 @@ export const getProducts = async (filters?: FilterInput): Promise<ProductsPage> 
     ),
   );
 
-  const { data } = await axios.get<ProductsPage>(`${API_URL}/products`, {
+  const { data } = await axios.get(`${API_URL}/products`, {
     params: cleanParams,
   });
-  return data;
+
+  if (Array.isArray(data)) {
+    return {
+      items: data,
+      total: data.length,
+      page: 1,
+      limit: data.length,
+      totalPages: 1,
+    };
+  }
+
+  return data as ProductsPage;
 };
 
 // Обязательно добавь export, чтобы ESLint понял, что она будет использоваться
