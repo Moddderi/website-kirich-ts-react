@@ -16,36 +16,41 @@ type MeasurementsPayload =
 
 const parseMeasurementsPayload = (measurementsData: unknown): { unit: MeasurementUnit; values: Record<string, string> } => {
   if (!measurementsData) {
-    return { unit: "cm" as MeasurementUnit, values: {} as Record<string, string> };
+    return { unit: "cm", values: {} };
   }
 
-  let parsed: MeasurementsPayload = measurementsData as MeasurementsPayload;
+  let data: any = measurementsData;
 
-  if (typeof measurementsData === "string") {
-    parsed = JSON.parse(measurementsData) as MeasurementsPayload;
+  if (typeof data === "string") {
+    try {
+      data = JSON.parse(data);
+    } catch {
+      return { unit: "cm", values: {} };
+    }
   }
 
-  if (
-    parsed &&
-    typeof parsed === "object" &&
-    "unit" in parsed &&
-    "values" in parsed &&
-    parsed.values
-  ) {
+  if (typeof data !== "object" || data === null) {
+    return { unit: "cm", values: {} };
+  }
+
+  if ("unit" in data && "values" in data && typeof data.values === "object" && data.values !== null) {
+    const values: Record<string, string> = {};
+    for (const [k, v] of Object.entries(data.values)) {
+      values[k] = String(v);
+    }
     return {
-      unit: (parsed.unit ?? "cm") as MeasurementUnit,
-      values: (typeof parsed.values === "object" ? parsed.values : {}) as Record<string, string>,
+      unit: (data.unit === "in" || data.unit === "cm") ? data.unit : "cm",
+      values,
     };
   }
 
-  if (typeof parsed === "object" && parsed !== null) {
-    return {
-      unit: "cm" as MeasurementUnit,
-      values: parsed as unknown as Record<string, string>,
-    };
+  const values: Record<string, string> = {};
+  for (const [k, v] of Object.entries(data)) {
+    if (typeof v === "string" || typeof v === "number") {
+      values[k] = String(v);
+    }
   }
-
-  return { unit: "cm" as MeasurementUnit, values: {} as Record<string, string> };
+  return { unit: "cm", values };
 };
 
 /**
