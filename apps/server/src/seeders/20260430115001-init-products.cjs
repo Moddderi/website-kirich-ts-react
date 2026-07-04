@@ -70,14 +70,16 @@ module.exports = {
 
         return {
           name: product.name,
+          name_en: product.name_en || null,
           search_name: product.search_name,
+          search_name_en: product.search_name_en || null,
           price: product.price,
           product_code: code,
           main_category: product.main_category,
           dance_program: product.dance_program,
           sub_type: product.sub_type,
           stock: product.stock || 0,
-          imageUrl: foundUrls, // Массив чистых ссылок летит в Postgres
+          imageUrl: foundUrls,
           createdAt: new Date(),
           updatedAt: new Date(),
         };

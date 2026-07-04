@@ -14,7 +14,9 @@ class Product extends Model<
 > {
   declare id: CreationOptional<number>;
   declare name: string;
+  declare name_en: CreationOptional<string | null>;
   declare search_name: string;
+  declare search_name_en: CreationOptional<string | null>;
   declare price: number;
 
   // ИЗМЕНЕНО: Тема с массивом строк для типизации TypeScript
@@ -47,9 +49,19 @@ export default (sequelize: Sequelize) => {
         type: DataTypes.STRING,
         allowNull: false,
       },
+      name_en: {
+        type: DataTypes.STRING,
+        allowNull: true,
+        defaultValue: null,
+      },
       search_name: {
         type: DataTypes.TEXT,
         allowNull: false,
+      },
+      search_name_en: {
+        type: DataTypes.TEXT,
+        allowNull: true,
+        defaultValue: null,
       },
       price: {
         type: DataTypes.DECIMAL(10, 2),

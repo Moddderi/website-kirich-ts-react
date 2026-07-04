@@ -14,7 +14,7 @@ type MeasurementsPayload =
       values?: Record<string, string>;
     };
 
-const parseMeasurementsPayload = (measurementsData: unknown) => {
+const parseMeasurementsPayload = (measurementsData: unknown): { unit: MeasurementUnit; values: Record<string, string> } => {
   if (!measurementsData) {
     return { unit: "cm" as MeasurementUnit, values: {} as Record<string, string> };
   }
@@ -34,14 +34,18 @@ const parseMeasurementsPayload = (measurementsData: unknown) => {
   ) {
     return {
       unit: (parsed.unit ?? "cm") as MeasurementUnit,
-      values: parsed.values,
+      values: (typeof parsed.values === "object" ? parsed.values : {}) as Record<string, string>,
     };
   }
 
-  return {
-    unit: "cm" as MeasurementUnit,
-    values: parsed as Record<string, string>,
-  };
+  if (typeof parsed === "object" && parsed !== null) {
+    return {
+      unit: "cm" as MeasurementUnit,
+      values: parsed as unknown as Record<string, string>,
+    };
+  }
+
+  return { unit: "cm" as MeasurementUnit, values: {} as Record<string, string> };
 };
 
 /**

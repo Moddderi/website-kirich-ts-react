@@ -32,6 +32,7 @@ const buildWhereClause = (filters?: FilterInput) => {
       {
         [Op.or]: [
           { search_name: { [Op.like]: `%${s}%` } },
+          { search_name_en: { [Op.like]: `%${s}%` } },
           { product_code: { [Op.like]: `%${s}%` } },
         ],
       },
@@ -50,7 +51,7 @@ export const getAllProducts = async (filters?: FilterInput) => {
 
     const { rows, count } = await Product.findAndCountAll({
       where,
-      attributes: { exclude: ["search_name"] },
+      attributes: { exclude: ["search_name", "search_name_en"] },
       limit,
       offset,
       order: [["id", "ASC"]],
