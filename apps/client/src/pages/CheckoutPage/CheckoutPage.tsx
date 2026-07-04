@@ -1,6 +1,7 @@
 /* eslint-disable react-hooks/incompatible-library */
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import axios from "axios";
@@ -12,14 +13,11 @@ import { createOrder } from "../../api/orderApi";
 
 import { checkoutSchema } from "@project/shared";
 import type { CheckoutFormValues, OrderPayload } from "@project/shared";
-import {
-  MEASUREMENTS_CATALOG,
-  MEASUREMENT_UNIT_LABELS,
-} from "@project/shared";
 
 export const CheckoutPage = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
+  const { t } = useTranslation();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const cartItems = useAppSelector((state) => state.cart.items);
@@ -70,12 +68,12 @@ export const CheckoutPage = () => {
 
   const onSubmit = async (data: CheckoutFormValues) => {
     if (orderType === "ready-made" && cartItems.length === 0) {
-      alert("Ваша корзина пуста!");
+      alert(t("checkout.emptyCart"));
       return;
     }
 
     if (orderType === "custom" && !tailoringType) {
-      alert("Не вибрано тип виробу для пошиття!");
+      alert(t("checkout.noTailoringType"));
       navigate("/individual-tailoring");
       return;
     }
@@ -162,12 +160,12 @@ export const CheckoutPage = () => {
         }
 
         alert(
-          err.response?.data?.message || "Не вдалося з'єднатися з сервером.",
+          err.response?.data?.message || t("checkout.serverError"),
         );
       } else {
         const genericError = err as Error;
         console.error("Unexpected error:", genericError.message);
-        alert("Сталася непередбачувана мережева помилка.");
+        alert(t("checkout.unexpectedError"));
       }
     } finally {
       setIsSubmitting(false);
@@ -185,12 +183,12 @@ export const CheckoutPage = () => {
           <div className="mb-8 border-b border-stone-200/60 pb-6 flex items-center justify-between">
             <h1 className="text-3xl sm:text-4xl font-semibold tracking-tighter text-stone-900">
               {orderType === "custom"
-                ? "Оформлення замовлення (Індивідуальний пошив)"
-                : "Оформлення замовлення"}
+                ? t("checkout.titleCustom")
+                : t("checkout.titleReady")}
             </h1>
             {orderType === "custom" && (
               <span className="rounded-full bg-stone-900 px-3 py-1 text-[10px] font-semibold uppercase tracking-widest text-white shadow-sm border border-stone-800">
-                Індивідуальний пошив
+                {t("checkout.customBadge")}
               </span>
             )}
           </div>
@@ -199,12 +197,12 @@ export const CheckoutPage = () => {
             {/* Контактні дані */}
             <div className="bg-white p-6 sm:p-8 rounded-4xl border border-stone-200/60 shadow-sm">
               <h2 className="text-lg font-semibold tracking-tight text-stone-900 mb-6">
-                Контактні дані
+                {t("checkout.contactData")}
               </h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                 <div>
                   <label className="block text-xs font-semibold uppercase tracking-widest text-stone-900 mb-2.5">
-                    Ім'я
+                    {t("checkout.firstName")}
                   </label>
                   <input
                     type="text"
@@ -214,7 +212,7 @@ export const CheckoutPage = () => {
                         ? "ring-red-500 focus:ring-red-500"
                         : "ring-stone-200 focus:ring-stone-900"
                     }`}
-                    placeholder="Ваше ім'я"
+                    placeholder={t("checkout.firstNamePlaceholder")}
                   />
                   {errors.firstName && (
                     <p className="mt-1.5 text-xs font-medium text-red-500">
@@ -225,7 +223,7 @@ export const CheckoutPage = () => {
 
                 <div>
                   <label className="block text-xs font-semibold uppercase tracking-widest text-stone-900 mb-2.5">
-                    Прізвище
+                    {t("checkout.lastName")}
                   </label>
                   <input
                     type="text"
@@ -235,7 +233,7 @@ export const CheckoutPage = () => {
                         ? "ring-red-500 focus:ring-red-500"
                         : "ring-stone-200 focus:ring-stone-900"
                     }`}
-                    placeholder="Ваше прізвище"
+                    placeholder={t("checkout.lastNamePlaceholder")}
                   />
                   {errors.lastName && (
                     <p className="mt-1.5 text-xs font-medium text-red-500">
@@ -246,7 +244,7 @@ export const CheckoutPage = () => {
 
                 <div>
                   <label className="block text-xs font-semibold uppercase tracking-widest text-stone-900 mb-2.5">
-                    Телефон
+                    {t("checkout.phone")}
                   </label>
                   <input
                     type="tel"
@@ -267,7 +265,7 @@ export const CheckoutPage = () => {
 
                 <div>
                   <label className="block text-xs font-semibold uppercase tracking-widest text-stone-900 mb-2.5">
-                    Email
+                    {t("checkout.email")}
                   </label>
                   <input
                     type="email"
@@ -290,11 +288,10 @@ export const CheckoutPage = () => {
               {/* Блок вибору каналу зв'язку */}
               <div className="mt-8 pt-6 border-t border-stone-100">
                 <h3 className="text-sm font-semibold tracking-widest uppercase text-stone-900 mb-4">
-                  Куди вам написати?
+                  {t("checkout.whereToWrite")}
                 </h3>
                 <p className="text-xs text-stone-500 mb-4">
-                  Менеджер зв'яжеться з вами у обраному месенджері для
-                  підтвердження деталей.
+                  {t("checkout.messengerNote")}
                 </p>
 
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-5">
@@ -359,8 +356,8 @@ export const CheckoutPage = () => {
                 <div>
                   <label className="block text-xs font-semibold uppercase tracking-widest text-stone-900 mb-2.5">
                     {communicationMethod === "whatsapp"
-                      ? "Номер телефону у WhatsApp"
-                      : `Нікнейм ${getSocialNetworkLabel()}`}
+                      ? t("checkout.whatsappPhone")
+                      : t("checkout.nickname", { network: getSocialNetworkLabel() })}
                   </label>
                   <div className="relative rounded-xl shadow-sm">
                     {communicationMethod !== "whatsapp" && (
@@ -401,7 +398,7 @@ export const CheckoutPage = () => {
             {/* Доставка */}
             <div className="bg-white p-6 sm:p-8 rounded-4xl border border-stone-200/60 shadow-sm">
               <h2 className="text-lg font-semibold tracking-tight text-stone-900 mb-6">
-                Доставка
+                {t("checkout.delivery")}
               </h2>
               <div className="space-y-3 mb-6">
                 <label
@@ -418,7 +415,7 @@ export const CheckoutPage = () => {
                     className="h-4 w-4 text-stone-900 accent-stone-900"
                   />
                   <span className="text-sm font-semibold text-stone-900">
-                    Нова Пошта
+                    {t("checkout.novaPoshta")}
                   </span>
                 </label>
                 <label
@@ -435,7 +432,7 @@ export const CheckoutPage = () => {
                     className="h-4 w-4 text-stone-900 accent-stone-900"
                   />
                   <span className="text-sm font-semibold text-stone-900">
-                    Самовивіз із студії в Києві
+                    {t("checkout.pickup")}
                   </span>
                 </label>
               </div>
@@ -444,7 +441,7 @@ export const CheckoutPage = () => {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 animate-fade-in">
                   <div>
                     <label className="block text-xs font-semibold uppercase tracking-widest text-stone-900 mb-2.5">
-                      Місто
+                      {t("checkout.city")}
                     </label>
                     <input
                       type="text"
@@ -454,7 +451,7 @@ export const CheckoutPage = () => {
                           ? "ring-red-500 focus:ring-red-500"
                           : "ring-stone-200 focus:ring-stone-900"
                       }`}
-                      placeholder="Київ"
+                      placeholder={t("checkout.cityPlaceholder")}
                     />
                     {errors.city && (
                       <p className="mt-1.5 text-xs font-medium text-red-500">
@@ -464,7 +461,7 @@ export const CheckoutPage = () => {
                   </div>
                   <div>
                     <label className="block text-xs font-semibold uppercase tracking-widest text-stone-900 mb-2.5">
-                      Відділення
+                      {t("checkout.warehouse")}
                     </label>
                     <input
                       type="text"
@@ -474,7 +471,7 @@ export const CheckoutPage = () => {
                           ? "ring-red-500 focus:ring-red-500"
                           : "ring-stone-200 focus:ring-stone-900"
                       }`}
-                      placeholder="№ відділення"
+                      placeholder={t("checkout.warehousePlaceholder")}
                     />
                     {errors.warehouse && (
                       <p className="mt-1.5 text-xs font-medium text-red-500">
@@ -494,24 +491,24 @@ export const CheckoutPage = () => {
             <div className="p-6 sm:p-8 rounded-4xl bg-white border border-stone-200/60 shadow-sm">
               <h2 className="text-sm font-semibold tracking-widest uppercase text-stone-900 mb-6">
                 {orderType === "custom"
-                  ? "Підсумок пошиття"
-                  : "Ваше замовлення"}
+                  ? t("checkout.tailoringSummary")
+                  : t("checkout.orderSummary")}
               </h2>
 
               {orderType === "ready-made" && (
                 <div className="space-y-4 pb-6 border-b border-stone-100">
                   <div className="flex justify-between text-sm font-medium text-stone-500">
-                    <span>Товари ({totalQuantity})</span>
+                    <span>{t("checkout.products", { count: totalQuantity })}</span>
                     <span className="text-stone-900">
                       {totalPrice.toLocaleString()} ₴
                     </span>
                   </div>
                   <div className="flex justify-between text-sm font-medium text-stone-500">
-                    <span>Доставка</span>
+                    <span>{t("checkout.deliveryLabel")}</span>
                     <span className="text-stone-900">
                       {deliveryMethod === "pickup"
-                        ? "Безкоштовно"
-                        : "За тарифами НП"}
+                        ? t("checkout.free")
+                        : t("checkout.byNPTariffs")}
                     </span>
                   </div>
                 </div>
@@ -520,15 +517,15 @@ export const CheckoutPage = () => {
               {orderType === "custom" && (
                 <div className="space-y-4 pb-6 border-b border-stone-100">
                   <div className="flex justify-between text-sm font-medium text-stone-500">
-                    <span>Категорія:</span>
+                    <span>{t("checkout.category")}:</span>
                     <span className="text-stone-900 font-semibold">
                       {tailoringType}
                     </span>
                   </div>
                   <div className="flex justify-between text-sm font-medium text-stone-500">
-                    <span>Одиниці виміру:</span>
+                    <span>{t("checkout.measurementUnits")}:</span>
                     <span className="text-stone-900 font-semibold">
-                      {MEASUREMENT_UNIT_LABELS[measurementUnit]}
+                      {t(`measurementUnits.${measurementUnit}`)}
                     </span>
                   </div>
                   {Object.entries(measurements)
@@ -539,26 +536,24 @@ export const CheckoutPage = () => {
                         className="flex justify-between gap-4 text-xs font-medium text-stone-500"
                       >
                         <span>
-                          {MEASUREMENTS_CATALOG[
-                            key as keyof typeof MEASUREMENTS_CATALOG
-                          ]?.name ?? key}
+                          {t(`measurementNames.${key}`, { defaultValue: key })}
                           :
                         </span>
                         <span className="text-stone-900 whitespace-nowrap">
-                          {value} {MEASUREMENT_UNIT_LABELS[measurementUnit]}
+                          {value} {t(`measurementUnits.${measurementUnit}`)}
                         </span>
                       </div>
                     ))}
                   <div className="flex justify-between text-sm font-medium text-stone-500">
-                    <span>Тип замовлення:</span>
-                    <span className="text-stone-900">Індивідуальний пошив</span>
+                    <span>{t("checkout.orderType")}:</span>
+                    <span className="text-stone-900">{t("checkout.orderTypeCustom")}</span>
                   </div>
                   <div className="flex justify-between text-sm font-medium text-stone-500">
-                    <span>Доставка:</span>
+                    <span>{t("checkout.deliveryLabel")}:</span>
                     <span className="text-stone-900">
                       {deliveryMethod === "pickup"
-                        ? "Самовивіз"
-                        : "За тарифами НП"}
+                        ? t("checkout.selfPickup")
+                        : t("checkout.byNPTariffs")}
                     </span>
                   </div>
                 </div>
@@ -566,19 +561,18 @@ export const CheckoutPage = () => {
 
               <div className="flex justify-between items-end py-6">
                 <span className="text-sm font-semibold uppercase tracking-widest text-stone-900">
-                  Всього
+                  {t("checkout.total")}
                 </span>
                 <span className="text-2xl font-semibold text-stone-900 leading-none">
                   {orderType === "ready-made"
                     ? `${totalPrice.toLocaleString()} ₴`
-                    : "Розраховується"}
+                    : t("checkout.calculated")}
                 </span>
               </div>
 
               {orderType === "custom" && (
                 <p className="text-xs text-stone-500 leading-relaxed mb-6">
-                  Після підтвердження замовлення менеджер зв'яжеться з вами для
-                  уточнення вартості пошиття за вашими мірками.
+                  {t("checkout.customNote")}
                 </p>
               )}
 
@@ -590,7 +584,7 @@ export const CheckoutPage = () => {
                 }
                 className="w-full rounded-2xl bg-stone-900 px-8 py-4 text-sm font-semibold uppercase tracking-widest text-white hover:bg-stone-800 transition-all duration-300 active:scale-95 flex items-center justify-center gap-2 group disabled:opacity-50 disabled:pointer-events-none"
               >
-                {isSubmitting ? "Обробка..." : "Підтвердити замовлення"}
+                {isSubmitting ? t("checkout.processing") : t("checkout.confirmOrder")}
                 {!isSubmitting && (
                   <IoIosArrowForward
                     size={16}

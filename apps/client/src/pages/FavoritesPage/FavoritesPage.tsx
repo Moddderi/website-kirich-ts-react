@@ -1,5 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { useAppDispatch, useAppSelector } from "../../store/store";
 import {
   removeFromFavorites,
@@ -11,10 +12,13 @@ import type { Product } from "@project/shared";
 
 import { IoHeartDislikeOutline } from "react-icons/io5";
 import { HiOutlineShoppingBag } from "react-icons/hi";
+import { useProductName } from "../../utils/useLocalizedProduct";
 
 export const FavoritesPage: React.FC = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
+  const { t } = useTranslation();
+  const getProductName = useProductName();
 
   // Достаем избранные товары из Redux-стора
   const favoriteItems = useAppSelector(selectFavoriteItems);
@@ -33,8 +37,9 @@ export const FavoritesPage: React.FC = () => {
 
     // Превращаем Product в Omit<CartItem, "quantity" | "cartItemId">
     const cartItemPayload = {
-      productId: String(item.id), // Превращаем числовой id из Zod в string
+      productId: String(item.id),
       name: item.name,
+      name_en: item.name_en,
       price: item.price,
       // Передаем в корзину массив картинок, соответствующий типу string[]
       imageUrl:
@@ -43,8 +48,8 @@ export const FavoritesPage: React.FC = () => {
           : ["https://res.cloudinary.com/dqe2odzsc/image/upload/default.jpg"],
       productCode: item.product_code,
       options: {
-        color: "Стандартний", // Укажите дефолтный цвет или логику выбора
-        size: "Стандартний", // Укажите дефолтный размер или логику выбора
+        color: t("favorites.defaultOption"),
+        size: t("favorites.defaultOption"),
       },
     };
 
@@ -67,7 +72,7 @@ export const FavoritesPage: React.FC = () => {
         {/* Заголовок */}
         <div className="flex items-baseline gap-6 sm:gap-10 mb-12 border-b border-stone-200/60 pb-6 overflow-x-auto no-scrollbar">
           <h1 className="text-3xl sm:text-4xl font-semibold tracking-tighter text-stone-900 relative whitespace-nowrap">
-            Вподобання
+            {t("favorites.title")}
             <span className="text-stone-400 font-medium normal-case ml-1 text-xl sm:text-2xl">
               ({favoriteItems.length})
             </span>
@@ -78,7 +83,7 @@ export const FavoritesPage: React.FC = () => {
         {/* СПИСОК ТОВАРОВ */}
         {favoriteItems.length === 0 ? (
           <div className="py-12 text-stone-500 text-sm font-medium">
-            Список вподобань порожній. Перейдіть до каталогу, щоб додати товари.
+            {t("favorites.empty")}
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
@@ -94,7 +99,7 @@ export const FavoritesPage: React.FC = () => {
                 >
                   <img
                     src={getDisplayImage(item.imageUrl)}
-                    alt={item.name}
+                    alt={getProductName(item)}
                     className="w-full h-full group-hover: transition-duration-500 object-cover"
                     crossOrigin="anonymous"
                   />
@@ -110,10 +115,10 @@ export const FavoritesPage: React.FC = () => {
                           onClick={() => navigate(`/catalog/${item.id}`)}
                           className="text-lg font-semibold text-stone-900 cursor-pointer hover:underline underline-offset-4"
                         >
-                          {item.name}
+                          {getProductName(item)}
                         </h3>
                         <p className="text-[10px] font-medium uppercase tracking-widest text-stone-500 mt-0.5">
-                          Арт: {item.product_code}
+                          {t("favorites.article")}: {item.product_code}
                         </p>
                       </div>
 
@@ -121,7 +126,7 @@ export const FavoritesPage: React.FC = () => {
                         onClick={() => handleRemove(item.id)}
                         className="text-stone-400 hover:text-red-500 transition-colors p-1 -mr-1"
                         type="button"
-                        title="Видалити з вподобань"
+                        title={t("favorites.removeFromFavorites")}
                       >
                         <IoHeartDislikeOutline size={20} />
                       </button>
@@ -141,7 +146,7 @@ export const FavoritesPage: React.FC = () => {
                       size={16}
                       className="text-white group-hover/btn:text-stone-900 transition-colors"
                     />
-                    У кошик
+                    {t("favorites.toCart")}
                   </button>
                 </div>
               </div>

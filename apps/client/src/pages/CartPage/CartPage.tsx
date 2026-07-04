@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { useAppDispatch, useAppSelector } from "../../store/store";
 import { updateQuantity, removeFromCart } from "../../store/cartSlice";
 import { Breadcrumbs } from "../../components/Breadcrumbs/Breadcrumbs";
@@ -6,10 +7,13 @@ import type { CartItem } from "../../store/cartSlice";
 
 import { IoTrashOutline } from "react-icons/io5";
 import { HiMinus, HiPlus, HiArrowRight } from "react-icons/hi";
+import { useProductName } from "../../utils/useLocalizedProduct";
 
 export const CartPage: React.FC = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
+  const { t } = useTranslation();
+  const getProductName = useProductName();
 
   // 1. Селектор вытаскивает данные только из cart
   const cartItems = useAppSelector(
@@ -59,7 +63,7 @@ export const CartPage: React.FC = () => {
           {/* ТАБ (Пока только заголовок Корзины, без ссылки на Избранное) */}
           <div className="flex items-baseline gap-6 sm:gap-10 mb-8 border-b border-stone-200/60 pb-6 overflow-x-auto no-scrollbar">
             <h1 className="text-3xl sm:text-4xl font-semibold tracking-tighter text-stone-900 relative whitespace-nowrap">
-              Корзина
+              {t("cart.title")}
               <span className="text-stone-400 font-medium normal-case ml-1 text-xl sm:text-2xl">
                 ({totalItems})
               </span>
@@ -70,7 +74,7 @@ export const CartPage: React.FC = () => {
           {/* СПИСОК ТОВАРОВ */}
           {cartItems.length === 0 ? (
             <div className="py-12 text-stone-500 text-sm font-medium">
-              Ваша корзина пуста. Перейдите в каталог, чтобы добавить товары.
+              {t("cart.empty")}
             </div>
           ) : (
             <div className="space-y-8">
@@ -83,7 +87,7 @@ export const CartPage: React.FC = () => {
                   <div className="h-40 w-32 shrink-0 overflow-hidden rounded-2xl bg-stone-200 border border-stone-200/60 relative">
                     <img
                       src={getDisplayImage(item.imageUrl)}
-                      alt={item.name}
+                      alt={getProductName(item)}
                       className="w-full h-full object-cover"
                     />
                     <div className="w-full h-full absolute bg-linear-to-tr from-stone-400/20 via-beige-100 to-white/60 mix-blend-overlay"></div>
@@ -95,10 +99,10 @@ export const CartPage: React.FC = () => {
                     <div className="flex justify-between items-start mb-2">
                       <div>
                         <h3 className="text-lg font-semibold text-stone-900">
-                          {item.name}
+                          {getProductName(item)}
                         </h3>
                         <p className="text-xs font-medium uppercase tracking-widest text-stone-500 mt-1">
-                          Арт: {item.productCode || "Bespoke"}
+                          {t("cart.article")}: {item.productCode || t("cart.bespoke")}
                         </p>
                       </div>
 
@@ -113,13 +117,13 @@ export const CartPage: React.FC = () => {
 
                     <div className="space-y-1.5 mb-6">
                       <p className="text-sm font-medium text-stone-500">
-                        Цвет:{" "}
+                        {t("cart.color")}:{" "}
                         <span className="text-stone-900 ml-1">
                           {item.options.color}
                         </span>
                       </p>
                       <p className="text-sm font-medium text-stone-500">
-                        Размер:{" "}
+                        {t("cart.size")}:{" "}
                         <span className="text-stone-900 ml-1">
                           {item.options.size}
                         </span>
@@ -164,29 +168,29 @@ export const CartPage: React.FC = () => {
           <div className="sticky top-32 space-y-6">
             <div className="p-6 sm:p-8 rounded-4xl bg-white border border-stone-200/60 shadow-sm">
               <h2 className="text-sm font-semibold tracking-widest uppercase text-stone-900 mb-6">
-                Ваш заказ
+                {t("cart.yourOrder")}
               </h2>
 
               <div className="space-y-4 pb-6 border-b border-stone-100">
                 <div className="flex justify-between text-sm font-medium text-stone-500">
-                  <span>Товары ({totalItems})</span>
+                  <span>{t("cart.products", { count: totalItems })}</span>
                   <span className="text-stone-900">
                     {totalPrice.toLocaleString()} ₴
                   </span>
                 </div>
                 <div className="flex justify-between text-sm font-medium text-stone-500">
-                  <span>Скидка</span>
+                  <span>{t("cart.discount")}</span>
                   <span className="text-stone-900">0 ₴</span>
                 </div>
                 <div className="flex justify-between text-sm font-medium text-stone-500">
-                  <span>Доставка</span>
-                  <span className="text-stone-900">По тарифам НП</span>
+                  <span>{t("cart.delivery")}</span>
+                  <span className="text-stone-900">{t("cart.deliveryNP")}</span>
                 </div>
               </div>
 
               <div className="flex justify-between items-end py-6">
                 <span className="text-sm font-semibold uppercase tracking-widest text-stone-900">
-                  Итого
+                  {t("cart.total")}
                 </span>
                 <span className="text-2xl font-semibold text-stone-900 leading-none">
                   {totalPrice.toLocaleString()} ₴
@@ -198,7 +202,7 @@ export const CartPage: React.FC = () => {
                 disabled={cartItems.length === 0}
                 className="w-full rounded-2xl bg-stone-900 px-8 py-4 text-sm font-semibold uppercase tracking-widest text-white hover:bg-stone-800 transition-all duration-300 active:scale-95 flex items-center justify-center gap-2 group disabled:opacity-50 disabled:pointer-events-none"
               >
-                Оформить заказ
+                {t("cart.checkout")}
                 <HiArrowRight
                   size={16}
                   className="group-hover:translate-x-1 transition-transform duration-300"

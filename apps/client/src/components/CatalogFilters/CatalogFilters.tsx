@@ -1,4 +1,5 @@
-import { SUBTYPE_MAP, SUBTYPE_LABELS, type FilterInput } from "@project/shared";
+import { SUBTYPE_MAP, type FilterInput } from "@project/shared";
+import { useTranslation } from "react-i18next";
 
 interface CatalogFiltersProps {
   filters: FilterInput;
@@ -9,6 +10,7 @@ export const CatalogFilters = ({
   filters,
   setFilters,
 }: CatalogFiltersProps) => {
+  const { t } = useTranslation();
   const updateFilter = (fields: Partial<FilterInput>) => {
     setFilters((prev) => ({ ...prev, ...fields }));
   };
@@ -56,7 +58,7 @@ export const CatalogFilters = ({
               : "text-stone-500 hover:text-stone-900"
           }`}
         >
-          Стандарт
+          {t("catalogFilters.standard")}
         </button>
 
         <button
@@ -73,7 +75,7 @@ export const CatalogFilters = ({
               : "text-stone-500 hover:text-stone-900"
           }`}
         >
-          Латина
+          {t("catalogFilters.latina")}
         </button>
 
         <button
@@ -90,7 +92,7 @@ export const CatalogFilters = ({
               : "text-stone-500 hover:text-stone-900"
           }`}
         >
-          Аксесуари
+          {t("catalogFilters.accessories")}
         </button>
 
         <button
@@ -108,7 +110,7 @@ export const CatalogFilters = ({
               : "text-stone-500 hover:text-stone-900"
           }`}
         >
-          Все
+          {t("catalogFilters.all")}
         </button>
       </div>
 
@@ -130,7 +132,7 @@ export const CatalogFilters = ({
                     : "bg-white border border-stone-200 text-stone-600 hover:border-stone-900"
                 }`}
               >
-                {SUBTYPE_LABELS[type] || type}
+                {t(`subtypeLabels.${type}`) || type}
               </button>
             ))}
           </div>
@@ -144,7 +146,7 @@ export const CatalogFilters = ({
         <div className="flex flex-wrap items-center justify-center gap-2">
           <input
             type="text"
-            placeholder="Поиск..."
+            placeholder={t("catalogFilters.search")}
             value={filters.search ?? ""}
             onChange={(e) => updateFilter({ search: e.target.value })}
             className="px-3 py-1.5 rounded-xl bg-white border border-stone-200 text-stone-900 text-xs font-medium focus:border-stone-900 focus:outline-none transition-all w-40"
@@ -153,7 +155,7 @@ export const CatalogFilters = ({
             onClick={resetFilters}
             className="px-3 py-1.5 text-xs text-stone-400 hover:text-stone-900 transition-colors underline decoration-dotted"
           >
-            Сброс
+            {t("catalogFilters.reset")}
           </button>
         </div>
       </div>

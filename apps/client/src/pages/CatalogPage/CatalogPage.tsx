@@ -16,6 +16,7 @@ import { Breadcrumbs } from "../../components/Breadcrumbs/Breadcrumbs";
 import { CatalogLoadingBar } from "../../components/shared/CatalogLoadingBar/CatalogLoadingBar";
 import { useCallback } from "react";
 import { HiOutlineArrowLeft, HiOutlineArrowRight } from "react-icons/hi";
+import { useTranslation } from "react-i18next";
 
 const ProductSkeleton = () => (
   <div>
@@ -30,6 +31,7 @@ const ProductSkeleton = () => (
 );
 
 export const CatalogPage = () => {
+  const { t } = useTranslation();
   const [searchParams, setSearchParams] = useSearchParams();
 
   const currentPage = Number(searchParams.get("page")) || 1;
@@ -138,7 +140,7 @@ export const CatalogPage = () => {
             ))
           ) : (
             <div className="col-span-full text-center py-20 text-stone-400">
-              Товары не найдены
+              {t("catalog.noProducts")}
             </div>
           )}
         </div>
@@ -154,7 +156,7 @@ export const CatalogPage = () => {
             </button>
 
             <span className="text-xs font-semibold tracking-widest uppercase text-stone-500">
-              Сторінка {currentPage} з {totalPages}
+              {t("catalog.page", { current: currentPage, total: totalPages })}
             </span>
 
             <button

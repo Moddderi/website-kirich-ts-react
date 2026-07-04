@@ -1,4 +1,5 @@
 import React from "react";
+import { useTranslation, Trans } from "react-i18next";
 import { Breadcrumbs } from "../../components/Breadcrumbs/Breadcrumbs";
 
 import {
@@ -10,6 +11,8 @@ import {
 import { LiaGlobeSolid } from "react-icons/lia";
 
 export const DeliveryAndPaymentPage: React.FC = () => {
+  const { t } = useTranslation();
+
   return (
     <div className="mx-auto max-w-5xl px-6 lg:px-8 py-12 lg:py-24 animate-reveal-up">
       <Breadcrumbs />
@@ -17,7 +20,7 @@ export const DeliveryAndPaymentPage: React.FC = () => {
       {/* Заголовок */}
       <div className="mt-4 mb-16 border-b border-stone-200/60 pb-8">
         <h1 className="text-3xl sm:text-5xl font-semibold tracking-tighter text-stone-900">
-          Доставка та оплата
+          {t("deliveryAndPayment.title")}
         </h1>
         <p className="text-xs font-medium uppercase tracking-widest text-stone-400 mt-4">
           K.I.RICH • POLTAVA
@@ -33,32 +36,26 @@ export const DeliveryAndPaymentPage: React.FC = () => {
                 <HiOutlineDocumentText size={24} />
               </div>
               <h2 className="text-lg font-semibold text-stone-900">
-                Загальні умови
+                {t("deliveryAndPayment.generalConditions")}
               </h2>
             </div>
             <ul className="text-sm text-stone-600 space-y-4 leading-relaxed">
               <li className="flex gap-3">
                 <span className="text-stone-400">•</span>
                 <span>
-                  <strong>Мінімальне роздрібне замовлення</strong> — 1 одиниця
-                  товару, незалежно від вашого місцеперебування та країни
-                  доставки.
+                  <Trans i18nKey="deliveryAndPayment.condition1" components={{ strong: <strong /> }} />
                 </span>
               </li>
               <li className="flex gap-3">
                 <span className="text-stone-400">•</span>
                 <span>
-                  Після оформлення замовлення з Вами зв'яжеться менеджер для
-                  уточнення деталей, після чого надішле рахунок на оплату
-                  зручним для Вас способом.
+                  {t("deliveryAndPayment.condition2")}
                 </span>
               </li>
               <li className="flex gap-3">
                 <span className="text-stone-400">•</span>
                 <span>
-                  Замовлення виконуються в обговорені терміни. У разі
-                  завантаженості виробництва або залежно від ситуації в країні
-                  терміни можуть збільшуватись.
+                  {t("deliveryAndPayment.condition3")}
                 </span>
               </li>
             </ul>
@@ -70,15 +67,15 @@ export const DeliveryAndPaymentPage: React.FC = () => {
               <div className="p-3 bg-white/10 backdrop-blur-md rounded-2xl text-white">
                 <HiOutlineShieldCheck size={24} />
               </div>
-              <h2 className="text-lg font-semibold">Індивідуальне пошиття</h2>
+              <h2 className="text-lg font-semibold">{t("deliveryAndPayment.customTailoring")}</h2>
             </div>
             <div className="text-sm text-stone-300 space-y-4 relative z-10 leading-relaxed">
               <p>
-                Оплата замовлень індивідуального пошиття здійснюється поетапно:
+                {t("deliveryAndPayment.customPaymentDesc")}
               </p>
               <div className="bg-white/5 border border-white/10 p-5 rounded-2xl space-y-2">
                 <div className="flex justify-between items-center">
-                  <span className="text-xs text-stone-400">Передплата</span>
+                  <span className="text-xs text-stone-400">{t("deliveryAndPayment.prepayment")}</span>
                   <span className="font-semibold text-white text-base">
                     30%
                   </span>
@@ -87,11 +84,11 @@ export const DeliveryAndPaymentPage: React.FC = () => {
                   <div className="bg-white h-full w-[30%] rounded-full"></div>
                 </div>
                 <p className="text-[11px] text-stone-400 mt-2">
-                  від суми замовлення береться в роботу
+                  {t("deliveryAndPayment.prepaymentNote")}
                 </p>
               </div>
               <p className="text-xs">
-                Решта суми сплачується по готовності замовлення.
+                {t("deliveryAndPayment.restPayment")}
               </p>
             </div>
           </div>
@@ -107,16 +104,15 @@ export const DeliveryAndPaymentPage: React.FC = () => {
           <div className="flex flex-col gap-6 w-full">
             <div>
               <h2 className="text-xl font-semibold text-stone-900">
-                Умови доставки
+                {t("deliveryAndPayment.deliveryConditions")}
               </h2>
               <p className="text-xs text-stone-500 mt-1 uppercase tracking-wider">
-                По всьому світу
+                {t("deliveryAndPayment.worldwide")}
               </p>
             </div>
 
             <p className="text-sm text-stone-600 leading-relaxed">
-              Протягом 1-2 робочих днів з моменту готовності замовлення Ваша
-              посилка буде укомплектована та відправлена транспортною компанією:
+              {t("deliveryAndPayment.deliveryDesc")}
             </p>
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -135,22 +131,19 @@ export const DeliveryAndPaymentPage: React.FC = () => {
               <li className="flex gap-2">
                 <span>•</span>
                 <span>
-                  Після відправки наш менеджер зв'яжеться з Вами та повідомить
-                  усю необхідну інформацію для отримання посилки.
+                  {t("deliveryAndPayment.deliveryNote1")}
                 </span>
               </li>
               <li className="flex gap-2">
                 <span>•</span>
                 <span>
-                  Усі витрати на транспортні послуги з доставки товару оплачує
-                  Покупець.
+                  {t("deliveryAndPayment.deliveryNote2")}
                 </span>
               </li>
               <li className="flex gap-2 text-red-600/90 font-medium">
                 <span>•</span>
                 <span>
-                  У разі втрати або псування посилки наша студія не несе
-                  відповідальності за надані послуги транспортної компанії.
+                  {t("deliveryAndPayment.deliveryWarning")}
                 </span>
               </li>
             </ul>
@@ -161,13 +154,10 @@ export const DeliveryAndPaymentPage: React.FC = () => {
         <section className="flex flex-col gap-10">
           <div>
             <h2 className="text-2xl font-semibold text-stone-900">
-              Способи оплати
+              {t("deliveryAndPayment.paymentMethods")}
             </h2>
             <p className="text-xs text-stone-500 mt-1 leading-relaxed">
-              Оплата замовлень на території України здійснюється в національній
-              валюті — українська гривня (₴). Якщо Ви перебуваєте за кордоном,
-              Ви можете оплатити покупку у доларах ($) або євро (€) за курсом на
-              день оплати.
+              {t("deliveryAndPayment.paymentDesc")}
             </p>
           </div>
 
@@ -180,30 +170,26 @@ export const DeliveryAndPaymentPage: React.FC = () => {
                     <HiOutlineCreditCard size={24} />
                   </div>
                   <span className="text-[10px] font-bold uppercase tracking-wider bg-stone-100 px-3 py-1 rounded-full text-stone-600">
-                    Рекомендовано
+                    {t("deliveryAndPayment.recommended")}
                   </span>
                 </div>
                 <h3 className="text-base font-semibold text-stone-900">
-                  Переказ на картку банків України
+                  {t("deliveryAndPayment.cardTransfer")}
                 </h3>
                 <p className="text-xs text-stone-400 font-medium mt-1 uppercase tracking-widest">
                   ПриватБанк / Ощадбанк
                 </p>
 
                 <p className="text-sm text-stone-600 mt-6 leading-relaxed">
-                  Найбільш сучасний і популярний спосіб оплати. Клієнт переказує
-                  гроші на банківську картку студії через термінали чи
-                  відділення, що займає всього декілька хвилин.
+                  {t("deliveryAndPayment.cardTransferDesc")}
                 </p>
               </div>
 
               <div className="bg-stone-50 border border-stone-200/60 p-4 rounded-2xl text-[11px] text-stone-500 leading-relaxed">
                 <strong className="block text-stone-700 mb-1">
-                  Порядок роботи:
+                  {t("deliveryAndPayment.workOrder")}
                 </strong>
-                Отримавши передплату, ми беремо замовлення в роботу. Коли воно
-                готове та залишок суми сплачений, ми відправляємо замовлення за
-                вказаною адресою.
+                {t("deliveryAndPayment.workOrderDesc")}
               </div>
             </div>
 
@@ -216,31 +202,26 @@ export const DeliveryAndPaymentPage: React.FC = () => {
                   </div>
                 </div>
                 <h3 className="text-base font-semibold text-stone-900">
-                  Валютний SWIFT-переказ
+                  {t("deliveryAndPayment.swiftTransfer")}
                 </h3>
                 <p className="text-xs text-stone-400 font-medium mt-1 uppercase tracking-widest">
-                  Для міжнародних платежів
+                  {t("deliveryAndPayment.forInternational")}
                 </p>
 
                 <p className="text-sm text-stone-600 mt-6 leading-relaxed">
-                  Зручний спосіб оплати для клієнтів, які знаходяться за
-                  кордоном. Переказ здійснюється на вказані реквізити студії в
-                  обговореній валюті ($ або €).
+                  {t("deliveryAndPayment.swiftDesc")}
                 </p>
               </div>
 
               <div className="space-y-4">
                 <div className="bg-stone-50 border border-stone-200/60 p-4 rounded-2xl text-[11px] text-stone-500 leading-relaxed">
-                  Зверніть увагу: такі перекази зараховуються на рахунок студії
-                  упродовж 1–5 робочих днів. Фіксовану банківську комісію за
-                  валютне зарахування, а також митну комісію сплачує Покупець.
+                  {t("deliveryAndPayment.swiftNote")}
                 </div>
                 <div className="bg-red-50 border border-red-100 p-4 rounded-2xl text-xs font-medium text-red-800 leading-relaxed">
                   <strong className="block text-red-900 mb-1">
-                    !!! Важливо:
+                    {t("deliveryAndPayment.swiftImportant")}
                   </strong>
-                  При оформленні SWIFT-переказу обов'язково вкажіть тип комісії{" "}
-                  <strong>«FULL»</strong> або <strong>«OUR»</strong>.
+                  <Trans i18nKey="deliveryAndPayment.swiftWarning" components={{ strong: <strong /> }} />
                 </div>
               </div>
             </div>

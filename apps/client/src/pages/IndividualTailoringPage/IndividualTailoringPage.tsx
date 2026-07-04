@@ -1,7 +1,9 @@
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { FaPenRuler } from "react-icons/fa6";
 
 export const IndividualTailoringPage = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
 
   return (
@@ -20,10 +22,10 @@ export const IndividualTailoringPage = () => {
             </div>
             <div>
               <h2 className="text-xl font-semibold tracking-tight text-white">
-                Как это работает
+                {t("individualTailoring.howItWorks")}
               </h2>
               <p className="text-xs font-medium text-stone-400 mt-1">
-                Процесс создания идеального изделия
+                {t("individualTailoring.processDescription")}
               </p>
             </div>
           </div>
@@ -33,18 +35,18 @@ export const IndividualTailoringPage = () => {
             {[
               {
                 id: 1,
-                title: "Выбор типа одежды",
-                desc: "Выберите силуэт из каталога: верх, низ или комплект.",
+                title: t("individualTailoring.step1Title"),
+                desc: t("individualTailoring.step1Desc"),
               },
               {
                 id: 2,
-                title: "Снятие мерок",
-                desc: "Запишитесь в студию или воспользуйтесь нашей видео-инструкцией.",
+                title: t("individualTailoring.step2Title"),
+                desc: t("individualTailoring.step2Desc"),
               },
               {
                 id: 3,
-                title: "Пошив и примерка",
-                desc: "Создание макета, примерка и финальная доработка изделия.",
+                title: t("individualTailoring.step3Title"),
+                desc: t("individualTailoring.step3Desc"),
               },
             ].map((step, idx) => (
               <div
@@ -78,7 +80,7 @@ export const IndividualTailoringPage = () => {
               onClick={() => navigate("/individual-tailoring/step-1")}
               className="flex-1 rounded-xl bg-white px-6 py-4 text-sm font-semibold text-stone-900 hover:scale-[1.02] transition-transform duration-300 text-center"
             >
-              Записаться в студию
+              {t("individualTailoring.bookStudio")}
             </button>
           </div>
         </div>

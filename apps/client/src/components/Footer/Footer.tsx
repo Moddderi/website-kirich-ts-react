@@ -2,8 +2,11 @@ import { FaInstagram } from "react-icons/fa";
 import { MdOutlineMailOutline } from "react-icons/md";
 import { RiExternalLinkLine } from "react-icons/ri";
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 export function Footer() {
+  const { t } = useTranslation();
+
   return (
     <footer className="border-t border-stone-800 bg-stone-950 relative overflow-hidden text-white">
       <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-stone-700 to-transparent"></div>
@@ -20,8 +23,7 @@ export function Footer() {
               </span>
             </a>
             <p className="text-sm text-stone-400 max-w-xs leading-relaxed font-medium">
-              Абсолютная бальная эстетика. Бренд, рожденный в Украине, чтобы
-              задавать мировые стандарты танцевальной одежды.
+              {t("footer.brandDescription")}
             </p>
             <div className="flex space-x-6">
               <a
@@ -40,16 +42,15 @@ export function Footer() {
               </a>
             </div>
 
-            {/* Блок авторства в бежевом стильном квадрате */}
             <div className="mt-12 pt-8 border-t border-stone-800/60 max-w-xs">
               <a
-                href="https://my-portfolio-app-two-hazel.vercel.app/" // !!! ЗАМЕНИТЕ НА ВАШ URL !!!
+                href="https://my-portfolio-app-two-hazel.vercel.app/"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="group/author flex flex-col gap-3 p-4 bg-stone-900/50 border border-stone-800 rounded-3xl hover:bg-stone-800/60 hover:border-stone-700 transition-all duration-300"
               >
                 <span className="text-[10px] font-bold uppercase tracking-widest text-stone-500 group-hover/author:text-stone-400 transition-colors">
-                  Сайт розробив
+                  {t("footer.developedBy")}
                 </span>
 
                 <div className="flex items-center justify-between">
@@ -57,7 +58,6 @@ export function Footer() {
                     Kyrychenko Oleh
                   </span>
 
-                  {/* Иконка внешней ссылки в красивой рамочке */}
                   <span className="flex h-7 w-7 items-center justify-center rounded-xl bg-stone-800 border border-stone-700 text-stone-400 group-hover/author:bg-[#e0d5c1] group-hover/author:border-[#e0d5c1] group-hover/author:text-stone-950 transition-all duration-300">
                     <RiExternalLinkLine size={12} />
                   </span>
@@ -70,7 +70,7 @@ export function Footer() {
             <div className="md:grid md:grid-cols-2 md:gap-12">
               <div>
                 <h3 className="text-xs font-bold text-white uppercase tracking-widest">
-                  Коллекции
+                  {t("footer.collections")}
                 </h3>
                 <ul role="list" className="mt-8 space-y-5">
                   <li>
@@ -78,7 +78,7 @@ export function Footer() {
                       href="#"
                       className="text-sm font-medium text-stone-400 hover:text-white transition-colors magnetic-link relative inline-block"
                     >
-                      Новинки
+                      {t("footer.newArrivals")}
                     </a>
                   </li>
                   <li>
@@ -86,7 +86,7 @@ export function Footer() {
                       href="#"
                       className="text-sm font-medium text-stone-400 hover:text-white transition-colors magnetic-link relative inline-block"
                     >
-                      Женская линия
+                      {t("footer.womenLine")}
                     </a>
                   </li>
                   <li>
@@ -94,7 +94,7 @@ export function Footer() {
                       href="#"
                       className="text-sm font-medium text-stone-400 hover:text-white transition-colors magnetic-link relative inline-block"
                     >
-                      Мужская линия
+                      {t("footer.menLine")}
                     </a>
                   </li>
                   <li>
@@ -102,14 +102,14 @@ export function Footer() {
                       href="#"
                       className="text-sm font-medium text-stone-400 hover:text-white transition-colors magnetic-link relative inline-block"
                     >
-                      Bespoke (Пошив)
+                      {t("footer.bespoke")}
                     </a>
                   </li>
                 </ul>
               </div>
               <div className="mt-12 md:mt-0">
                 <h3 className="text-xs font-bold text-white uppercase tracking-widest">
-                  Сервис
+                  {t("footer.service")}
                 </h3>
                 <ul role="list" className="mt-8 space-y-5">
                   <li>
@@ -117,7 +117,7 @@ export function Footer() {
                       href="#"
                       className="text-sm font-medium text-stone-400 hover:text-white transition-colors magnetic-link relative inline-block"
                     >
-                      Глобальная доставка
+                      {t("footer.globalShipping")}
                     </a>
                   </li>
                   <li>
@@ -125,7 +125,7 @@ export function Footer() {
                       href="#"
                       className="text-sm font-medium text-stone-400 hover:text-white transition-colors magnetic-link relative inline-block"
                     >
-                      Размерная архитектура
+                      {t("footer.sizeArchitecture")}
                     </a>
                   </li>
                   <li>
@@ -133,7 +133,7 @@ export function Footer() {
                       href="#"
                       className="text-sm font-medium text-stone-400 hover:text-white transition-colors magnetic-link relative inline-block"
                     >
-                      Возврат
+                      {t("footer.returns")}
                     </a>
                   </li>
                   <li>
@@ -141,7 +141,7 @@ export function Footer() {
                       href="#"
                       className="text-sm font-medium text-stone-400 hover:text-white transition-colors magnetic-link relative inline-block"
                     >
-                      Связь с ателье
+                      {t("footer.contactStudio")}
                     </a>
                   </li>
                 </ul>
@@ -156,7 +156,7 @@ export function Footer() {
                 Vanguard Club
               </h3>
               <p className="mt-4 text-xs text-stone-400 font-medium relative z-10 leading-relaxed">
-                Закрытые релизы и привилегии для резидентов клуба.
+                {t("footer.vanguardDesc")}
               </p>
               <form className="mt-6 relative z-10 group-hover:scale-[1.02] transition-transform duration-500">
                 <label htmlFor="email-address" className="sr-only">
@@ -169,13 +169,13 @@ export function Footer() {
                   autoComplete="email"
                   required
                   className="block w-full rounded-2xl border-0 bg-white/5 py-4 pl-5 pr-24 text-sm font-medium text-white shadow-inner ring-1 ring-inset ring-white/10 placeholder:text-stone-500 focus:ring-2 focus:ring-inset focus:ring-white sm:leading-6 transition-all backdrop-blur-sm"
-                  placeholder="Ваш email"
+                  placeholder={t("footer.yourEmail")}
                 />
                 <button
                   type="submit"
                   className="absolute inset-y-1.5 right-1.5 flex items-center justify-center rounded-xl bg-white px-5 text-xs font-bold uppercase tracking-widest text-stone-900 shadow-lg hover:bg-stone-200 transition-colors active:scale-95"
                 >
-                  Вход
+                  {t("footer.join")}
                 </button>
               </form>
             </div>
@@ -184,24 +184,24 @@ export function Footer() {
 
         <div className="mt-8 flex flex-col md:flex-row items-center justify-between border-t border-stone-800 pt-10">
           <p className="text-xs font-semibold text-stone-500 uppercase tracking-widest">
-            © {new Date().getFullYear()} K.I.RICH POLTAVA. Global Excellence.
+            {t("footer.copyright", { year: new Date().getFullYear() })}
           </p>
           <div className="mt-6 md:mt-0 flex gap-8 text-xs font-semibold text-stone-500 uppercase tracking-widest">
             <Link
               to="delivery-and-payment"
               className="hover:text-white transition-colors"
             >
-              Доставка та оплата
+              {t("footer.deliveryAndPayment")}
             </Link>
             <Link
               to="privacy-policy"
               className="hover:text-white transition-colors"
             >
-              Політика безпеки
+              {t("footer.privacyPolicy")}
             </Link>
             <span className="flex items-center gap-1.5 text-stone-400">
               <span className="h-1.5 w-1.5 rounded-full bg-white animate-pulse"></span>
-              Створено в Україні
+              {t("footer.madeInUkraine")}
             </span>
           </div>
         </div>

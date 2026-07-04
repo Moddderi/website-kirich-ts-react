@@ -14,16 +14,20 @@ import { IoIosArrowDown, IoMdClose } from "react-icons/io";
 import { HiOutlineArrowLeft } from "react-icons/hi";
 
 import { getProductById } from "../../api/productApi";
-
-const AVAILABLE_COLORS = [
-  { id: "black", hex: "#000000", label: "Черный" },
-  { id: "burgundy", hex: "#8B0000", label: "Бордовый" },
-  { id: "navy", hex: "#000080", label: "Тёмно-синий" },
-];
+import { useTranslation } from "react-i18next";
+import { useProductName } from "../../utils/useLocalizedProduct";
 
 const AVAILABLE_SIZES = ["XS", "S", "M", "L", "XL"];
 
 export const ProductPage: React.FC = () => {
+  const { t } = useTranslation();
+  const getProductName = useProductName();
+
+  const AVAILABLE_COLORS = [
+    { id: "black", hex: "#000000", label: t("productPage.colors.black") },
+    { id: "burgundy", hex: "#8B0000", label: t("productPage.colors.burgundy") },
+    { id: "navy", hex: "#000080", label: t("productPage.colors.navy") },
+  ];
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
@@ -69,6 +73,7 @@ export const ProductPage: React.FC = () => {
       addToCart({
         productId: product.id.toString(),
         name: product.name,
+        name_en: product.name_en,
         price: product.price,
         // Передаем массив из одного элемента (текущую выбранную картинку),
         // чтобы соответствовать типу string[] в CartItem
@@ -93,7 +98,7 @@ export const ProductPage: React.FC = () => {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-[50vh] text-stone-500 font-medium text-sm">
-        <span className="animate-pulse">Загрузка информации о товаре...</span>
+        <span className="animate-pulse">{t("productPage.loading")}</span>
       </div>
     );
   }
@@ -102,10 +107,10 @@ export const ProductPage: React.FC = () => {
     return (
       <div className="mx-auto max-w-7xl px-6 py-24 text-center">
         <h2 className="text-2xl font-semibold text-stone-900 mb-2">
-          Произошла ошибка
+          {t("productPage.error")}
         </h2>
         <p className="text-stone-500 text-sm mb-6">
-          {error?.message || "Товар не существует."}
+          {error?.message || t("productPage.notFound")}
         </p>
       </div>
     );
@@ -120,7 +125,7 @@ export const ProductPage: React.FC = () => {
           className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-stone-600 bg-stone-50 border border-stone-200/60 hover:bg-white hover:border-stone-900 hover:text-stone-900 px-5 py-3.5 rounded-2xl transition-all duration-300 active:scale-95 shadow-xs"
         >
           <HiOutlineArrowLeft size={16} />
-          Назад до каталогу
+          {t("productPage.backToCatalog")}
         </button>
       </div>
 
@@ -134,7 +139,7 @@ export const ProductPage: React.FC = () => {
               <img
                 className="w-full h-full absolute inset-0 object-cover"
                 src={displayImages[activeImageIndex]}
-                alt={`${product.name} — ракурс ${activeImageIndex + 1}`}
+                alt={`${getProductName(product)} — ${t("productCard.angle", { n: activeImageIndex + 1 })}`}
                 crossOrigin="anonymous"
               />
             </div>
@@ -177,23 +182,23 @@ export const ProductPage: React.FC = () => {
                   {SUBTYPE_LABELS[product.sub_type] || product.sub_type}
                 </span>
                 <span className="text-xs font-semibold text-stone-400 flex items-center gap-1.5 uppercase tracking-widest">
-                  2-3 дні
+                  {t("productPage.days")}
                 </span>
                 {product.product_code && (
                   <span className="text-[10px] font-medium text-stone-400 tracking-wider ml-auto">
-                    Арт: {product.product_code}
+                    {t("productPage.article")}: {product.product_code}
                   </span>
                 )}
               </div>
 
               <h1 className="text-4xl sm:text-5xl font-semibold tracking-tighter text-stone-900 mb-4">
-                {product.name}
+                {getProductName(product)}
               </h1>
               <p className="text-2xl font-semibold text-stone-900 mb-6">
-                від {Number(product.price).toLocaleString()} ₴
+                {t("productPage.from")} {Number(product.price).toLocaleString()} ₴
               </p>
               <p className="text-sm font-medium text-stone-500 leading-relaxed">
-                Описание товара...
+                {t("productPage.description")}
               </p>
             </div>
 
@@ -202,10 +207,10 @@ export const ProductPage: React.FC = () => {
               <div>
                 <div className="flex items-center justify-between mb-5">
                   <h3 className="text-xs font-semibold uppercase tracking-widest text-stone-900">
-                    Материал основы
+                    {t("productPage.baseMaterial")}
                   </h3>
                   <button className="text-xs font-medium text-stone-500 underline decoration-stone-300 underline-offset-4 hover:text-stone-900 transition-colors">
-                    Палитра
+                    {t("productPage.palette")}
                   </button>
                 </div>
                 <div className="flex flex-wrap gap-4">
@@ -239,14 +244,14 @@ export const ProductPage: React.FC = () => {
               <div>
                 <div className="flex items-center justify-between mb-5">
                   <h3 className="text-xs font-semibold uppercase tracking-widest text-stone-900">
-                    Размер
+                    {t("productPage.size")}
                   </h3>
                   <button
                     type="button"
                     onClick={() => setIsSizeChartOpen(true)}
                     className="text-xs font-medium text-stone-500 underline decoration-stone-300 underline-offset-4 hover:text-stone-900 transition-colors"
                   >
-                    Размерная сетка
+                    {t("productPage.sizeChart")}
                   </button>
                 </div>
                 <div className="flex flex-wrap gap-2.5">
@@ -278,7 +283,7 @@ export const ProductPage: React.FC = () => {
                 onClick={handleAddToCart}
                 className="flex-1 rounded-2xl bg-stone-900 px-8 py-4 text-sm font-semibold uppercase tracking-widest text-white shadow-[0_8px_30px_rgba(28,25,23,0.12)] hover:bg-stone-800 hover:shadow-[0_8px_30px_rgba(28,25,23,0.2)] transition-all duration-300 active:scale-95 flex items-center justify-center gap-2"
               >
-                <IoBagHandleOutline size={18} /> Добавить в корзину
+                <IoBagHandleOutline size={18} /> {t("productPage.addToCart")}
               </button>
 
               {/* КНОПКА ИЗБРАННОГО */}
@@ -290,7 +295,7 @@ export const ProductPage: React.FC = () => {
                     ? "border-red-200 bg-red-50 text-red-600 hover:bg-red-100"
                     : "border-stone-200 bg-white text-stone-400 hover:text-stone-900 hover:border-stone-900"
                 }`}
-                title={isFavorite ? "Видалити з вподобань" : "Вподобати"}
+                title={isFavorite ? t("productPage.removeFromFavorites") : t("productPage.addToFavorites")}
               >
                 {isFavorite ? (
                   <IoHeart size={22} className="text-red-500" />
@@ -304,12 +309,11 @@ export const ProductPage: React.FC = () => {
             <div className="mt-12 border-t border-stone-200/60 divide-y divide-stone-200/60">
               <details className="group py-5">
                 <summary className="flex cursor-pointer items-center justify-between text-sm font-semibold tracking-tight text-stone-900 marker:content-none select-none">
-                  Описание процесса
+                  {t("productPage.processDescription")}
                   <IoIosArrowDown className="text-stone-400 group-open:rotate-180 transition-transform" />
                 </summary>
                 <div className="mt-4 text-sm font-medium text-stone-500 leading-relaxed pr-8">
-                  После оформления заказа мы свяжемся с вами для уточнения
-                  деталей. Пошив занимает 10-14 дней.
+                  {t("productPage.processText")}
                 </div>
               </details>
             </div>
@@ -336,17 +340,17 @@ export const ProductPage: React.FC = () => {
               </button>
 
               <h3 className="text-2xl font-semibold tracking-tight text-stone-900 mb-6">
-                Таблица размеров
+                {t("productPage.sizeChartTitle")}
               </h3>
 
               <div className="overflow-x-auto min-w-full inline-block align-middle">
                 <table className="w-full text-left text-sm text-stone-600 border-collapse">
                   <thead>
                     <tr className="border-b border-stone-200 text-xs font-semibold uppercase tracking-widest text-stone-400">
-                      <th className="py-3 px-2">Размер</th>
-                      <th className="py-3 px-2">Обхват груди (см)</th>
-                      <th className="py-3 px-2">Обхват талии (см)</th>
-                      <th className="py-3 px-2">Обхват бедер (см)</th>
+                      <th className="py-3 px-2">{t("productPage.sizeChartSize")}</th>
+                      <th className="py-3 px-2">{t("productPage.sizeChartChest")}</th>
+                      <th className="py-3 px-2">{t("productPage.sizeChartWaist")}</th>
+                      <th className="py-3 px-2">{t("productPage.sizeChartHips")}</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-stone-100 font-medium">
@@ -403,9 +407,7 @@ export const ProductPage: React.FC = () => {
               </div>
 
               <p className="mt-6 text-xs text-stone-400 leading-relaxed">
-                * Если ваши параметры находятся между двумя размерами,
-                рекомендуем выбирать больший размер или проконсультироваться с
-                менеджером при подтверждении заказа.
+                {t("productPage.sizeChartNote")}
               </p>
             </div>
           </div>
