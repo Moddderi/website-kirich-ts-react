@@ -1,4 +1,5 @@
 import React from "react";
+import { useTranslation, Trans } from "react-i18next";
 import { Breadcrumbs } from "../../components/Breadcrumbs/Breadcrumbs";
 
 import {
@@ -10,6 +11,8 @@ import {
 } from "react-icons/hi";
 
 export const PrivacyPolicyPage: React.FC = () => {
+  const { t } = useTranslation();
+
   return (
     <div className="mx-auto max-w-5xl px-6 lg:px-8 py-12 lg:py-24 animate-reveal-up">
       <Breadcrumbs />
@@ -17,7 +20,7 @@ export const PrivacyPolicyPage: React.FC = () => {
       {/* Заголовок */}
       <div className="mt-4 mb-16 border-b border-stone-200/60 pb-8">
         <h1 className="text-3xl sm:text-5xl font-semibold tracking-tighter text-stone-900">
-          Політика безпеки
+          {t("privacyPolicy.title")}
         </h1>
         <p className="text-xs font-medium uppercase tracking-widest text-stone-400 mt-4">
           K.I.RICH SEWING STUDIO • ПОЛТАВА
@@ -31,11 +34,7 @@ export const PrivacyPolicyPage: React.FC = () => {
             <HiOutlineShieldCheck size={32} />
           </div>
           <p className="text-sm text-stone-600 leading-relaxed">
-            Студія <strong>«K.I.RICH SEWING STUDIO»</strong> не тільки
-            намагається задовольнити побажання клієнтів, а й піклується про
-            захист особистих даних кожного покупця. Ми поважаємо Ваш вибір, тому
-            докладаємо максимум зусиль для збереження конфіденційної інформації
-            про клієнтів від посягань третіх осіб.
+            <Trans i18nKey="privacyPolicy.intro" components={{ strong: <strong /> }} />
           </p>
         </section>
 
@@ -46,43 +45,32 @@ export const PrivacyPolicyPage: React.FC = () => {
               <HiOutlineUser size={24} />
             </div>
             <h2 className="text-lg font-semibold text-stone-900">
-              Отримання персональної інформації
+              {t("privacyPolicy.personalInfo")}
             </h2>
           </div>
 
           <p>
-            Під час відвідування сайту наші клієнти можуть не переживати про
-            відстеження їхніх дій, оскільки ми цього не робимо. Переглядаючи
-            розділи, підрозділи та сторінки сервісу, Ви можете залишатися
-            анонімом або отримати спеціальний анонімний гостьовий доступ до
-            ресурсу. При цьому варто врахувати, що браузер автоматично інформує
-            нашу компанію про тип електронного пристрою, з якого Ви виходите в
-            Інтернет, а також про вид операційної системи, встановленої на
-            ньому.
+            {t("privacyPolicy.personalInfoDesc1")}
           </p>
 
           <p>
-            Дані, які вказуються Вами при заповненні реєстраційної форми та
-            полів замовлення, є єдиною особистою інформацією про Вас, якою ми
-            володіємо. Вам може бути необхідно внести особисті дані наступного
-            характеру:
+            {t("privacyPolicy.personalInfoDesc2")}
           </p>
 
           <ul className="grid grid-cols-1 sm:grid-cols-3 gap-4 font-medium text-center">
             <li className="bg-white border border-stone-200/60 py-4 px-6 rounded-2xl shadow-xs">
-              Ім’я та прізвище
+              {t("privacyPolicy.nameAndSurname")}
             </li>
             <li className="bg-white border border-stone-200/60 py-4 px-6 rounded-2xl shadow-xs">
-              Контактні дані
+              {t("privacyPolicy.contactDetails")}
             </li>
             <li className="bg-white border border-stone-200/60 py-4 px-6 rounded-2xl shadow-xs">
-              Електронна пошта
+              {t("privacyPolicy.emailAddress")}
             </li>
           </ul>
 
           <p className="text-xs text-stone-400 mt-4">
-            Надання даних є абсолютно добровільним і необхідне лише для того,
-            щоб прискорити обробку замовлення, зробленого в нашій студії.
+            {t("privacyPolicy.voluntaryNote")}
           </p>
         </section>
 
@@ -93,43 +81,38 @@ export const PrivacyPolicyPage: React.FC = () => {
               <HiOutlineChartBar size={24} />
             </div>
             <h2 className="text-lg font-semibold text-stone-900">
-              Як обробляється особиста інформація про клієнтів?
+              {t("privacyPolicy.howProcessed")}
             </h2>
           </div>
 
           <p>
-            Відомості особистого характеру використовуються в межах вузьких
-            завдань: при маркетинговому аналізі потреб цільової аудиторії, її
-            побажань і рекомендацій. Зокрема, вони стають ефективним
-            інструментом для:
+            {t("privacyPolicy.howProcessedDesc")}
           </p>
 
           <ul className="space-y-3 pl-2 text-stone-600">
             <li className="flex gap-3">
               <span className="text-stone-400">•</span>
               <span>
-                Професійної допомоги, що надається нашими консультантами
-                клієнтам під час замовлень.
+                {t("privacyPolicy.process1")}
               </span>
             </li>
             <li className="flex gap-3">
               <span className="text-stone-400">•</span>
-              <span>Виявлення та усунення недоліків обслуговування.</span>
+              <span>{t("privacyPolicy.process2")}</span>
             </li>
             <li className="flex gap-3">
               <span className="text-stone-400">•</span>
               <span>
-                Оповіщення про новини студії, нові надходження, чинні акції та
-                знижки.
+                {t("privacyPolicy.process3")}
               </span>
             </li>
             <li className="flex gap-3">
               <span className="text-stone-400">•</span>
-              <span>Технічної підтримки користувачів.</span>
+              <span>{t("privacyPolicy.process4")}</span>
             </li>
             <li className="flex gap-3">
               <span className="text-stone-400">•</span>
-              <span>Розсилки рекламних пропозицій.</span>
+              <span>{t("privacyPolicy.process5")}</span>
             </li>
           </ul>
         </section>
@@ -142,31 +125,21 @@ export const PrivacyPolicyPage: React.FC = () => {
               <div className="p-3 bg-white/10 backdrop-blur-md rounded-2xl text-white">
                 <HiOutlineServer size={24} />
               </div>
-              <h2 className="text-lg font-semibold">Статична інформація</h2>
+              <h2 className="text-lg font-semibold">{t("privacyPolicy.staticInfo")}</h2>
             </div>
             <p className="text-stone-300 text-xs leading-relaxed relative z-10">
-              Для забезпечення безпроблемного функціонування сайту і для
-              персонального аналізу статистичних даних трафіку ми досліджуємо
-              IP-адреси відвідувань сайту. Зібрані дані ніяк не зачіпають
-              особистого простору клієнтів, не стосуються глибоко персональної
-              інформації, а обробляються виключно як узагальнена користувацька
-              статистика.
+              {t("privacyPolicy.staticInfoDesc")}
             </p>
           </div>
 
           <div className="space-y-4 bg-white p-8 rounded-3xl border border-stone-200/60 flex flex-col justify-between">
             <div>
               <h2 className="text-lg font-semibold text-stone-900">
-                Як захищається особиста інформація?
+                {t("privacyPolicy.howProtected")}
               </h2>
             </div>
             <p className="text-xs text-stone-500 leading-relaxed">
-              Усі дані, надані Вами, студія зберігає в надійній базі і не
-              передає їх третім особам. Виключення становлять випадки, коли
-              користувач сам погодився на їхню передачу, або в передбачених
-              законом випадках. В інших ситуаціях студія зобов’язується
-              дотримуватися конфіденційності інформації, керуючись принципами
-              порядності та поваги до Покупця.
+              {t("privacyPolicy.howProtectedDesc")}
             </p>
           </div>
         </section>
@@ -178,47 +151,39 @@ export const PrivacyPolicyPage: React.FC = () => {
               <div className="p-3 bg-stone-100 rounded-2xl text-stone-900">
                 <HiOutlineDocumentDuplicate size={24} />
               </div>
-              Файли «cookies»
+              {t("privacyPolicy.cookies")}
             </h2>
             <p className="text-xs text-stone-400 font-medium mt-2 uppercase tracking-widest">
-              Спрощують використання сайту
+              {t("privacyPolicy.cookiesSubtitle")}
             </p>
           </div>
 
           <p>
-            Фактично охорона особистих даних користувача не пов’язана з поняттям
-            cookie. Файли «cookies» лише спрощують експлуатацію різних сайтів,
-            автоматично збираючи певні види інформації. Вони являють собою
-            текстові документи, які зберігаються сервером інтернет-сторінки на
-            вінчестері електронного пристрою.
+            {t("privacyPolicy.cookiesDesc1")}
           </p>
 
           <p>
-            Cookie ніяк не впливають на налаштування операційної системи або
-            файли, розташовані на комп’ютері, проте істотно економлять час
-            користувача. З їх допомогою можливо:
+            {t("privacyPolicy.cookiesDesc2")}
           </p>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mt-6">
             <div className="bg-stone-50 border border-stone-200/60 p-5 rounded-2xl text-xs text-stone-600 leading-relaxed">
               <strong className="block text-stone-900 font-semibold mb-2">
-                Заповнення форм
+                {t("privacyPolicy.cookiesForms")}
               </strong>
-              Швидко заповнювати поля (ім’я, прізвище, адресу, електронну пошту,
-              телефони та інше).
+              {t("privacyPolicy.cookiesFormsDesc")}
             </div>
             <div className="bg-stone-50 border border-stone-200/60 p-5 rounded-2xl text-xs text-stone-600 leading-relaxed">
               <strong className="block text-stone-900 font-semibold mb-2">
-                Збереження налаштувань
+                {t("privacyPolicy.cookiesSettings")}
               </strong>
-              Зберігати власні налаштування на сайті для наступних відвідувань.
+              {t("privacyPolicy.cookiesSettingsDesc")}
             </div>
             <div className="bg-stone-50 border border-stone-200/60 p-5 rounded-2xl text-xs text-stone-600 leading-relaxed">
               <strong className="block text-stone-900 font-semibold mb-2">
-                Робота з Кошиком
+                {t("privacyPolicy.cookiesCart")}
               </strong>
-              Залишати відкладені товари в Кошику для подальшого оформлення
-              замовлення.
+              {t("privacyPolicy.cookiesCartDesc")}
             </div>
           </div>
         </section>

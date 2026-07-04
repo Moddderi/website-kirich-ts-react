@@ -4,8 +4,10 @@ import { useAppDispatch, useAppSelector } from "../../store/store";
 import { toggleFavorite, selectIsFavorite } from "../../store/favoriteSlice";
 import { optimizeCloudinaryUrl } from "../../utils/cloudinary";
 import { ProductImage } from "../shared/ProductImage/ProductImage";
+import { useProductName } from "../../utils/useLocalizedProduct";
 
 import { IoHeart, IoHeartOutline } from "react-icons/io5";
+import { useTranslation } from "react-i18next";
 
 interface ProductCardProps {
   product: Product;
@@ -19,8 +21,11 @@ export const ProductCard = ({
   enterDelayMs = 0,
 }: ProductCardProps) => {
   const dispatch = useAppDispatch();
+  const { t } = useTranslation();
+  const getProductName = useProductName();
 
   const isFavorite = useAppSelector(selectIsFavorite(product.id));
+  const localizedName = getProductName(product);
   const productId = product.id || product.product_code;
 
   const defaultImage = optimizeCloudinaryUrl(
@@ -48,7 +53,7 @@ export const ProductCard = ({
         <div className="absolute inset-0 overflow-hidden">
           <ProductImage
             src={displayImages[0]}
-            alt={product.name}
+            alt={localizedName}
             loading={imageLoading}
             className={`scale-100 group-hover:scale-110 transition-transform duration-1000 ease-[cubic-bezier(0.25,1,0.5,1)] ${
               displayImages.length > 1 ? "group-hover:opacity-0" : ""
@@ -59,7 +64,7 @@ export const ProductCard = ({
             <div className="absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100">
               <ProductImage
                 src={displayImages[1]}
-                alt={`${product.name} - ракурс 2`}
+                alt={`${localizedName} - ${t("productCard.angle", { n: 2 })}`}
                 loading="lazy"
                 className="scale-100 group-hover:scale-110 transition-transform duration-1000 ease-[cubic-bezier(0.25,1,0.5,1)]"
               />
@@ -81,12 +86,12 @@ export const ProductCard = ({
             {isFavorite ? (
               <>
                 <IoHeart size={16} className="text-red-500" />
-                Видалити
+                {t("productCard.remove")}
               </>
             ) : (
               <>
                 <IoHeartOutline size={16} />
-                Вподобати
+                {t("productCard.like")}
               </>
             )}
           </button>
@@ -96,7 +101,7 @@ export const ProductCard = ({
       <div className="mt-5">
         <div className="flex justify-between items-start gap-4">
           <h3 className="text-sm font-semibold tracking-tight text-stone-900 group-hover:text-stone-500 transition-colors">
-            {product.name}
+            {localizedName}
           </h3>
           <p className="text-sm font-semibold text-stone-900 whitespace-nowrap">
             {product.price.toLocaleString()} ₴

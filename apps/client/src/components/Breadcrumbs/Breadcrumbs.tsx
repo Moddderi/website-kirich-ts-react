@@ -1,36 +1,40 @@
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import { IoIosArrowForward } from "react-icons/io";
 import { GoHome } from "react-icons/go";
 import { getProductById } from "../../api/productApi";
-
-const routeLabels: Record<string, string> = {
-  catalog: "Каталог",
-  cart: "Кошик",
-  favorite: "Вподобання",
-  "individual-tailoring": "Індивідуальне пошиття",
-  checkout: "Оформлення замовлення",
-  "order-success": "Замовлення оформлено",
-  studio: "Студія",
-  women: "Жінкам",
-  latina: "Латина",
-  "step-1": "Вибір типу",
-  "step-2": "Зняття мірок",
-  "step-3": "Завершення",
-  "delivery-and-payment": "Доставка та оплата",
-  "privacy-policy": "Політика безпеки",
-};
-
-const tailoringSteps = [
-  { path: "/individual-tailoring", label: "Індивідуальне пошиття" },
-  { path: "/individual-tailoring/step-1", label: "Вибір типу" },
-  { path: "/individual-tailoring/step-2", label: "Зняття мірок" },
-  { path: "/individual-tailoring/step-3", label: "Завершення" },
-];
+import { useProductName } from "../../utils/useLocalizedProduct";
 
 export const Breadcrumbs: React.FC = () => {
   const location = useLocation();
+  const { t } = useTranslation();
+  const getProductName = useProductName();
+
+  const routeLabels: Record<string, string> = {
+    catalog: t("breadcrumbs.catalog"),
+    cart: t("breadcrumbs.cart"),
+    favorite: t("breadcrumbs.favorites"),
+    "individual-tailoring": t("breadcrumbs.tailoring"),
+    checkout: t("breadcrumbs.checkout"),
+    "order-success": t("breadcrumbs.orderSuccess"),
+    studio: t("breadcrumbs.studio"),
+    women: t("breadcrumbs.women"),
+    latina: t("breadcrumbs.latina"),
+    "step-1": t("breadcrumbs.step1"),
+    "step-2": t("breadcrumbs.step2"),
+    "step-3": t("breadcrumbs.step3"),
+    "delivery-and-payment": t("breadcrumbs.deliveryAndPayment"),
+    "privacy-policy": t("breadcrumbs.privacyPolicy"),
+  };
+
+  const tailoringSteps = [
+    { path: "/individual-tailoring", label: t("breadcrumbs.tailoring") },
+    { path: "/individual-tailoring/step-1", label: t("breadcrumbs.step1") },
+    { path: "/individual-tailoring/step-2", label: t("breadcrumbs.step2") },
+    { path: "/individual-tailoring/step-3", label: t("breadcrumbs.step3") },
+  ];
 
   // Присікаємо шлях до order-success на етапі розбиття, обрізаючи все, що йде після нього
   const rawPathnames = location.pathname.split("/").filter((x) => x);
@@ -57,7 +61,7 @@ export const Breadcrumbs: React.FC = () => {
     <nav className="flex items-center gap-2 mb-10 text-xs font-medium text-stone-500 select-none flex-wrap">
       <Link to="/" className="flex items-center gap-1 hover:text-stone-900">
         <GoHome size={14} className="text-stone-900" />
-        Головна
+        {t("breadcrumbs.home")}
       </Link>
 
       {isTailoringPath
@@ -98,7 +102,7 @@ export const Breadcrumbs: React.FC = () => {
               (isDynamicProductParam && isLast
                 ? isLoading
                   ? "..."
-                  : product?.name
+                  : product ? getProductName(product) : decodeURIComponent(value)
                 : decodeURIComponent(value));
 
             return (

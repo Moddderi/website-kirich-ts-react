@@ -1,5 +1,6 @@
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { setType } from "../../store/tailoringSlice";
 import type { MeasurementType } from "@project/shared";
 
@@ -8,10 +9,10 @@ import { ImScissors } from "react-icons/im";
 import { GiClothes, GiSuitcase } from "react-icons/gi";
 
 export const SelectTypePage = () => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  // Используем актуальный общий тип MeasurementType (body | jacket | pants | suit)
   const handleSelect = (type: MeasurementType) => {
     dispatch(setType(type));
     navigate("/individual-tailoring/step-2");
@@ -21,29 +22,29 @@ export const SelectTypePage = () => {
     {
       type: "body" as const,
       icon: IoShirtOutline,
-      title: "Боді",
-      desc: "Облегающие боди и комбинезоны",
+      title: t("selectType.body"),
+      desc: t("selectType.bodyDesc"),
       dark: false,
     },
     {
       type: "jacket" as const,
       icon: ImScissors,
-      title: "Піджак / жилет",
-      desc: "Верхняя плечевая одежда",
+      title: t("selectType.jacket"),
+      desc: t("selectType.jacketDesc"),
       dark: false,
     },
     {
       type: "pants" as const,
       icon: GiClothes,
-      title: "Штани",
-      desc: "Брюки, юбки и шорты",
+      title: t("selectType.pants"),
+      desc: t("selectType.pantsDesc"),
       dark: false,
     },
     {
       type: "suit" as const,
       icon: GiSuitcase,
-      title: "Костюм",
-      desc: "Полноценный костюм или платье",
+      title: t("selectType.suit"),
+      desc: t("selectType.suitDesc"),
       dark: true,
     },
   ];
@@ -54,14 +55,13 @@ export const SelectTypePage = () => {
         {/* Заголовок */}
         <div className="mb-16 text-center max-w-2xl mx-auto animate-reveal-up [animation-delay:200ms] opacity-0 [animation-fill-mode:forwards]">
           <span className="rounded-full bg-stone-900 px-3 py-1 text-[10px] font-semibold uppercase tracking-widest text-white shadow-sm border border-stone-800 mb-6 inline-block">
-            Шаг 1 из 3
+            {t("selectType.stepLabel")}
           </span>
           <h1 className="text-4xl sm:text-5xl font-semibold tracking-tighter text-stone-900 mb-6">
-            Что будем шить?
+            {t("selectType.title")}
           </h1>
           <p className="text-base font-medium text-stone-500 leading-relaxed">
-            Выберите тип изделия. На следующем шаге мы предложим вам удобную
-            форму для снятия мерок по фото.
+            {t("selectType.description")}
           </p>
         </div>
 
@@ -121,7 +121,7 @@ export const SelectTypePage = () => {
                         : "border-stone-200 bg-white text-stone-900 group-hover:border-stone-900 group-hover:bg-stone-900 group-hover:text-white"
                     }`}
                   >
-                    Выбрать
+                    {t("selectType.select")}
                   </span>
                 </div>
               </button>

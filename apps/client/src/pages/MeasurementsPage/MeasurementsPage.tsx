@@ -2,6 +2,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import type { RootState } from "../../store/store";
 import { setMeasurement, setMeasurementUnit } from "../../store/tailoringSlice";
 import { ProductImage } from "../../components/shared/ProductImage/ProductImage";
@@ -9,7 +10,6 @@ import { optimizeCloudinaryUrl } from "../../utils/cloudinary";
 import {
   FINAL_MEASUREMENT_FIELD,
   MEASUREMENT_CONFIG,
-  MEASUREMENT_UNIT_LABELS,
   MEASUREMENTS_CATALOG,
   getMeasurementSchema,
   type MeasurementType,
@@ -19,6 +19,7 @@ import {
 const UNIT_OPTIONS: MeasurementUnit[] = ["cm", "in"];
 
 export const MeasurementsPage = () => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { type, measurements, measurementUnit } = useSelector(
@@ -26,7 +27,7 @@ export const MeasurementsPage = () => {
   );
 
   const config = type ? MEASUREMENT_CONFIG[type as MeasurementType] : null;
-  const unitLabel = MEASUREMENT_UNIT_LABELS[measurementUnit];
+  const unitLabel = t(`measurementUnits.${measurementUnit}`);
   const heightLimits =
     measurementUnit === "cm"
       ? { min: 100, max: 250, placeholder: "170" }
@@ -70,14 +71,13 @@ export const MeasurementsPage = () => {
       <div className="mx-auto max-w-7xl px-6 lg:px-8 animate-reveal-up">
         <div className="mb-16 text-center max-w-2xl mx-auto">
           <span className="rounded-full bg-stone-900 px-3 py-1 text-[10px] font-semibold uppercase tracking-widest text-white shadow-sm border border-stone-800 mb-6 inline-block">
-            Шаг 2 из 2
+            {t("measurements.stepLabel")}
           </span>
           <h1 className="text-4xl sm:text-5xl font-semibold tracking-tighter text-stone-900 mb-6">
-            Зняття мірок: {config.label}
+            {t("measurements.title", { type: t(`measurementConfig.${type}`) })}
           </h1>
           <p className="text-base font-medium text-stone-500 leading-relaxed">
-            Вкажіть ваші точні параметри, дотримуючись фото-інструкцій для
-            кожної мірки
+            {t("measurements.description")}
           </p>
         </div>
 
@@ -91,7 +91,7 @@ export const MeasurementsPage = () => {
             style={{ animationDelay: "0ms" }}
           >
             <p className="text-xs font-semibold uppercase tracking-widest text-stone-500">
-              Одиниці виміру
+              {t("measurements.unitLabel")}
             </p>
             <div className="inline-flex items-center rounded-full border border-stone-200 bg-stone-100 p-1">
               {UNIT_OPTIONS.map((unit) => (
@@ -105,12 +105,12 @@ export const MeasurementsPage = () => {
                       : "text-stone-500 hover:text-stone-900"
                   }`}
                 >
-                  {MEASUREMENT_UNIT_LABELS[unit]}
+                  {t(`measurementUnits.${unit}`)}
                 </button>
               ))}
             </div>
             <p className="text-[11px] text-stone-400">
-              При зміні одиниць введені мірки очищаються
+              {t("measurements.unitChangeNote")}
             </p>
           </div>
 
@@ -136,7 +136,7 @@ export const MeasurementsPage = () => {
                   <div className="aspect-4/5 w-full rounded-2xl bg-stone-200 border border-stone-100 mb-4 overflow-hidden relative flex items-center justify-center group shrink-0">
                     <ProductImage
                       src={optimizeCloudinaryUrl(measurementInfo.imageUrl)}
-                      alt={measurementInfo.name}
+                      alt={t(`measurementNames.${field}`)}
                       loading={index < 4 ? "eager" : "lazy"}
                       className="group-hover:scale-105 transition-transform duration-500"
                     />
@@ -144,13 +144,13 @@ export const MeasurementsPage = () => {
                   <h3
                     className={`${isInfoBlock ? "text-white" : "text-stone-900"} text-sm font-semibold mb-1 leading-tight`}
                   >
-                    {measurementInfo.name}
+                    {t(`measurementNames.${field}`)}
                   </h3>
                   <p
                     className={`${isInfoBlock ? "text-stone-300" : "text-stone-500"} text-[11px] font-medium mb-4 overflow-y-auto max-h-24 pr-1 leading-relaxed scrollbar-thin`}
-                    title={measurementInfo.description}
+                    title={t(`measurementDescriptions.${field}`)}
                   >
-                    {measurementInfo.description}
+                    {t(`measurementDescriptions.${field}`)}
                   </p>
 
                   {!isInfoBlock && (
@@ -172,7 +172,7 @@ export const MeasurementsPage = () => {
 
                   {isInfoBlock && (
                     <div className="mt-auto bg-stone-700/50 border border-stone-600/50 rounded-xl py-3 px-4 text-center text-[11px] font-semibold text-stone-100 shadow-inner">
-                      Підготовчий етап
+                      {t("measurements.preparationStage")}
                     </div>
                   )}
 
@@ -191,19 +191,19 @@ export const MeasurementsPage = () => {
             style={{ animationDelay: `${(config.fields.length + 1) * 60}ms` }}
           >
             <h2 className="text-xl font-semibold tracking-tighter text-stone-900 mb-6 text-center">
-              Фінальні дані
+              {t("measurements.finalData")}
             </h2>
             <div className="space-y-6">
               <div>
                 <label className="block text-xs font-semibold text-stone-900 mb-2 uppercase tracking-widest text-center">
-                  {MEASUREMENTS_CATALOG[FINAL_MEASUREMENT_FIELD].name} ({unitLabel})
+                  {t(`measurementNames.${FINAL_MEASUREMENT_FIELD}`)} ({unitLabel})
                 </label>
                 <input
                   type="number"
                   step="0.1"
                   min={heightLimits.min}
                   max={heightLimits.max}
-                  placeholder={`Наприклад, ${heightLimits.placeholder}`}
+                  placeholder={t("measurements.example", { value: heightLimits.placeholder })}
                   {...register(FINAL_MEASUREMENT_FIELD)}
                   className={`block w-full rounded-2xl border-0 bg-stone-50 py-4 pl-5 pr-5 text-center text-base font-semibold text-stone-900 shadow-inner ring-1 ring-inset ${
                     errors[FINAL_MEASUREMENT_FIELD]
@@ -221,7 +221,7 @@ export const MeasurementsPage = () => {
                 type="submit"
                 className="w-full mt-2 flex items-center justify-center gap-2 rounded-2xl bg-stone-900 py-4 px-8 text-sm font-semibold text-white hover:bg-stone-800 transition-all active:scale-[0.98] shadow-lg shadow-stone-900/20 group"
               >
-                Перейти к оформлению
+                {t("measurements.proceedToCheckout")}
               </button>
             </div>
           </div>

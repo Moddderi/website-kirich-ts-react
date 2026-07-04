@@ -1,5 +1,6 @@
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import { getOrderById } from "../../api/orderApi";
 
 interface OrderItem {
@@ -27,6 +28,7 @@ interface OrderData {
 }
 
 export const OrderSuccessPage = () => {
+  const { t } = useTranslation();
   const { orderId } = useParams<{ orderId?: string }>();
   const navigate = useNavigate();
   const location = useLocation();
@@ -52,7 +54,7 @@ export const OrderSuccessPage = () => {
   if (orderId && isLoading) {
     return (
       <div className="flex min-h-[60vh] items-center justify-center text-stone-500 font-medium text-sm">
-        Завантаження деталей замовлення...
+        {t("orderSuccess.loading")}
       </div>
     );
   }
@@ -62,13 +64,13 @@ export const OrderSuccessPage = () => {
     return (
       <div className="flex min-h-[60vh] flex-col items-center justify-center gap-4 text-center">
         <p className="text-stone-900 font-semibold text-lg">
-          Замовлення не знайдено або сталася помилка.
+          {t("orderSuccess.notFound")}
         </p>
         <button
           onClick={() => navigate("/")}
           className="text-sm font-semibold underline text-stone-500 hover:text-stone-900"
         >
-          Повернутися на головну
+          {t("orderSuccess.goHome")}
         </button>
       </div>
     );
@@ -100,19 +102,18 @@ export const OrderSuccessPage = () => {
           </div>
 
           <h1 className="text-4xl sm:text-5xl font-semibold tracking-tighter text-stone-900 mb-6">
-            Замовлення на пошив оформлено
+            {t("orderSuccess.customTitle")}
           </h1>
 
           <p className="text-lg font-medium text-stone-500 max-w-lg mb-8 leading-relaxed">
-            Раді повідомити, ваше замовлення успішно передано. Менеджер
-            зв'яжеться з вами найближчим часом для уточнення мірок та деталей.
+            {t("orderSuccess.customMessage")}
           </p>
 
           <button
             onClick={() => navigate("/")}
             className="mt-6 rounded-2xl border border-stone-200 bg-transparent px-8 py-4 text-sm font-semibold uppercase tracking-widest text-stone-900 hover:bg-stone-50 transition-all duration-300 active:scale-95 flex items-center justify-center gap-2 cursor-pointer"
           >
-            Повернутися на головну
+            {t("orderSuccess.goHome")}
           </button>
         </div>
       </div>
@@ -156,19 +157,18 @@ export const OrderSuccessPage = () => {
           </div>
 
           <h1 className="text-4xl sm:text-5xl font-semibold tracking-tighter text-stone-900 mb-6">
-            Замовлення оформлено
+            {t("orderSuccess.title")}
           </h1>
 
           <p className="text-lg font-medium text-stone-500 max-w-lg mb-8 leading-relaxed">
-            Раді повідомити, {orderData.firstName}, ваше замовлення успішно
-            передано. Менеджер зв'яжеться з вами найближчим часом.
+            {t("orderSuccess.message", { name: orderData.firstName })}
           </p>
 
           <button
             onClick={() => navigate("/")}
             className="mt-12 rounded-2xl border border-stone-200 bg-transparent px-8 py-4 text-sm font-semibold uppercase tracking-widest text-stone-900 hover:bg-stone-50 transition-all duration-300 active:scale-95 flex items-center justify-center gap-2 cursor-pointer"
           >
-            Повернутися в каталог
+            {t("orderSuccess.backToCatalog")}
           </button>
         </div>
 
@@ -177,7 +177,7 @@ export const OrderSuccessPage = () => {
           <div className="sticky top-32">
             <div className="mb-8 p-6 sm:p-8 rounded-4xl bg-white border border-stone-200/60 shadow-sm">
               <h2 className="text-sm font-semibold tracking-widest uppercase text-stone-900 mb-6 flex items-center justify-between">
-                <span>Деталі замовлення</span>
+                <span>{t("orderSuccess.orderDetails")}</span>
                 <span className="text-xs font-medium text-stone-400 normal-case tracking-normal">
                   {new Date(orderData.createdAt).toLocaleDateString("uk-UA", {
                     day: "numeric",
@@ -198,13 +198,13 @@ export const OrderSuccessPage = () => {
                       </h3>
                       {item.color && (
                         <p className="text-xs font-medium text-stone-500">
-                          Колір:{" "}
+                          {t("orderSuccess.color")}:{" "}
                           <span className="text-stone-900">{item.color}</span>
                         </p>
                       )}
                       {item.size && (
                         <p className="text-xs font-medium text-stone-500">
-                          Розмір:{" "}
+                          {t("orderSuccess.size")}:{" "}
                           <span className="text-stone-900">{item.size}</span>
                         </p>
                       )}
@@ -218,24 +218,24 @@ export const OrderSuccessPage = () => {
 
               <div className="space-y-4 pt-6 mb-6">
                 <div className="flex justify-between text-sm font-medium text-stone-500">
-                  <span>Товари</span>
+                  <span>{t("orderSuccess.products")}</span>
                   <span className="text-stone-900">
                     {itemsTotal.toLocaleString()} ₴
                   </span>
                 </div>
                 <div className="flex justify-between text-sm font-medium text-stone-500">
-                  <span>Доставка</span>
+                  <span>{t("orderSuccess.delivery")}</span>
                   <span className="text-stone-900">
                     {orderData.deliveryMethod === "pickup"
-                      ? "Самовивіз"
-                      : "За тарифами НП"}
+                      ? t("orderSuccess.selfPickup")
+                      : t("orderSuccess.byNPTariffs")}
                   </span>
                 </div>
               </div>
 
               <div className="flex justify-between items-center pt-6 border-t border-stone-100">
                 <span className="text-sm font-semibold uppercase tracking-widest text-stone-900">
-                  Всього
+                  {t("orderSuccess.total")}
                 </span>
                 <span className="text-2xl font-semibold text-stone-900">
                   {Number(orderData.totalAmount).toLocaleString()} ₴

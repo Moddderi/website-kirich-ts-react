@@ -11,8 +11,11 @@ import { FaArrowsAltV } from "react-icons/fa";
 import { RiShieldStarLine } from "react-icons/ri";
 import { GoArrowUpRight } from "react-icons/go";
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 export const MainPage = () => {
+  const { t } = useTranslation();
+
   return (
     <main className="flex-grow">
       <section className="relative overflow-hidden pt-6 pb-32 sm:pt-14 sm:pb-48">
@@ -28,22 +31,21 @@ export const MainPage = () => {
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-stone-400 opacity-75"></span>
               <span className="relative inline-flex rounded-full h-2 w-2 bg-stone-600"></span>
             </span>
-            The Vanguard Collection
+            {t("main.vanguardCollection")}
           </div>
 
           <h1 className=" animate-reveal-up delay-300 mx-auto max-w-5xl text-5xl font-semibold tracking-tighter text-stone-900 sm:text-7xl lg:text-8xl leading-[1.1]">
-            Абсолютна форма <br className="hidden sm:block" />
+            {t("main.heroTitle1")} <br className="hidden sm:block" />
             <span className="relative inline-block">
               <span className="relative z-10 text-transparent bg-clip-text bg-gradient-to-r from-stone-900 via-stone-700 to-stone-400">
-                вашого руху
+                {t("main.heroTitle2")}
               </span>
               <div className="absolute -bottom-2 left-0 right-0 h-3 bg-beige-200/50 -z-10 -rotate-1 origin-left scale-x-0 animate-[shimmer_2s_forwards_1s] delay-700"></div>
             </span>
           </h1>
 
           <p className=" animate-reveal-up delay-500 mx-auto mt-8 max-w-2xl text-lg text-stone-500 leading-relaxed font-medium">
-            Безкомпромісний бальний одяг світового рівня. Створена в Києві з
-            маніакальною увагою до кожної деталі, щоб ви домінували на паркет.
+            {t("main.heroDescription")}
           </p>
 
           <div className=" animate-reveal-up delay-700 mt-12 flex flex-col sm:flex-row items-center justify-center gap-5 w-full sm:w-auto">
@@ -52,7 +54,7 @@ export const MainPage = () => {
               className="group relative w-full sm:w-auto rounded-xl bg-stone-900 px-8 py-4 text-sm font-semibold text-white shadow-2xl shadow-stone-900/30 hover:bg-stone-800 hover:-translate-y-1 transition-all duration-500 overflow-hidden flex items-center justify-center gap-3"
             >
               <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-out"></div>
-              <span className="relative z-10">Перейти до колекції</span>
+              <span className="relative z-10">{t("main.goToCollection")}</span>
               {/* <iconify-icon icon="solar:arrow-right-linear" width="18" stroke-width="1.5" className="relative z-10 transform group-hover:translate-x-2 transition-transform duration-500"></iconify-icon> */}
             </a>
             <a
@@ -65,7 +67,7 @@ export const MainPage = () => {
               }}
               className="group w-full sm:w-auto rounded-xl border border-stone-200/80 bg-white/40 backdrop-blur-md px-8 py-4 text-sm font-semibold text-stone-900 shadow-sm hover:border-stone-900 hover:bg-white transition-all duration-500 flex items-center justify-center gap-2"
             >
-              Філософія бренда
+              {t("main.brandPhilosophy")}
               <div className="h-1.5 w-1.5 rounded-full bg-stone-300 group-hover:bg-stone-900 transition-colors duration-500 ml-1"></div>
             </a>
           </div>
@@ -77,10 +79,10 @@ export const MainPage = () => {
             </div>
             <div>
               <p className="text-sm font-semibold tracking-tight text-stone-900">
-                Точність до 1 мм
+                {t("main.precisionTitle")}
               </p>
               <p className="text-xs text-stone-500 mt-1 font-medium">
-                Бездоганна архітектура крою
+                {t("main.precisionDesc")}
               </p>
             </div>
           </div>
@@ -94,7 +96,7 @@ export const MainPage = () => {
                 Poltava, Ukraine
               </p>
               <p className="text-xs text-stone-500 mt-1 font-medium">
-                Створено вручну
+                {t("main.handmade")}
               </p>
             </div>
           </div>
@@ -108,10 +110,10 @@ export const MainPage = () => {
           {/* HEADER */}
           <div className="text-center mb-20">
             <h2 className="text-3xl font-semibold tracking-tighter text-white sm:text-5xl">
-              Архитектура вашего заказа
+              {t("main.orderArchitecture")}
             </h2>
             <p className="mt-6 text-sm text-stone-500 max-w-2xl mx-auto font-medium">
-              Два бескомпромиссных пути к созданию вашего идеального образа.
+              {t("main.orderArchitectureDesc")}
             </p>
           </div>
 
@@ -132,7 +134,7 @@ export const MainPage = () => {
 
                     <div>
                       <h3 className="text-xl font-semibold text-white">
-                        Bespoke / Индивидуально
+                        {t("main.bespokeTitle")}
                       </h3>
 
                       <div className="flex items-center gap-2 mt-2">
@@ -140,7 +142,7 @@ export const MainPage = () => {
                           <span className="absolute h-full w-full rounded-full bg-white opacity-40 animate-ping" />
                         </span>
                         <p className="text-xs font-semibold text-stone-500 uppercase tracking-widest">
-                          Абсолютная точность
+                          {t("main.absolutePrecision")}
                         </p>
                       </div>
                     </div>
@@ -148,25 +150,25 @@ export const MainPage = () => {
                 </div>
 
                 <p className="text-sm text-stone-500 leading-relaxed mb-10 flex-grow font-medium">
-                  Премиальный индивидуальный пошив по вашим меркам.
+                  {t("main.bespokeDesc")}
                 </p>
 
                 <div className="grid grid-cols-2 gap-4 text-xs font-semibold text-stone-300 bg-stone-950/50 rounded-2xl p-6 border border-stone-800 shadow-[0_4px_20px_rgba(0,0,0,0.02)] group-hover:border-stone-700">
                   <div className="flex gap-2 group-hover:translate-x-1 transition-transform duration-300">
                     <FaPenRuler size={16} />
-                    Посадка до миллиметра
+                    {t("main.fitToMm")}
                   </div>
                   <div className="flex gap-2 group-hover:translate-x-1 transition-transform duration-300 delay-100">
                     <MdOutlineWorkspacePremium size={18} />
-                    Премиум ткани
+                    {t("main.premiumFabrics")}
                   </div>
                   <div className="flex gap-2 group-hover:translate-x-1 transition-transform duration-300 delay-100">
                     <BsPencilSquare size={16} />
-                    Уникальный дизайн
+                    {t("main.uniqueDesign")}
                   </div>
                   <div className="flex gap-2 group-hover:translate-x-1 transition-transform duration-300 delay-100">
                     <IoTimeOutline size={18} />
-                    Создание от 14 дней
+                    {t("main.creationFrom14")}
                   </div>
                 </div>
 
@@ -174,7 +176,7 @@ export const MainPage = () => {
                   to="/catalog"
                   className="mt-8 flex w-full items-center justify-center gap-3 rounded-xl bg-white px-8 py-4 text-sm font-bold text-stone-900  hover:bg-stone-400  transition-all duration-300"
                 >
-                  Каталог Bespoke
+                  {t("main.catalogBespoke")}
                   {/* <iconify-icon icon="solar:arrow-right-linear" width="18" class="transform group-hover/btn:translate-x-1 transition-transform"></iconify-icon> */}
                 </Link>
               </div>
@@ -196,7 +198,7 @@ export const MainPage = () => {
 
                     <div>
                       <h3 className="text-xl font-semibold text-white">
-                        Готові вироби
+                        {t("main.readyProducts")}
                       </h3>
 
                       <div className="flex items-center gap-2 mt-2">
@@ -204,7 +206,7 @@ export const MainPage = () => {
                           <span className="absolute h-full w-full rounded-full bg-white opacity-40 animate-ping" />
                         </span>
                         <p className="text-xs font-semibold text-stone-500 uppercase tracking-widest">
-                          Выверенная сетка
+                          {t("main.calibratedGrid")}
                         </p>
                       </div>
                     </div>
@@ -212,16 +214,16 @@ export const MainPage = () => {
                 </div>
 
                 <p className="text-sm text-stone-500 leading-relaxed mb-10 flex-grow font-medium">
-                  Премиальный индивидуальный пошив по вашим меркам.
+                  {t("main.bespokeDesc")}
                 </p>
 
                 <div className="grid grid-cols-2 gap-4 text-xs font-semibold text-stone-300 bg-stone-950/50 rounded-2xl p-6 border border-stone-800 shadow-[0_4px_20px_rgba(0,0,0,0.02)] group-hover:border-stone-700">
                   <div className="flex gap-2 group-hover:translate-x-1 transition-transform duration-300">
                     <FiBox size={18} />
-                    Отправка за 24ч
+                    {t("main.shippingIn24h")}
                   </div>
                   <div className="group-hover:translate-x-1 transition-transform duration-300 delay-100">
-                    Премиум ткани
+                    {t("main.premiumFabrics")}
                   </div>
                   <div className="group-hover:translate-x-1 transition-transform duration-300 delay-100">
                     3
@@ -235,7 +237,7 @@ export const MainPage = () => {
                   to="/individual-tailoring"
                   className="mt-8 flex w-full items-center justify-center gap-3 rounded-xl bg-white px-8 py-4 text-sm font-bold text-stone-900  hover:bg-stone-400  transition-all duration-300"
                 >
-                  Індивідуальне пошиття
+                  {t("main.tailoring")}
                   {/* <iconify-icon icon="solar:arrow-right-linear" width="18" class="transform group-hover/btn:translate-x-1 transition-transform"></iconify-icon> */}
                 </Link>
               </div>
@@ -250,12 +252,10 @@ export const MainPage = () => {
             id="about"
             className="text-3xl font-semibold tracking-tighter text-stone-900 sm:text-5xl text-center"
           >
-            Инженерия эстетики
+            {t("main.engineeringTitle")}
           </h2>
           <p className="mt-6 text-sm text-stone-500 max-w-2xl mx-auto text-center font-medium leading-relaxed">
-            Мы импортируем только премиальные ткани из Италии и Англии,
-            интегрируя высокие технологии в классическое искусство кроя.
-            Украинское качество мирового уровня.
+            {t("main.engineeringDesc")}
           </p>
         </div>
 
@@ -274,13 +274,11 @@ export const MainPage = () => {
 
             <div className="relative z-10 max-w-lg mt-auto">
               <h3 className="text-3xl sm:text-5xl font-semibold tracking-tighter mb-6 leading-[1.1]">
-                Материалы, которые <br />
-                дышат с вами
+                {t("main.materialsTitle")} <br />
+                {t("main.materialsTitle2")}
               </h3>
               <p className="text-sm text-stone-400 leading-relaxed font-medium">
-                Эластичный креп, невесомый шифон и высокотехнологичный бифлекс
-                обеспечивают абсолютную посадку. Каждая молекула ткани работает
-                на свободу вашего движения.
+                {t("main.materialsDesc")}
               </p>
             </div>
           </div>
@@ -294,7 +292,7 @@ export const MainPage = () => {
               4-way
             </span>
             <span className="mt-3 text-xs font-bold text-stone-500 uppercase tracking-widest relative z-10">
-              Stretch ткани
+              {t("main.stretchFabrics")}
             </span>
           </div>
 
@@ -306,7 +304,7 @@ export const MainPage = () => {
               Global
             </span>
             <span className="mt-3 text-xs font-bold text-stone-500 uppercase tracking-widest relative z-10">
-              Стандарты
+              {t("main.globalStandards")}
             </span>
           </div>
 
@@ -317,10 +315,10 @@ export const MainPage = () => {
 
             <div className="relative z-10 text-center sm:text-left mb-6 sm:mb-0">
               <h3 className="text-2xl font-semibold tracking-tighter text-white">
-                Взгляните на процесс создания
+                {t("main.viewProcess")}
               </h3>
               <p className="mt-2 text-sm text-stone-400 font-medium">
-                Бескомпромиссный подход киевских мастеров к каждому шву.
+                {t("main.viewProcessDesc")}
               </p>
             </div>
             <div className="relative z-10 flex h-16 w-16 items-center justify-center rounded-full bg-white text-stone-900 group-hover:scale-110 group-hover:rotate-45 transition-all duration-500 shadow-[0_0_30px_rgba(255,255,255,0.2)]">

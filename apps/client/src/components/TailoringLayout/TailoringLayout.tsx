@@ -1,9 +1,11 @@
 // components/TailoringLayout/TailoringLayout.tsx
 import { Outlet, useLocation } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { Breadcrumbs } from "../Breadcrumbs/Breadcrumbs";
 
 export const TailoringLayout = () => {
   const location = useLocation();
+  const { t } = useTranslation();
 
   // Перевіряємо, чи знаходимося ми зараз на сторінці чекауту або успіху індивідуального пошиття
   const isCheckoutPage = location.pathname.includes(
@@ -29,9 +31,7 @@ export const TailoringLayout = () => {
       <footer className="w-full max-w-2xl mt-12 mb-6 text-center">
         <div className="border-t border-stone-200 pt-6">
           <p className="text-[10px] sm:text-xs text-stone-400 font-medium leading-relaxed px-4">
-            * Студія не несе відповідальності за невідповідність готового виробу
-            через некоректно внесені або самостійно виміряні клієнтом мірки.
-            Будь ласка, перевіряйте дані перед підтвердженням замовлення.
+            {t("tailoringLayout.disclaimer")}
           </p>
         </div>
       </footer>
