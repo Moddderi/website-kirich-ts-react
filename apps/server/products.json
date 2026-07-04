@@ -1,7 +1,9 @@
 [
   {
-    "name": "Сорочка-боді ST",
-    "search_name": "сорочка-боді st",
+    "name": "Сорочка-боді",
+    "name_en": "Body Shirt",
+    "search_name": "сорочка-боді",
+    "search_name_en": "body shirt",
     "price": 3000,
     "main_category": "clothing",
     "sub_type": "shirt",
@@ -10,8 +12,10 @@
     "dance_program": "ST"
   },
   {
-    "name": "Сорочка-боді ST фактурна",
-    "search_name": "сорочка-боді st фактурна",
+    "name": "Сорочка-боді фактурна",
+    "name_en": "Body Shirt Textured",
+    "search_name": "сорочка-боді фактурна",
+    "search_name_en": "body shirt textured",
     "price": 3200,
     "main_category": "clothing",
     "sub_type": "shirt",
@@ -20,8 +24,10 @@
     "dance_program": "ST"
   },
   {
-    "name": "Сорочка TR ST короткий рукав",
-    "search_name": "сорочка tr st короткий рукав",
+    "name": "Сорочка TR короткий рукав",
+    "name_en": "Shirt TR Short Sleeve",
+    "search_name": "сорочка tr короткий рукав",
+    "search_name_en": "shirt tr short sleeve",
     "price": 2500,
     "main_category": "clothing",
     "sub_type": "shirt",
@@ -30,8 +36,10 @@
     "dance_program": "ST"
   },
   {
-    "name": "Сорочка TR ST довгий рукав",
-    "search_name": "сорочка tr st довгий рукав",
+    "name": "Сорочка TR довгий рукав",
+    "name_en": "Shirt TR Long Sleeve",
+    "search_name": "сорочка tr довгий рукав",
+    "search_name_en": "shirt tr long sleeve",
     "price": 2700,
     "main_category": "clothing",
     "sub_type": "shirt",
@@ -40,8 +48,10 @@
     "dance_program": "ST"
   },
   {
-    "name": "Сорочка ST контраст",
-    "search_name": "сорочка st контраст",
+    "name": "Сорочка контраст",
+    "name_en": "Shirt Contrast",
+    "search_name": "сорочка контраст",
+    "search_name_en": "shirt contrast",
     "price": 2800,
     "main_category": "clothing",
     "sub_type": "shirt",
@@ -51,7 +61,9 @@
   },
   {
     "name": "Футболка поло короткий рукав",
+    "name_en": "Polo Shirt Short Sleeve",
     "search_name": "футболка поло короткий рукав",
+    "search_name_en": "polo shirt short sleeve",
     "price": 2000,
     "main_category": "clothing",
     "sub_type": "t-shirt",
@@ -61,7 +73,9 @@
   },
   {
     "name": "Футболка поло довгий рукав",
+    "name_en": "Polo Shirt Long Sleeve",
     "search_name": "футболка поло довгий рукав",
+    "search_name_en": "polo shirt long sleeve",
     "price": 2300,
     "main_category": "clothing",
     "sub_type": "t-shirt",
@@ -71,7 +85,9 @@
   },
   {
     "name": "Футболка поло контраст",
+    "name_en": "Polo Shirt Contrast",
     "search_name": "футболка поло контраст",
+    "search_name_en": "polo shirt contrast",
     "price": 2100,
     "main_category": "clothing",
     "sub_type": "t-shirt",
@@ -80,8 +96,10 @@
     "dance_program": "ST"
   },
   {
-    "name": "Футболка LAT короткий рукав",
-    "search_name": "футболка lat короткий рукав",
+    "name": "Футболка короткий рукав",
+    "name_en": "T-Shirt Short Sleeve",
+    "search_name": "футболка короткий рукав",
+    "search_name_en": "t-shirt short sleeve",
     "price": 1600,
     "main_category": "clothing",
     "sub_type": "t-shirt",
@@ -90,8 +108,10 @@
     "dance_program": "LAT"
   },
   {
-    "name": "Футболка LAT діагональ",
-    "search_name": "футболка lat діагональ",
+    "name": "Футболка діагональ",
+    "name_en": "T-Shirt Diagonal",
+    "search_name": "футболка діагональ",
+    "search_name_en": "t-shirt diagonal",
     "price": 1800,
     "main_category": "clothing",
     "sub_type": "t-shirt",
@@ -100,8 +120,10 @@
     "dance_program": "LAT"
   },
   {
-    "name": "Лонгслів LAT довгий рукав",
-    "search_name": "лонгслів lat довгий рукав",
+    "name": "Лонгслів довгий рукав",
+    "name_en": "Longsleeve Long Sleeve",
+    "search_name": "лонгслів довгий рукав",
+    "search_name_en": "longsleeve long sleeve",
     "price": 2000,
     "main_category": "clothing",
     "sub_type": "longsleeve",
@@ -111,7 +133,9 @@
   },
   {
     "name": "Лонгслів 'крило кажана'",
+    "name_en": "Longsleeve 'Bat Wing'",
     "search_name": "лонгслів 'крило кажана'",
+    "search_name_en": "longsleeve bat wing",
     "price": 2200,
     "main_category": "clothing",
     "sub_type": "longsleeve",
@@ -121,7 +145,9 @@
   },
   {
     "name": "Лонгслів з манжетами на кнопках",
+    "name_en": "Longsleeve with Button Cuffs",
     "search_name": "лонгслів з манжетами на кнопках",
+    "search_name_en": "longsleeve with button cuffs",
     "price": 2100,
     "main_category": "clothing",
     "sub_type": "longsleeve",
@@ -130,8 +156,10 @@
     "dance_program": "LAT"
   },
   {
-    "name": "Сорочка TR LAT довгий рукав",
-    "search_name": "сорочка tr lat довгий рукав",
+    "name": "Сорочка TR довгий рукав",
+    "name_en": "Shirt TR Long Sleeve",
+    "search_name": "сорочка tr довгий рукав",
+    "search_name_en": "shirt tr long sleeve",
     "price": 3000,
     "main_category": "clothing",
     "sub_type": "shirt",
@@ -141,7 +169,9 @@
   },
   {
     "name": "Сорочка-боді фрачна",
+    "name_en": "Body Shirt Tailcoat",
     "search_name": "сорочка-боді фрачна",
+    "search_name_en": "body shirt tailcoat",
     "price": 6100,
     "main_category": "clothing",
     "sub_type": "shirt",
@@ -150,8 +180,10 @@
     "dance_program": "ST"
   },
   {
-    "name": "Штани ST",
-    "search_name": "штани st",
+    "name": "Штани",
+    "name_en": "Trousers",
+    "search_name": "штани",
+    "search_name_en": "trousers",
     "price": 2500,
     "main_category": "clothing",
     "sub_type": "pants",
@@ -160,8 +192,10 @@
     "dance_program": "ST"
   },
   {
-    "name": "Штани ST зі шльовками под ремінь",
-    "search_name": "штани st зі шльовками под ремінь",
+    "name": "Штани зі шльовками под ремінь",
+    "name_en": "Trousers with Belt Loops",
+    "search_name": "штани зі шльовками под ремінь",
+    "search_name_en": "trousers with belt loops",
     "price": 2600,
     "main_category": "clothing",
     "sub_type": "pants",
@@ -170,8 +204,10 @@
     "dance_program": "ST"
   },
   {
-    "name": "Штани LAT",
-    "search_name": "штани lat",
+    "name": "Штани",
+    "name_en": "Trousers",
+    "search_name": "штани",
+    "search_name_en": "trousers",
     "price": 2500,
     "main_category": "clothing",
     "sub_type": "pants",
@@ -180,8 +216,10 @@
     "dance_program": "LAT"
   },
   {
-    "name": "Штани ST фрачні",
-    "search_name": "штани st фрачні",
+    "name": "Штани фрачні",
+    "name_en": "Trousers Tailcoat",
+    "search_name": "штани фрачні",
+    "search_name_en": "trousers tailcoat",
     "price": 4700,
     "main_category": "clothing",
     "sub_type": "pants",
@@ -191,7 +229,9 @@
   },
   {
     "name": "Краватка-метелик атласна",
+    "name_en": "Bow Tie Satin",
     "search_name": "краватка-метелик атласна",
+    "search_name_en": "bow tie satin",
     "price": 400,
     "main_category": "accessories",
     "sub_type": "tie",
@@ -200,7 +240,9 @@
   },
   {
     "name": "Краватка-метелик вишиванка",
+    "name_en": "Bow Tie Embroidered",
     "search_name": "краватка-метелик вишиванка",
+    "search_name_en": "bow tie embroidered",
     "price": 600,
     "main_category": "accessories",
     "sub_type": "tie",
@@ -209,7 +251,9 @@
   },
   {
     "name": "Краватка атласна",
+    "name_en": "Necktie Satin",
     "search_name": "краватка атласна",
+    "search_name_en": "necktie satin",
     "price": 500,
     "main_category": "accessories",
     "sub_type": "tie",
@@ -219,7 +263,9 @@
   },
   {
     "name": "Краватка вишиванка",
+    "name_en": "Necktie Embroidered",
     "search_name": "краватка вишиванка",
+    "search_name_en": "necktie embroidered",
     "price": 700,
     "main_category": "accessories",
     "sub_type": "tie",
@@ -228,7 +274,9 @@
   },
   {
     "name": "Ремінь шкіряний",
+    "name_en": "Leather Belt",
     "search_name": "ремінь шкіряний",
+    "search_name_en": "leather belt",
     "price": 1200,
     "main_category": "accessories",
     "sub_type": "belt",
@@ -237,7 +285,9 @@
   },
   {
     "name": "Регулювання довжини ременя",
+    "name_en": "Belt Length Adjustment",
     "search_name": "регулювання довжини ременя",
+    "search_name_en": "belt length adjustment",
     "price": 350,
     "main_category": "accessories",
     "sub_type": "other",
@@ -246,7 +296,9 @@
   },
   {
     "name": "Магніти для кріплення номеру",
+    "name_en": "Number Holder Magnets",
     "search_name": "магніти для кріплення номеру",
+    "search_name_en": "number holder magnets",
     "price": 290,
     "main_category": "accessories",
     "sub_type": "other",
@@ -255,7 +307,9 @@
   },
   {
     "name": "Шкарпетки чоловічі",
+    "name_en": "Men's Socks",
     "search_name": "шкарпетки чоловічі",
+    "search_name_en": "mens socks",
     "price": 100,
     "main_category": "accessories",
     "sub_type": "socks",
@@ -264,7 +318,9 @@
   },
   {
     "name": "Хустинка нагрудна фрачна",
+    "name_en": "Pocket Square Tailcoat",
     "search_name": "хустинка нагрудна фрачна",
+    "search_name_en": "pocket square tailcoat",
     "price": 650,
     "main_category": "accessories",
     "sub_type": "other",
@@ -273,7 +329,9 @@
   },
   {
     "name": "Метелик фрачний",
+    "name_en": "Bow Tie Tailcoat",
     "search_name": "метелик фрачний",
+    "search_name_en": "bow tie tailcoat",
     "price": 1100,
     "main_category": "accessories",
     "sub_type": "tie",
@@ -282,7 +340,9 @@
   },
   {
     "name": "Пояс до фраку",
+    "name_en": "Cummerbund",
     "search_name": "пояс до фраку",
+    "search_name_en": "cummerbund",
     "price": 1300,
     "main_category": "accessories",
     "sub_type": "belt",
@@ -291,7 +351,9 @@
   },
   {
     "name": "Комірець фрачний",
+    "name_en": "Tailcoat Collar",
     "search_name": "комірець фрачний",
+    "search_name_en": "tailcoat collar",
     "price": 1100,
     "main_category": "accessories",
     "sub_type": "other",
