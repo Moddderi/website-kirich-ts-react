@@ -8,6 +8,7 @@ import { MainPage } from "./pages/MainPage/MainPage";
 import { CatalogPage } from "./pages/CatalogPage/CatalogPage";
 import { IndividualTailoringPage } from "./pages/IndividualTailoringPage/IndividualTailoringPage";
 import { ScrollToTop } from "./components/shared/ScrollToTop";
+import { UmamiAnalytics } from "./components/shared/UmamiAnalytics/UmamiAnalytics";
 import { ProductPage } from "./pages/ProductPage/ProductPage";
 import { CartPage } from "./pages/CartPage/CartPage";
 import { store } from "./store/store";
@@ -34,6 +35,7 @@ export const Root = () => {
     <Provider store={store}>
       <QueryClientProvider client={queryClient}>
         <HashRouter>
+          <UmamiAnalytics />
           <ScrollToTop />
 
           <Routes>
