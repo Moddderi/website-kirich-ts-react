@@ -17,10 +17,6 @@ export const UmamiAnalytics = (): null => {
     script.defer = true;
     script.src = scriptUrl;
     script.setAttribute("data-website-id", websiteId);
-    script.setAttribute("data-auto-track", "false");
-    script.onload = () => {
-      window.dispatchEvent(new CustomEvent("umami:ready"));
-    };
     document.head.appendChild(script);
   }, []);
 

@@ -310,6 +310,8 @@
     "process5": "Sending promotional offers.",
     "staticInfo": "Static Information",
     "staticInfoDesc": "To ensure the smooth functioning of the website and for personal analysis of traffic statistics, we study IP addresses of site visits. The collected data does not affect the personal space of clients, does not concern deeply personal information, and is processed exclusively as generalized user statistics.",
+    "analytics": "Web Analytics",
+    "analyticsDesc": "We use Umami Analytics (cloud.umami.is) to collect anonymous visit statistics (pages viewed, referral source, device type, and browser). The service does not use cookies, does not collect personal data, and does not identify individual users. IP addresses are processed only to determine the visitor's country and are not stored.",
     "howProtected": "How is personal information protected?",
     "howProtectedDesc": "All data provided by you is stored by the studio in a secure database and is not shared with third parties. Exceptions are cases where the user has agreed to their transfer, or in cases provided by law. In other situations, the studio undertakes to maintain the confidentiality of information, guided by the principles of decency and respect for the Buyer.",
     "cookies": "Cookies",

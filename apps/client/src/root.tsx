@@ -1,4 +1,4 @@
-import { HashRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Provider } from "react-redux";
 import "./i18n/i18n";
@@ -34,7 +34,7 @@ export const Root = () => {
   return (
     <Provider store={store}>
       <QueryClientProvider client={queryClient}>
-        <HashRouter>
+        <BrowserRouter>
           <UmamiAnalytics />
           <ScrollToTop />
 
@@ -74,7 +74,7 @@ export const Root = () => {
               <Route path="privacy-policy" element={<PrivacyPolicyPage />} />
             </Route>
           </Routes>
-        </HashRouter>
+        </BrowserRouter>
       </QueryClientProvider>
     </Provider>
   );

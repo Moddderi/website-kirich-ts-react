@@ -49,14 +49,14 @@ export const MainPage = () => {
           </p>
 
           <div className=" animate-reveal-up delay-700 mt-12 flex flex-col sm:flex-row items-center justify-center gap-5 w-full sm:w-auto">
-            <a
-              href="#catalog"
+            <Link
+              to="/catalog"
               className="group relative w-full sm:w-auto rounded-xl bg-stone-900 px-8 py-4 text-sm font-semibold text-white shadow-2xl shadow-stone-900/30 hover:bg-stone-800 hover:-translate-y-1 transition-all duration-500 overflow-hidden flex items-center justify-center gap-3"
             >
               <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-out"></div>
               <span className="relative z-10">{t("main.goToCollection")}</span>
               {/* <iconify-icon icon="solar:arrow-right-linear" width="18" stroke-width="1.5" className="relative z-10 transform group-hover:translate-x-2 transition-transform duration-500"></iconify-icon> */}
-            </a>
+            </Link>
             <a
               href="#"
               onClick={(e) => {
