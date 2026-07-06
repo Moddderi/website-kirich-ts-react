@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { Analytics } from "@vercel/analytics/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Provider } from "react-redux";
 import "./i18n/i18n";
@@ -8,7 +9,6 @@ import { MainPage } from "./pages/MainPage/MainPage";
 import { CatalogPage } from "./pages/CatalogPage/CatalogPage";
 import { IndividualTailoringPage } from "./pages/IndividualTailoringPage/IndividualTailoringPage";
 import { ScrollToTop } from "./components/shared/ScrollToTop";
-import { UmamiAnalytics } from "./components/shared/UmamiAnalytics/UmamiAnalytics";
 import { ProductPage } from "./pages/ProductPage/ProductPage";
 import { CartPage } from "./pages/CartPage/CartPage";
 import { store } from "./store/store";
@@ -35,7 +35,6 @@ export const Root = () => {
     <Provider store={store}>
       <QueryClientProvider client={queryClient}>
         <BrowserRouter>
-          <UmamiAnalytics />
           <ScrollToTop />
 
           <Routes>
@@ -74,6 +73,7 @@ export const Root = () => {
               <Route path="privacy-policy" element={<PrivacyPolicyPage />} />
             </Route>
           </Routes>
+          <Analytics />
         </BrowserRouter>
       </QueryClientProvider>
     </Provider>
