@@ -144,6 +144,14 @@ export const PrivacyPolicyPage: React.FC = () => {
           </div>
         </section>
 
+        {/* Веб-аналитика */}
+        <section className="space-y-4 bg-beige-50 border border-stone-200/40 p-8 rounded-3xl">
+          <h2 className="text-lg font-semibold text-stone-900">
+            {t("privacyPolicy.analytics")}
+          </h2>
+          <p>{t("privacyPolicy.analyticsDesc")}</p>
+        </section>
+
         {/* Файлы cookies */}
         <section className="space-y-6 border-t border-stone-200/60 pt-12">
           <div>

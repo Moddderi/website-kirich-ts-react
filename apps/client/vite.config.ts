@@ -5,8 +5,7 @@ import tailwindcss from "@tailwindcss/vite";
 
 // https://vite.dev/config/
 export default defineConfig({
-  // Оставляем только одну base: "./", этого достаточно для Vercel
-  base: "./",
+  base: "/",
 
   plugins: [
     react({
