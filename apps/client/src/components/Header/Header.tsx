@@ -11,6 +11,7 @@ import { MdFavoriteBorder } from "react-icons/md";
 import { useAppSelector } from "../../store/store";
 import type { CartItem } from "../../store/cartSlice";
 import { selectFavoriteItems } from "../../store/favoriteSlice";
+import logoDark from "../../assets/logo-dark.svg";
 
 export const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -37,32 +38,29 @@ export const Header = () => {
         <div className="absolute inset-0 opacity-20 bg-[linear-gradient(45deg,transparent_25%,rgba(255,255,255,0.2)_50%,transparent_75%,transparent_100%)] bg-[length:250px_250px] animate-[pulse_3s_linear_infinite] group-hover:bg-[length:300px_300px] transition-all duration-1000"></div>
         <p className="text-xs font-medium text-white tracking-widest relative z-10 uppercase animate-reveal-up">
           {t("header.topBar")}
-          <a
-            href="#"
-            className="underline underline-offset-4 decoration-stone-500 hover:decoration-white transition-colors ml-2"
-          >
-            {t("header.topBarLink")}
-          </a>
+          
         </p>
       </div>
 
       <nav className="sticky top-0 z-50 border-b border-stone-200/50 bg-beige-50/80 backdrop-blur-3xl transition-all duration-500">
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
-          <div className="flex h-16 items-center justify-between animate-reveal-up delay-100">
-            <div className="flex-shrink-0">
+          <div className="relative flex h-16 items-center justify-between animate-reveal-up delay-100">
+            <div className="flex shrink-0 items-center">
               <NavLink
-                to="/"
+                to="./"
                 onClick={closeMenu}
-                className="text-xl font-semibold tracking-tighter text-stone-900 flex items-baseline gap-2 group"
+                className="flex items-center group"
+                aria-label="K.I.RICH POLTAVA"
               >
-                K.I.RICH
-                <span className="text-xs font-medium text-stone-400 tracking-widest group-hover:text-stone-900 transition-colors duration-500">
-                  POLTAVA
-                </span>
+                <img
+                  src={logoDark}
+                  alt="K.I.RICH POLTAVA"
+                  className="h-16 w-auto object-contain transition-opacity duration-300 group-hover:opacity-80"
+                />
               </NavLink>
             </div>
 
-            <div className="hidden md:flex md:items-center md:gap-10">
+            <div className="hidden md:flex absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 items-center gap-10">
               <NavLink
                 to="/catalog"
                 className={({ isActive }) =>

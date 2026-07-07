@@ -173,21 +173,21 @@ export const CheckoutPage = () => {
   };
 
   return (
-    <div className="mx-auto max-w-7xl px-6 lg:px-8 py-12 lg:py-24 animate-reveal-up">
+    <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8 sm:py-12 lg:py-24 animate-reveal-up">
       <form
         onSubmit={handleSubmit(onSubmit)}
-        className="lg:grid lg:grid-cols-12 lg:items-start lg:gap-x-12 xl:gap-x-16 mt-4"
+        className="lg:grid lg:grid-cols-12 lg:items-start lg:gap-x-12 xl:gap-x-16 mt-2 sm:mt-4"
       >
         {/* ЛЕВА КОЛОНКА — ЗБІР ДАНИХ */}
-        <div className="lg:col-span-7 xl:col-span-8">
-          <div className="mb-8 border-b border-stone-200/60 pb-6 flex items-center justify-between">
-            <h1 className="text-3xl sm:text-4xl font-semibold tracking-tighter text-stone-900">
+        <div className="min-w-0 lg:col-span-7 xl:col-span-8">
+          <div className="mb-6 sm:mb-8 border-b border-stone-200/60 pb-5 sm:pb-6 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-semibold tracking-tighter text-stone-900 leading-tight">
               {orderType === "custom"
                 ? t("checkout.titleCustom")
                 : t("checkout.titleReady")}
             </h1>
             {orderType === "custom" && (
-              <span className="rounded-full bg-stone-900 px-3 py-1 text-[10px] font-semibold uppercase tracking-widest text-white shadow-sm border border-stone-800">
+              <span className="self-start rounded-full bg-stone-900 px-3 py-1 text-[10px] font-semibold uppercase tracking-widest text-white shadow-sm border border-stone-800 shrink-0">
                 {t("checkout.customBadge")}
               </span>
             )}
@@ -486,8 +486,8 @@ export const CheckoutPage = () => {
         </div>
 
         {/* ПРАВА КОЛОНКА — ПІДСУМОК ЗАМОВЛЕННЯ */}
-        <div className="mt-12 lg:mt-0 lg:col-span-5 xl:col-span-4 relative">
-          <div className="sticky top-32 space-y-6">
+        <div className="mt-8 sm:mt-12 lg:mt-0 min-w-0 lg:col-span-5 xl:col-span-4 relative">
+          <div className="lg:sticky lg:top-32 space-y-6">
             <div className="p-6 sm:p-8 rounded-4xl bg-white border border-stone-200/60 shadow-sm">
               <h2 className="text-sm font-semibold tracking-widest uppercase text-stone-900 mb-6">
                 {orderType === "custom"
@@ -515,16 +515,18 @@ export const CheckoutPage = () => {
               )}
 
               {orderType === "custom" && (
-                <div className="space-y-4 pb-6 border-b border-stone-100">
-                  <div className="flex justify-between text-sm font-medium text-stone-500">
+                <div className="space-y-3 sm:space-y-4 pb-6 border-b border-stone-100">
+                  <div className="flex flex-col gap-1 sm:flex-row sm:justify-between sm:gap-4 text-sm font-medium text-stone-500">
                     <span>{t("checkout.category")}:</span>
-                    <span className="text-stone-900 font-semibold">
-                      {tailoringType}
+                    <span className="text-stone-900 font-semibold sm:text-right">
+                      {t(`measurementConfig.${tailoringType}`, {
+                        defaultValue: tailoringType,
+                      })}
                     </span>
                   </div>
-                  <div className="flex justify-between text-sm font-medium text-stone-500">
+                  <div className="flex flex-col gap-1 sm:flex-row sm:justify-between sm:gap-4 text-sm font-medium text-stone-500">
                     <span>{t("checkout.measurementUnits")}:</span>
-                    <span className="text-stone-900 font-semibold">
+                    <span className="text-stone-900 font-semibold sm:text-right">
                       {t(`measurementUnits.${measurementUnit}`)}
                     </span>
                   </div>
@@ -533,24 +535,26 @@ export const CheckoutPage = () => {
                     .map(([key, value]) => (
                       <div
                         key={key}
-                        className="flex justify-between gap-4 text-xs font-medium text-stone-500"
+                        className="flex flex-col gap-1 sm:flex-row sm:justify-between sm:gap-4 text-xs font-medium text-stone-500"
                       >
-                        <span>
+                        <span className="min-w-0 wrap-break-word">
                           {t(`measurementNames.${key}`, { defaultValue: key })}
                           :
                         </span>
-                        <span className="text-stone-900 whitespace-nowrap">
+                        <span className="text-stone-900 sm:text-right sm:whitespace-nowrap shrink-0">
                           {value} {t(`measurementUnits.${measurementUnit}`)}
                         </span>
                       </div>
                     ))}
-                  <div className="flex justify-between text-sm font-medium text-stone-500">
+                  <div className="flex flex-col gap-1 sm:flex-row sm:justify-between sm:gap-4 text-sm font-medium text-stone-500">
                     <span>{t("checkout.orderType")}:</span>
-                    <span className="text-stone-900">{t("checkout.orderTypeCustom")}</span>
+                    <span className="text-stone-900 sm:text-right">
+                      {t("checkout.orderTypeCustom")}
+                    </span>
                   </div>
-                  <div className="flex justify-between text-sm font-medium text-stone-500">
+                  <div className="flex flex-col gap-1 sm:flex-row sm:justify-between sm:gap-4 text-sm font-medium text-stone-500">
                     <span>{t("checkout.deliveryLabel")}:</span>
-                    <span className="text-stone-900">
+                    <span className="text-stone-900 sm:text-right">
                       {deliveryMethod === "pickup"
                         ? t("checkout.selfPickup")
                         : t("checkout.byNPTariffs")}
@@ -559,7 +563,7 @@ export const CheckoutPage = () => {
                 </div>
               )}
 
-              <div className="flex justify-between items-end py-6">
+              <div className="flex flex-wrap items-end justify-between gap-3 py-6">
                 <span className="text-sm font-semibold uppercase tracking-widest text-stone-900">
                   {t("checkout.total")}
                 </span>

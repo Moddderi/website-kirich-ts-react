@@ -3,7 +3,9 @@ dotenv.config();
 
 import {
   MEASUREMENTS_CATALOG,
+  MEASUREMENT_CONFIG,
   MEASUREMENT_UNIT_LABELS,
+  type MeasurementType,
   type MeasurementUnit,
 } from "@project/shared";
 
@@ -53,6 +55,22 @@ const parseMeasurementsPayload = (measurementsData: unknown): { unit: Measuremen
   return { unit: "cm", values };
 };
 
+const getTailoringTypeLabel = (customItem: { name?: string } | undefined): string => {
+  const name = customItem?.name ?? "";
+  const typeMatch = name.match(/:\s*([^:]+)$/);
+  const typeKey = typeMatch?.[1]?.trim();
+
+  if (typeKey && typeKey in MEASUREMENT_CONFIG) {
+    return MEASUREMENT_CONFIG[typeKey as MeasurementType].label;
+  }
+
+  if (typeKey) {
+    return typeKey;
+  }
+
+  return "Не вказано";
+};
+
 /**
  * Функція для відправки сповіщення в Telegram-чат менеджерів
  */
@@ -71,9 +89,13 @@ export const sendTelegramNotification = async (order: any) => {
 
   let itemsList = "";
   if (isCustomOrder) {
-    itemsList = `• 🧵 *Індивідуальний пошив*\n`;
-
     const customItem = order.items?.[0];
+    const tailoringTypeLabel = getTailoringTypeLabel(customItem);
+
+    itemsList =
+      `• 🧵 *Індивідуальний пошив*\n` +
+      `  *Тип виробу:* ${tailoringTypeLabel}\n`;
+
     const measurementsData = customItem?.measurements;
 
     let measurementsObj: Record<string, string> = {};
