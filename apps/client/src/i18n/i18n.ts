@@ -5,6 +5,25 @@ import en from "./locales/en.json";
 
 const savedLang = localStorage.getItem("lang") || "uk";
 
+const applySiteLanguage = (lng: string) => {
+  document.documentElement.lang = lng;
+  document.documentElement.setAttribute("translate", "no");
+  document.documentElement.classList.add("notranslate");
+
+  document.body.setAttribute("translate", "no");
+  document.body.classList.add("notranslate");
+
+  const root = document.getElementById("root");
+  root?.setAttribute("translate", "no");
+  root?.classList.add("notranslate");
+
+  document
+    .getElementById("content-language-meta")
+    ?.setAttribute("content", lng);
+};
+
+applySiteLanguage(savedLang);
+
 i18n.use(initReactI18next).init({
   resources: {
     uk: { translation: uk },
@@ -17,7 +36,7 @@ i18n.use(initReactI18next).init({
 
 i18n.on("languageChanged", (lng) => {
   localStorage.setItem("lang", lng);
-  document.documentElement.lang = lng;
+  applySiteLanguage(lng);
 });
 
 export default i18n;

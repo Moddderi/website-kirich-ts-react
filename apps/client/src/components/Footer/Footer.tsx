@@ -1,8 +1,14 @@
-import { FaInstagram } from "react-icons/fa";
-import { MdOutlineMailOutline } from "react-icons/md";
+import { FaFacebook, FaInstagram, FaTelegramPlane } from "react-icons/fa";
 import { RiExternalLinkLine } from "react-icons/ri";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import logoMini from "../../assets/logo-mini.png";
+
+const SOCIAL_LINKS = {
+  instagram: "https://www.instagram.com/k.i.rich_sewing_studio/",
+  facebook: "https://www.facebook.com/profile.php?id=100068277892798",
+  telegram: "https://t.me/KirichIrina",
+} as const;
 
 export function Footer() {
   const { t } = useTranslation();
@@ -11,38 +17,53 @@ export function Footer() {
     <footer className="border-t border-stone-800 bg-stone-950 relative overflow-hidden text-white">
       <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-stone-700 to-transparent"></div>
       <div className="mx-auto max-w-7xl px-6 py-20 lg:px-8 relative z-10">
-        <div className="xl:grid xl:grid-cols-4 xl:gap-16">
-          <div className="space-y-10 xl:col-span-1">
-            <a
-              href="#"
-              className="text-3xl font-semibold tracking-tighter text-white flex items-baseline gap-2"
+        <div className="grid grid-cols-1 gap-16 md:grid-cols-2 xl:grid-cols-3 xl:gap-20">
+          <div className="space-y-10 max-w-md">
+            <Link
+              to="./"
+              className="inline-block transition-opacity duration-300 hover:opacity-80"
+              aria-label="K.I.RICH POLTAVA"
             >
-              K.I.RICH
-              <span className="text-xs font-bold text-stone-500 tracking-widest uppercase">
-                Poltava
-              </span>
-            </a>
-            <p className="text-sm text-stone-400 max-w-xs leading-relaxed font-medium">
+              <img
+                src={logoMini}
+                alt="K.I.RICH POLTAVA"
+                className="h-16 w-auto object-contain"
+              />
+            </Link>
+            <p className="text-sm text-stone-400 max-w-sm leading-relaxed font-medium">
               {t("footer.brandDescription")}
             </p>
-            <div className="flex space-x-6">
+            <div className="flex gap-4">
               <a
-                href="#"
+                href={SOCIAL_LINKS.instagram}
+                target="_blank"
+                rel="noopener noreferrer"
                 className="flex h-12 w-12 items-center justify-center rounded-full border border-stone-800 text-stone-400 hover:bg-white hover:text-stone-900 hover:border-white transition-all duration-300 transform hover:-translate-y-1"
               >
                 <span className="sr-only">Instagram</span>
-                <FaInstagram />
+                <FaInstagram size={20} />
               </a>
               <a
-                href="#"
+                href={SOCIAL_LINKS.facebook}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex h-12 w-12 items-center justify-center rounded-full border border-stone-800 text-stone-400 hover:bg-white hover:text-stone-900 hover:border-white transition-all duration-300 transform hover:-translate-y-1"
+              >
+                <span className="sr-only">Facebook</span>
+                <FaFacebook size={20} />
+              </a>
+              <a
+                href={SOCIAL_LINKS.telegram}
+                target="_blank"
+                rel="noopener noreferrer"
                 className="flex h-12 w-12 items-center justify-center rounded-full border border-stone-800 text-stone-400 hover:bg-white hover:text-stone-900 hover:border-white transition-all duration-300 transform hover:-translate-y-1"
               >
                 <span className="sr-only">Telegram</span>
-                <MdOutlineMailOutline />
+                <FaTelegramPlane size={20} />
               </a>
             </div>
 
-            <div className="mt-12 pt-8 border-t border-stone-800/60 max-w-xs">
+            <div className="mt-12 pt-8 border-t border-stone-800/60 max-w-sm">
               <a
                 href="https://my-portfolio-app-two-hazel.vercel.app/"
                 target="_blank"
@@ -66,119 +87,60 @@ export function Footer() {
             </div>
           </div>
 
-          <div className="mt-20 grid grid-cols-2 gap-8 xl:col-span-2 xl:mt-0">
-            <div className="md:grid md:grid-cols-2 md:gap-12">
-              <div>
-                <h3 className="text-xs font-bold text-white uppercase tracking-widest">
-                  {t("footer.collections")}
-                </h3>
-                <ul role="list" className="mt-8 space-y-5">
-                  <li>
-                    <a
-                      href="#"
-                      className="text-sm font-medium text-stone-400 hover:text-white transition-colors magnetic-link relative inline-block"
-                    >
-                      {t("footer.newArrivals")}
-                    </a>
-                  </li>
-                  <li>
-                    <a
-                      href="#"
-                      className="text-sm font-medium text-stone-400 hover:text-white transition-colors magnetic-link relative inline-block"
-                    >
-                      {t("footer.womenLine")}
-                    </a>
-                  </li>
-                  <li>
-                    <a
-                      href="#"
-                      className="text-sm font-medium text-stone-400 hover:text-white transition-colors magnetic-link relative inline-block"
-                    >
-                      {t("footer.menLine")}
-                    </a>
-                  </li>
-                  <li>
-                    <a
-                      href="#"
-                      className="text-sm font-medium text-stone-400 hover:text-white transition-colors magnetic-link relative inline-block"
-                    >
-                      {t("footer.bespoke")}
-                    </a>
-                  </li>
-                </ul>
-              </div>
-              <div className="mt-12 md:mt-0">
-                <h3 className="text-xs font-bold text-white uppercase tracking-widest">
-                  {t("footer.service")}
-                </h3>
-                <ul role="list" className="mt-8 space-y-5">
-                  <li>
-                    <a
-                      href="#"
-                      className="text-sm font-medium text-stone-400 hover:text-white transition-colors magnetic-link relative inline-block"
-                    >
-                      {t("footer.globalShipping")}
-                    </a>
-                  </li>
-                  <li>
-                    <a
-                      href="#"
-                      className="text-sm font-medium text-stone-400 hover:text-white transition-colors magnetic-link relative inline-block"
-                    >
-                      {t("footer.sizeArchitecture")}
-                    </a>
-                  </li>
-                  <li>
-                    <a
-                      href="#"
-                      className="text-sm font-medium text-stone-400 hover:text-white transition-colors magnetic-link relative inline-block"
-                    >
-                      {t("footer.returns")}
-                    </a>
-                  </li>
-                  <li>
-                    <a
-                      href="#"
-                      className="text-sm font-medium text-stone-400 hover:text-white transition-colors magnetic-link relative inline-block"
-                    >
-                      {t("footer.contactStudio")}
-                    </a>
-                  </li>
-                </ul>
-              </div>
-            </div>
+          <div className="md:mt-0">
+            <h3 className="text-xs font-bold text-white uppercase tracking-widest">
+              {t("footer.collections")}
+            </h3>
+            <ul role="list" className="mt-8 space-y-5">
+              <li>
+                <Link
+                  to="/catalog"
+                  className="text-sm font-medium text-stone-400 hover:text-white transition-colors magnetic-link relative inline-block"
+                >
+                  {t("footer.newArrivals")}
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/individual-tailoring"
+                  className="text-sm font-medium text-stone-400 hover:text-white transition-colors magnetic-link relative inline-block"
+                >
+                  {t("footer.womenLine")}
+                </Link>
+              </li>
+            </ul>
           </div>
 
-          <div className="mt-20 xl:mt-0 xl:col-span-1">
-            <div className="bg-stone-900 rounded-4xl p-8 border border-stone-800 relative overflow-hidden group">
-              <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.05),transparent)] z-0"></div>
-              <h3 className="text-xs font-bold text-white uppercase tracking-widest relative z-10">
-                Vanguard Club
-              </h3>
-              <p className="mt-4 text-xs text-stone-400 font-medium relative z-10 leading-relaxed">
-                {t("footer.vanguardDesc")}
-              </p>
-              <form className="mt-6 relative z-10 group-hover:scale-[1.02] transition-transform duration-500">
-                <label htmlFor="email-address" className="sr-only">
-                  Email
-                </label>
-                <input
-                  type="email"
-                  name="email-address"
-                  id="email-address"
-                  autoComplete="email"
-                  required
-                  className="block w-full rounded-2xl border-0 bg-white/5 py-4 pl-5 pr-24 text-sm font-medium text-white shadow-inner ring-1 ring-inset ring-white/10 placeholder:text-stone-500 focus:ring-2 focus:ring-inset focus:ring-white sm:leading-6 transition-all backdrop-blur-sm"
-                  placeholder={t("footer.yourEmail")}
-                />
-                <button
-                  type="submit"
-                  className="absolute inset-y-1.5 right-1.5 flex items-center justify-center rounded-xl bg-white px-5 text-xs font-bold uppercase tracking-widest text-stone-900 shadow-lg hover:bg-stone-200 transition-colors active:scale-95"
+          <div className="md:mt-0 min-w-[260px]">
+            <h3 className="text-xs font-bold text-white uppercase tracking-widest">
+              {t("footer.service")}
+            </h3>
+            <ul role="list" className="mt-8 space-y-5">
+              <li>
+                <a
+                  href="tel:+380508344955"
+                  className="text-sm font-medium text-stone-400 hover:text-white transition-colors magnetic-link relative inline-block"
                 >
-                  {t("footer.join")}
-                </button>
-              </form>
-            </div>
+                  {t("footer.phone")}
+                </a>
+                <p className="mt-1 text-xs text-stone-500">
+                  {t("footer.phoneMessengers")}
+                </p>
+              </li>
+              <li>
+                <p className="text-sm font-medium text-stone-400">
+                  {t("footer.address")}
+                </p>
+              </li>
+              <li>
+                <a
+                  href="mailto:kirich.sewing.studio@gmail.com"
+                  className="text-sm font-medium text-stone-400 hover:text-white transition-colors magnetic-link relative inline-block"
+                >
+                  {t("footer.email")}
+                </a>
+              </li>
+            </ul>
           </div>
         </div>
 
