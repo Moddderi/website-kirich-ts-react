@@ -267,7 +267,7 @@ export const MainPage = () => {
               <img
                 src={logoMini}
                 alt="K.I.RICH"
-                className="h-10 w-10 object-contain"
+                className="h-20 w-20 object-contain"
               />
               <span className="self-start rounded-full border border-white/20 bg-white/5 px-4 py-1.5 text-[10px] font-semibold uppercase tracking-[0.25em] text-white/80 backdrop-blur-md">
                 K.I.RICH SEWING STUDIO

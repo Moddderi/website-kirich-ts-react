@@ -2,7 +2,7 @@ import dotenv from "dotenv";
 dotenv.config();
 
 import {
-  MEASUREMENTS_CATALOG,
+  MEASUREMENT_LABELS_UK,
   MEASUREMENT_CONFIG,
   MEASUREMENT_UNIT_LABELS,
   type MeasurementType,
@@ -118,9 +118,9 @@ export const sendTelegramNotification = async (order: any) => {
         Object.entries(measurementsObj)
           .filter(([key]) => key !== "waist_definition")
           .map(([key, value]) => {
-            const measurementInfo =
-              MEASUREMENTS_CATALOG[key as keyof typeof MEASUREMENTS_CATALOG];
-            const nameUkr = measurementInfo ? measurementInfo.name : key;
+            const nameUkr =
+              MEASUREMENT_LABELS_UK[key as keyof typeof MEASUREMENT_LABELS_UK] ??
+              key;
 
             return `  - *${nameUkr}:* ${value} ${unitLabel}`;
           })
