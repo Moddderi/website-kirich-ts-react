@@ -5,6 +5,9 @@ import {
   MEASUREMENT_LABELS_UK,
   MEASUREMENT_CONFIG,
   MEASUREMENT_UNIT_LABELS,
+  formatPrice,
+  isCurrency,
+  type Currency,
   type MeasurementType,
   type MeasurementUnit,
 } from "@project/shared";
@@ -71,6 +74,14 @@ const getTailoringTypeLabel = (customItem: { name?: string } | undefined): strin
   return "Не вказано";
 };
 
+const getDisplayCurrency = (order: { displayCurrency?: unknown }): Currency =>
+  isCurrency(order.displayCurrency) ? order.displayCurrency : "UAH";
+
+const formatOrderPrice = (
+  amountUah: number | string,
+  currency: Currency,
+): string => formatPrice(Number(amountUah), currency);
+
 /**
  * Функція для відправки сповіщення в Telegram-чат менеджерів
  */
@@ -86,6 +97,7 @@ export const sendTelegramNotification = async (order: any) => {
   }
 
   const isCustomOrder = order.orderType === "custom";
+  const displayCurrency = getDisplayCurrency(order);
 
   let itemsList = "";
   if (isCustomOrder) {
@@ -140,7 +152,7 @@ export const sendTelegramNotification = async (order: any) => {
 
         const detailsStr = details ? ` (${details})` : "";
 
-        return `• 🛍️ *${item.name}*${detailsStr}\n  _${item.quantity} шт. х ${parseFloat(item.price).toLocaleString()} ₴_`;
+        return `• 🛍️ *${item.name}*${detailsStr}\n  _${item.quantity} шт. х ${formatOrderPrice(item.price, displayCurrency)}_`;
       })
       .join("\n");
   } else {
@@ -189,7 +201,7 @@ ${itemsList}
 💰 *Всього до сплати:* *${
     isCustomOrder
       ? "Розраховується менеджером"
-      : `${parseFloat(order.totalAmount).toLocaleString()} ₴`
+      : formatOrderPrice(order.totalAmount, displayCurrency)
   }*
 `;
 

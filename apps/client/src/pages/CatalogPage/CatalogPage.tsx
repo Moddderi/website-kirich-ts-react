@@ -14,9 +14,10 @@ import { useDebounce } from "use-debounce";
 import { useSearchParams } from "react-router-dom";
 import { Breadcrumbs } from "../../components/Breadcrumbs/Breadcrumbs";
 import { CatalogLoadingBar } from "../../components/shared/CatalogLoadingBar/CatalogLoadingBar";
+import { CurrencySwitcher } from "../../components/CurrencySwitcher/CurrencySwitcher";
 import { useCallback } from "react";
 import { HiOutlineArrowLeft, HiOutlineArrowRight } from "react-icons/hi";
-import { useTranslation } from "react-i18next";
+import { Trans, useTranslation } from "react-i18next";
 
 const ProductSkeleton = () => (
   <div>
@@ -116,6 +117,10 @@ export const CatalogPage = () => {
       <section className="mx-auto max-w-7xl px-6 lg:px-8 mt-12">
         <Breadcrumbs />
 
+        <div className="mt-8 flex justify-end">
+          <CurrencySwitcher />
+        </div>
+
         <CatalogFilters filters={filters} setFilters={setFilters} />
 
         {isFetching && <CatalogLoadingBar />}
@@ -156,7 +161,13 @@ export const CatalogPage = () => {
             </button>
 
             <span className="text-xs font-semibold tracking-widest uppercase text-stone-500">
-              {t("catalog.page", { current: currentPage, total: totalPages })}
+              <Trans
+                i18nKey="catalog.page"
+                values={{ current: currentPage, total: totalPages }}
+                components={{
+                  bold: <span className="text-stone-900" />,
+                }}
+              />
             </span>
 
             <button

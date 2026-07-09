@@ -5,6 +5,7 @@ import { toggleFavorite, selectIsFavorite } from "../../store/favoriteSlice";
 import { optimizeCloudinaryUrl } from "../../utils/cloudinary";
 import { ProductImage } from "../shared/ProductImage/ProductImage";
 import { useProductName } from "../../utils/useLocalizedProduct";
+import { useFormattedPrice } from "../../hooks/useFormattedPrice";
 
 import { IoHeart, IoHeartOutline } from "react-icons/io5";
 import { useTranslation } from "react-i18next";
@@ -23,6 +24,7 @@ export const ProductCard = ({
   const dispatch = useAppDispatch();
   const { t } = useTranslation();
   const getProductName = useProductName();
+  const formatPrice = useFormattedPrice();
 
   const isFavorite = useAppSelector(selectIsFavorite(product.id));
   const localizedName = getProductName(product);
@@ -104,7 +106,7 @@ export const ProductCard = ({
             {localizedName}
           </h3>
           <p className="text-sm font-semibold text-stone-900 whitespace-nowrap">
-            {product.price.toLocaleString()} ₴
+            {formatPrice(product.price)}
           </p>
         </div>
         <div className="mt-2 flex items-center justify-between">

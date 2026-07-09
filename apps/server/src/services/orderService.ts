@@ -64,7 +64,11 @@ export const createOrder = async (payload: OrderPayload) => {
       const fullOrder = await getOrderById(order.id);
 
       if (fullOrder) {
-        sendTelegramNotification(fullOrder);
+        const orderForTelegram = {
+          ...fullOrder.toJSON(),
+          displayCurrency: payload.displayCurrency ?? "UAH",
+        };
+        sendTelegramNotification(orderForTelegram);
       }
     } catch (tgError) {
       console.error("Помилка відправки в ТГ:", tgError);

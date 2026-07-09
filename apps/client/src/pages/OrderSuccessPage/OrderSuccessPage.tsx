@@ -2,6 +2,7 @@ import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { getOrderById } from "../../api/orderApi";
+import { useFormattedPrice } from "../../hooks/useFormattedPrice";
 
 interface OrderItem {
   id?: string;
@@ -29,6 +30,7 @@ interface OrderData {
 
 export const OrderSuccessPage = () => {
   const { t } = useTranslation();
+  const formatPrice = useFormattedPrice();
   const { orderId } = useParams<{ orderId?: string }>();
   const navigate = useNavigate();
   const location = useLocation();
@@ -209,7 +211,7 @@ export const OrderSuccessPage = () => {
                         </p>
                       )}
                       <p className="text-xs font-semibold text-stone-900 mt-0.5">
-                        {Number(item.price).toLocaleString()} ₴
+                        {formatPrice(Number(item.price))}
                       </p>
                     </div>
                   </div>
@@ -220,7 +222,7 @@ export const OrderSuccessPage = () => {
                 <div className="flex justify-between text-sm font-medium text-stone-500">
                   <span>{t("orderSuccess.products")}</span>
                   <span className="text-stone-900">
-                    {itemsTotal.toLocaleString()} ₴
+                    {formatPrice(itemsTotal)}
                   </span>
                 </div>
                 <div className="flex justify-between text-sm font-medium text-stone-500">
@@ -238,7 +240,7 @@ export const OrderSuccessPage = () => {
                   {t("orderSuccess.total")}
                 </span>
                 <span className="text-2xl font-semibold text-stone-900">
-                  {Number(orderData.totalAmount).toLocaleString()} ₴
+                  {formatPrice(Number(orderData.totalAmount))}
                 </span>
               </div>
             </div>

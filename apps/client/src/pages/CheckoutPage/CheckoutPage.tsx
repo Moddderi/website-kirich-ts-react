@@ -10,6 +10,7 @@ import { clearCart } from "../../store/cartSlice";
 import { IoIosArrowForward } from "react-icons/io";
 import { FaTelegramPlane, FaInstagram, FaWhatsapp } from "react-icons/fa";
 import { createOrder } from "../../api/orderApi";
+import { useFormattedPrice } from "../../hooks/useFormattedPrice";
 
 import { checkoutSchema } from "@project/shared";
 import type { CheckoutFormValues, OrderPayload } from "@project/shared";
@@ -18,9 +19,11 @@ export const CheckoutPage = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const { t } = useTranslation();
+  const formatPrice = useFormattedPrice();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const cartItems = useAppSelector((state) => state.cart.items);
+  const displayCurrency = useAppSelector((state) => state.currency.code);
   const { type: tailoringType, measurements, measurementUnit } = useAppSelector(
     (state) => state.tailoring,
   );
@@ -111,6 +114,7 @@ export const CheckoutPage = () => {
         totalAmount: totalPrice,
         status: "pending",
         orderType: "ready-made",
+        displayCurrency,
         items: itemsPayload,
       };
     } else {
@@ -119,6 +123,7 @@ export const CheckoutPage = () => {
         totalAmount: 0,
         status: "pending",
         orderType: "custom",
+        displayCurrency,
         // 🟢 Виносимо мірки на рівень об'єкта замовлення, як того вимагає схема з packages/shared/src/order.schema.ts
         measurements: {
           unit: measurementUnit,
@@ -500,7 +505,7 @@ export const CheckoutPage = () => {
                   <div className="flex justify-between text-sm font-medium text-stone-500">
                     <span>{t("checkout.products", { count: totalQuantity })}</span>
                     <span className="text-stone-900">
-                      {totalPrice.toLocaleString()} ₴
+                      {formatPrice(totalPrice)}
                     </span>
                   </div>
                   <div className="flex justify-between text-sm font-medium text-stone-500">
@@ -569,7 +574,7 @@ export const CheckoutPage = () => {
                 </span>
                 <span className="text-2xl font-semibold text-stone-900 leading-none">
                   {orderType === "ready-made"
-                    ? `${totalPrice.toLocaleString()} ₴`
+                    ? formatPrice(totalPrice)
                     : t("checkout.calculated")}
                 </span>
               </div>

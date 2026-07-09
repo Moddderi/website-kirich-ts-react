@@ -13,12 +13,14 @@ import type { Product } from "@project/shared";
 import { IoHeartDislikeOutline } from "react-icons/io5";
 import { HiOutlineShoppingBag } from "react-icons/hi";
 import { useProductName } from "../../utils/useLocalizedProduct";
+import { useFormattedPrice } from "../../hooks/useFormattedPrice";
 
 export const FavoritesPage: React.FC = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const { t } = useTranslation();
   const getProductName = useProductName();
+  const formatPrice = useFormattedPrice();
 
   // Достаем избранные товары из Redux-стора
   const favoriteItems = useAppSelector(selectFavoriteItems);
@@ -133,7 +135,7 @@ export const FavoritesPage: React.FC = () => {
                     </div>
 
                     <p className="text-xl font-semibold text-stone-900 mb-4">
-                      {Number(item.price).toLocaleString()} ₴
+                      {formatPrice(Number(item.price))}
                     </p>
                   </div>
 
