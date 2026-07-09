@@ -3,7 +3,15 @@ import { initReactI18next } from "react-i18next";
 import uk from "./locales/uk.json";
 import en from "./locales/en.json";
 
-const savedLang = localStorage.getItem("lang") || "uk";
+const SUPPORTED_LANGS = ["uk", "en"] as const;
+type SupportedLang = (typeof SUPPORTED_LANGS)[number];
+
+const getInitialLanguage = (): SupportedLang => {
+  const saved = localStorage.getItem("lang");
+  return saved === "en" ? "en" : "uk";
+};
+
+const savedLang = getInitialLanguage();
 
 const applySiteLanguage = (lng: string) => {
   document.documentElement.lang = lng;
@@ -31,6 +39,7 @@ i18n.use(initReactI18next).init({
   },
   lng: savedLang,
   fallbackLng: "uk",
+  supportedLngs: ["uk", "en"],
   interpolation: { escapeValue: false },
 });
 

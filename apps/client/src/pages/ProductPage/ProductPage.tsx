@@ -16,12 +16,14 @@ import { HiOutlineArrowLeft } from "react-icons/hi";
 import { getProductById } from "../../api/productApi";
 import { useTranslation } from "react-i18next";
 import { useProductName } from "../../utils/useLocalizedProduct";
+import { useFormattedPrice } from "../../hooks/useFormattedPrice";
 
 const AVAILABLE_SIZES = ["XS", "S", "M", "L", "XL"];
 
 export const ProductPage: React.FC = () => {
   const { t } = useTranslation();
   const getProductName = useProductName();
+  const formatPrice = useFormattedPrice();
 
   const AVAILABLE_COLORS = [
     { id: "black", hex: "#000000", label: t("productPage.colors.black") },
@@ -195,7 +197,7 @@ export const ProductPage: React.FC = () => {
                 {getProductName(product)}
               </h1>
               <p className="text-2xl font-semibold text-stone-900 mb-6">
-                {t("productPage.from")} {Number(product.price).toLocaleString()} ₴
+                {t("productPage.from")} {formatPrice(Number(product.price))}
               </p>
               <p className="text-sm font-medium text-stone-500 leading-relaxed">
                 {t("productPage.description")}

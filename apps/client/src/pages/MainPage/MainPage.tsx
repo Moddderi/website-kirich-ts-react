@@ -228,7 +228,7 @@ export const MainPage = () => {
                   </div>
                   <div className="flex gap-2 group-hover:translate-x-1 transition-transform duration-300 delay-100">
                     <TbAward size={18} className="shrink-0" />
-                    {t("main.premiumFabrics")}
+                    {t("main.readyPremiumFabrics")}
                   </div>
                   <div className="flex gap-2 group-hover:translate-x-1 transition-transform duration-300 delay-100">
                     <HiOutlineSquares2X2 size={18} className="shrink-0" />

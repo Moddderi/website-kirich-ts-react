@@ -1,6 +1,8 @@
 import { z } from "zod";
 import { customMeasurementsSchema } from "./measurements.schema.js";
 
+export const currencySchema = z.enum(["UAH", "USD", "EUR"]);
+
 // 1. Базовый объект полей формы
 export const checkoutFieldsSchema = z.object({
   firstName: z.string().min(2, "Ім'я має містити мінімум 2 символи"),
@@ -52,7 +54,8 @@ export const readyMadeOrderSchema = checkoutFieldsSchema.extend({
   orderType: z.literal("ready-made"),
   totalAmount: z.number().positive("Сума замовлення має бути більше 0"),
   status: z.string(),
-  items: z.array(orderItemSchema), // <-- Добавлено
+  displayCurrency: currencySchema.optional().default("UAH"),
+  items: z.array(orderItemSchema),
 });
 
 // 4. Схема для кастомного / індивідуального замовлення
@@ -60,8 +63,9 @@ export const customOrderSchema = checkoutFieldsSchema.extend({
   orderType: z.literal("custom"),
   totalAmount: z.number().nonnegative(),
   status: z.string(),
+  displayCurrency: currencySchema.optional().default("UAH"),
   measurements: customMeasurementsSchema,
-  items: z.array(orderItemSchema), // <-- Добавлено
+  items: z.array(orderItemSchema),
 });
 
 // 5. Главная дискриминированная схема

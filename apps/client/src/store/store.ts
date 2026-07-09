@@ -1,7 +1,8 @@
 import { configureStore } from "@reduxjs/toolkit";
 import cartReducer from "./cartSlice";
 import tailoringReducer from "./tailoringSlice";
-import favoritesReducer from "./favoriteSlice"; // Подключаем редюсер избранного
+import favoritesReducer from "./favoriteSlice";
+import currencyReducer from "./currencySlice";
 import { useDispatch, useSelector } from "react-redux";
 import type { TypedUseSelectorHook } from "react-redux";
 
@@ -9,7 +10,8 @@ export const store = configureStore({
   reducer: {
     cart: cartReducer,
     tailoring: tailoringReducer,
-    favorites: favoritesReducer, // Добавили срез избранного
+    favorites: favoritesReducer,
+    currency: currencyReducer,
   },
 });
 

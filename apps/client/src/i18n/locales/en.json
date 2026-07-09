@@ -70,7 +70,7 @@
   },
   "catalog": {
     "noProducts": "No products found",
-    "page": "Page {{current}} of {{total}}",
+    "page": "Page <bold>{{current}}</bold> of <bold>{{total}}</bold>",
     "loadingProducts": "Loading products"
   },
   "productPage": {
@@ -199,15 +199,15 @@
     "bookStudio": "Book a Studio Visit"
   },
   "selectType": {
-    "stepLabel": "Step 1 of 3",
+    "stepLabel": "Step 1 of 2",
     "title": "What shall we make?",
-    "description": "Choose the garment type. On the next step, we'll provide a measurement guide with detailed descriptions and a convenient form to fill in.",
+    "description": "Choose the garment type. On the next step, we'll provide a measurement guide with detailed descriptions and a convenient form to fill in",
     "body": "Bodysuit",
     "bodyDesc": "Unitards",
     "jacket": "Jacket / Vest",
     "jacketDesc": "Shoulder garments",
     "pants": "Pants",
-    "pantsDesc": "Pants, skirts, and shorts",
+    "pantsDesc": "Pants",
     "suit": "Suit",
     "suitDesc": "Complete set",
     "select": "Select"
@@ -240,13 +240,14 @@
     "individualDesc": "Premium custom tailoring to your measurements",
     "readyDesc": "Ready-to-wear from the catalog for quick ordering",
     "fitToMm": "Precise tailoring",
-    "premiumFabrics": "Quality",
-    "uniqueDesign": "Custom",
+    "premiumFabrics": "High quality",
+    "readyPremiumFabrics": "Quality fabrics",
+    "uniqueDesign": "Custom design",
     "creationFrom14": "Tailoring on a clear timeline",
     "readyProducts": "Ready-to-Wear",
     "calibratedGrid": "Verified size chart",
     "wideAssortment": "Wide assortment",
-    "wideSizeGrid": "Wide size range",
+    "wideSizeGrid": "Convenient size chart",
     "shippingIn24h": "Ships in 2-3 days",
     "tailoring": "Custom Tailoring",
     "engineeringTitle": "Brand Philosophy",
