@@ -132,9 +132,9 @@
     "dance_program": "LAT"
   },
   {
-    "name": "Лонгслів 'крило кажана'",
-    "name_en": "Longsleeve 'Bat Wing'",
-    "search_name": "лонгслів 'крило кажана'",
+    "name": "Лонгслів \"крило кажана\"",
+    "name_en": "Longsleeve \"Bat Wing\"",
+    "search_name": "лонгслів \"крило кажана\"",
     "search_name_en": "longsleeve bat wing",
     "price": 2200,
     "main_category": "clothing",
@@ -282,17 +282,6 @@
     "sub_type": "belt",
     "stock": 25,
     "product_code": "3032"
-  },
-  {
-    "name": "Регулювання довжини ременя",
-    "name_en": "Belt Length Adjustment",
-    "search_name": "регулювання довжини ременя",
-    "search_name_en": "belt length adjustment",
-    "price": 350,
-    "main_category": "accessories",
-    "sub_type": "other",
-    "stock": 100,
-    "product_code": "3044"
   },
   {
     "name": "Магніти для кріплення номеру",

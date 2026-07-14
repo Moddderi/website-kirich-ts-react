@@ -7,6 +7,7 @@ import {
   HiOutlineCreditCard,
   HiOutlineDocumentText,
   HiOutlineShieldCheck,
+  HiOutlineCamera,
 } from "react-icons/hi";
 import { LiaGlobeSolid } from "react-icons/lia";
 
@@ -52,12 +53,7 @@ export const DeliveryAndPaymentPage: React.FC = () => {
                   {t("deliveryAndPayment.condition2")}
                 </span>
               </li>
-              <li className="flex gap-3">
-                <span className="text-stone-400">•</span>
-                <span>
-                  {t("deliveryAndPayment.condition3")}
-                </span>
-              </li>
+              
             </ul>
           </div>
 
@@ -123,7 +119,7 @@ export const DeliveryAndPaymentPage: React.FC = () => {
                 Укрпошта
               </div>
               <div className="bg-white border border-stone-200/60 px-5 py-4 rounded-2xl text-center text-xs font-semibold text-stone-800 shadow-xs">
-                EMS / DHL
+                EMS
               </div>
             </div>
 
@@ -176,9 +172,6 @@ export const DeliveryAndPaymentPage: React.FC = () => {
                 <h3 className="text-base font-semibold text-stone-900">
                   {t("deliveryAndPayment.cardTransfer")}
                 </h3>
-                <p className="text-xs text-stone-400 font-medium mt-1 uppercase tracking-widest">
-                  ПриватБанк / Ощадбанк
-                </p>
 
                 <p className="text-sm text-stone-600 mt-6 leading-relaxed">
                   {t("deliveryAndPayment.cardTransferDesc")}
@@ -225,6 +218,21 @@ export const DeliveryAndPaymentPage: React.FC = () => {
                 </div>
               </div>
             </div>
+          </div>
+        </section>
+
+        {/* Право на публікацію фото */}
+        <section className="bg-white border border-stone-200/60 p-8 rounded-3xl flex gap-5 items-start">
+          <div className="p-3 bg-stone-100 rounded-2xl text-stone-900 shrink-0">
+            <HiOutlineCamera size={24} />
+          </div>
+          <div>
+            <h2 className="text-lg font-semibold text-stone-900">
+              {t("deliveryAndPayment.photoRightsTitle")}
+            </h2>
+            <p className="text-sm text-stone-600 mt-3 leading-relaxed">
+              {t("deliveryAndPayment.photoRightsDesc")}
+            </p>
           </div>
         </section>
       </div>
