@@ -14,7 +14,7 @@ export const checkoutFieldsSchema = z.object({
       "Невірний формат телефону (наприклад: +380991234567)",
     ),
   email: z.string().email("Введіть коректну електронну адресу"),
-  deliveryMethod: z.enum(["nova_poshta", "pickup"]),
+  deliveryMethod: z.enum(["nova_poshta", "ukrposhta", "pickup"]),
   city: z.string().optional(),
   warehouse: z.string().optional(),
   paymentMethod: z.enum(["online", "cod"]),
@@ -23,6 +23,9 @@ export const checkoutFieldsSchema = z.object({
     .string()
     .min(1, "Будь ласка, вкажіть ваш нікнейм або телефон для зв'язку"),
 });
+
+const isPostalDelivery = (method: string) =>
+  method === "nova_poshta" || method === "ukrposhta";
 
 // Схема для валидации одного товара/услуги в заказе
 export const orderItemSchema = z.object({
@@ -38,7 +41,7 @@ export const orderItemSchema = z.object({
 // 2. Схема с проверкой заполнения города и отделения
 export const checkoutSchema = checkoutFieldsSchema.refine(
   (data) => {
-    if (data.deliveryMethod === "nova_poshta") {
+    if (isPostalDelivery(data.deliveryMethod)) {
       return !!data.city && !!data.warehouse;
     }
     return true;

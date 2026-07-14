@@ -1,11 +1,9 @@
 import type { OrderPayload } from "@project/shared";
 import db from "../models/index.js";
-// 1. ИМПОРТИРУЕМ НАШУ УТИЛИТУ (проверь правильность пути к файлу!)
 import { sendTelegramNotification } from "../utils/telegram.js";
+import { sendOrderConfirmationEmail } from "../utils/email.js";
 
 export const createOrder = async (payload: OrderPayload) => {
-  // 🟢 ЗАХИСТ: Перевіряємо наявність масиву товарів перед його використанням.
-  // Це на 100% виправляє помилку TS18048 та захищає від падіння програми.
   if (!payload.items || !Array.isArray(payload.items)) {
     throw new Error(
       "Тіло замовлення не містить масиву товарів (items) або він пустий.",
@@ -17,7 +15,6 @@ export const createOrder = async (payload: OrderPayload) => {
     const customMeasurements =
       payload.orderType === "custom" ? payload.measurements : null;
 
-    // Создаем заказ в БД
     const order = await db.Order.create(
       {
         firstName: payload.firstName,
@@ -26,11 +23,13 @@ export const createOrder = async (payload: OrderPayload) => {
         email: payload.email,
         deliveryMethod: payload.deliveryMethod,
         city:
-          payload.deliveryMethod === "nova_poshta"
+          payload.deliveryMethod === "nova_poshta" ||
+          payload.deliveryMethod === "ukrposhta"
             ? (payload.city ?? null)
             : null,
         warehouse:
-          payload.deliveryMethod === "nova_poshta"
+          payload.deliveryMethod === "nova_poshta" ||
+          payload.deliveryMethod === "ukrposhta"
             ? (payload.warehouse ?? null)
             : null,
         paymentMethod: payload.paymentMethod,
@@ -58,20 +57,23 @@ export const createOrder = async (payload: OrderPayload) => {
 
     await transaction.commit();
 
-    //NOTE: Логика отправки тг сообщения
-
     try {
       const fullOrder = await getOrderById(order.id);
 
       if (fullOrder) {
-        const orderForTelegram = {
+        const orderForNotifications = {
           ...fullOrder.toJSON(),
           displayCurrency: payload.displayCurrency ?? "UAH",
         };
-        sendTelegramNotification(orderForTelegram);
+
+        // Менеджеру в Telegram
+        void sendTelegramNotification(orderForNotifications);
+
+        // Клієнту на email (Resend)
+        void sendOrderConfirmationEmail(orderForNotifications);
       }
-    } catch (tgError) {
-      console.error("Помилка відправки в ТГ:", tgError);
+    } catch (notifyError) {
+      console.error("Помилка відправки сповіщень:", notifyError);
     }
 
     return order;

@@ -110,10 +110,7 @@ export const PrivacyPolicyPage: React.FC = () => {
               <span className="text-stone-400">•</span>
               <span>{t("privacyPolicy.process4")}</span>
             </li>
-            <li className="flex gap-3">
-              <span className="text-stone-400">•</span>
-              <span>{t("privacyPolicy.process5")}</span>
-            </li>
+            
           </ul>
         </section>
 

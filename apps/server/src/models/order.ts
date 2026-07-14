@@ -63,7 +63,7 @@ export default (sequelize: Sequelize) => {
       },
       deliveryMethod: {
         type: DataTypes.STRING,
-        allowNull: false, // "nova_poshta" | "pickup"
+        allowNull: false, // "nova_poshta" | "ukrposhta" | "pickup"
       },
       city: {
         type: DataTypes.STRING,

@@ -190,7 +190,9 @@ export const sendTelegramNotification = async (order: any) => {
 📦 *Доставка:* ${
     order.deliveryMethod === "nova_poshta"
       ? `🚚 Нова Пошта\n📍 *Місто:* ${order.city}\n🏢 *Відділення:* ${order.warehouse}`
-      : "🏪 Самовивіз із студії в Києві"
+      : order.deliveryMethod === "ukrposhta"
+        ? `✉️ Укрпошта\n📍 *Місто:* ${order.city}\n🏢 *Відділення:* ${order.warehouse}`
+        : "🏪 Самовивіз із студії в Полтаві"
   }
 💳 *Оплата:* ${order.paymentMethod === "online" ? "💳 Онлайн (Передоплата)" : "💵 Накладений платіж"}
 

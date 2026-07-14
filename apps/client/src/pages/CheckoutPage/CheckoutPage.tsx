@@ -14,6 +14,10 @@ import { useFormattedPrice } from "../../hooks/useFormattedPrice";
 
 import { checkoutSchema } from "@project/shared";
 import type { CheckoutFormValues, OrderPayload } from "@project/shared";
+import {
+  NovaPoshtaIcon,
+  UkrposhtaIcon,
+} from "../../components/DeliveryIcons/DeliveryIcons";
 
 export const CheckoutPage = () => {
   const navigate = useNavigate();
@@ -407,7 +411,7 @@ export const CheckoutPage = () => {
               </h2>
               <div className="space-y-3 mb-6">
                 <label
-                  className={`flex items-center gap-4 p-4 rounded-xl border-2 cursor-pointer transition-all ${
+                  className={`flex items-center gap-3 p-4 rounded-xl border-2 cursor-pointer transition-all ${
                     deliveryMethod === "nova_poshta"
                       ? "border-stone-900 bg-stone-50"
                       : "border-stone-200 bg-white"
@@ -419,12 +423,31 @@ export const CheckoutPage = () => {
                     {...register("deliveryMethod")}
                     className="h-4 w-4 text-stone-900 accent-stone-900"
                   />
+                  <NovaPoshtaIcon size={24} className="text-[#ED1C24] shrink-0" />
                   <span className="text-sm font-semibold text-stone-900">
                     {t("checkout.novaPoshta")}
                   </span>
                 </label>
                 <label
-                  className={`flex items-center gap-4 p-4 rounded-xl border-2 cursor-pointer transition-all ${
+                  className={`flex items-center gap-3 p-4 rounded-xl border-2 cursor-pointer transition-all ${
+                    deliveryMethod === "ukrposhta"
+                      ? "border-stone-900 bg-stone-50"
+                      : "border-stone-200 bg-white"
+                  }`}
+                >
+                  <input
+                    type="radio"
+                    value="ukrposhta"
+                    {...register("deliveryMethod")}
+                    className="h-4 w-4 text-stone-900 accent-stone-900"
+                  />
+                  <UkrposhtaIcon size={22} className="text-[#E6B800] shrink-0" />
+                  <span className="text-sm font-semibold text-stone-900">
+                    {t("checkout.ukrposhta")}
+                  </span>
+                </label>
+                <label
+                  className={`flex items-center gap-3 p-4 rounded-xl border-2 cursor-pointer transition-all ${
                     deliveryMethod === "pickup"
                       ? "border-stone-900 bg-stone-50"
                       : "border-stone-200 bg-white"
@@ -442,7 +465,8 @@ export const CheckoutPage = () => {
                 </label>
               </div>
 
-              {deliveryMethod === "nova_poshta" && (
+              {(deliveryMethod === "nova_poshta" ||
+                deliveryMethod === "ukrposhta") && (
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 animate-fade-in">
                   <div>
                     <label className="block text-xs font-semibold uppercase tracking-widest text-stone-900 mb-2.5">

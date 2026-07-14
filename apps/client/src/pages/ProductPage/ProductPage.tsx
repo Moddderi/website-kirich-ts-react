@@ -3,41 +3,54 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import type { Product } from "@project/shared";
 import { SUBTYPE_LABELS } from "@project/shared";
-import { Portal } from "../../components/shared/Portal/Portal";
 import { useAppDispatch, useAppSelector } from "../../store/store";
 import { addToCart } from "../../store/cartSlice";
 import { toggleFavorite, selectIsFavorite } from "../../store/favoriteSlice";
+import { SizeChartModal } from "../../components/SizeChartModal/SizeChartModal";
+import { ColorPaletteModal } from "../../components/ColorPaletteModal/ColorPaletteModal";
 
 import { IoBagHandleOutline } from "react-icons/io5";
 import { IoHeart, IoHeartOutline } from "react-icons/io5";
-import { IoIosArrowDown, IoMdClose } from "react-icons/io";
+import { IoIosArrowDown } from "react-icons/io";
 import { HiOutlineArrowLeft } from "react-icons/hi";
 
 import { getProductById } from "../../api/productApi";
 import { useTranslation } from "react-i18next";
 import { useProductName } from "../../utils/useLocalizedProduct";
 import { useFormattedPrice } from "../../hooks/useFormattedPrice";
-
-const AVAILABLE_SIZES = ["XS", "S", "M", "L", "XL"];
+import {
+  getSizesForGroup,
+  type SizeGroup,
+} from "../../constants/sizeCharts";
+import { PRODUCT_COLORS } from "../../constants/colorPalette";
 
 export const ProductPage: React.FC = () => {
   const { t } = useTranslation();
   const getProductName = useProductName();
   const formatPrice = useFormattedPrice();
 
-  const AVAILABLE_COLORS = [
-    { id: "black", hex: "#000000", label: t("productPage.colors.black") },
-    { id: "burgundy", hex: "#8B0000", label: t("productPage.colors.burgundy") },
-    { id: "navy", hex: "#000080", label: t("productPage.colors.navy") },
-  ];
+  const AVAILABLE_COLORS = PRODUCT_COLORS.map((color) => ({
+    ...color,
+    label: t(`productPage.colors.${color.id}`),
+  }));
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
 
-  // Локальный стейт
   const [selectedColor, setSelectedColor] = useState<string>("black");
+  const [sizeGroup, setSizeGroup] = useState<SizeGroup>("men");
   const [selectedSize, setSelectedSize] = useState<string>("M");
   const [isSizeChartOpen, setIsSizeChartOpen] = useState<boolean>(false);
+  const [isPaletteOpen, setIsPaletteOpen] = useState<boolean>(false);
+
+  const availableSizes = getSizesForGroup(sizeGroup);
+
+  const handleSizeGroupChange = (group: SizeGroup) => {
+    if (group === sizeGroup) return;
+    setSizeGroup(group);
+    const nextSizes = getSizesForGroup(group);
+    setSelectedSize(nextSizes[Math.floor(nextSizes.length / 2)] ?? nextSizes[0]);
+  };
 
   // Стейт для активной (выбранной) картинки в галерее
   const [activeImageIndex, setActiveImageIndex] = useState<number>(0);
@@ -197,7 +210,7 @@ export const ProductPage: React.FC = () => {
                 {getProductName(product)}
               </h1>
               <p className="text-2xl font-semibold text-stone-900 mb-6">
-                {t("productPage.from")} {formatPrice(Number(product.price))}
+                 {formatPrice(Number(product.price))}
               </p>
               <p className="text-sm font-medium text-stone-500 leading-relaxed">
                 {t("productPage.description")}
@@ -211,7 +224,11 @@ export const ProductPage: React.FC = () => {
                   <h3 className="text-xs font-semibold uppercase tracking-widest text-stone-900">
                     {t("productPage.baseMaterial")}
                   </h3>
-                  <button className="text-xs font-medium text-stone-500 underline decoration-stone-300 underline-offset-4 hover:text-stone-900 transition-colors">
+                  <button
+                    type="button"
+                    onClick={() => setIsPaletteOpen(true)}
+                    className="text-xs font-medium text-stone-500 underline decoration-stone-300 underline-offset-4 hover:text-stone-900 transition-colors"
+                  >
                     {t("productPage.palette")}
                   </button>
                 </div>
@@ -223,6 +240,7 @@ export const ProductPage: React.FC = () => {
                         key={color.id}
                         type="button"
                         onClick={() => setSelectedColor(color.id)}
+                        title={color.label}
                         className="group relative w-12 h-12 rounded-full flex items-center justify-center focus:outline-none transition-transform active:scale-95"
                       >
                         <span
@@ -233,13 +251,18 @@ export const ProductPage: React.FC = () => {
                           }`}
                         ></span>
                         <span
-                          className="w-10 h-10 rounded-full shadow-sm group-hover:scale-95 transition-transform"
+                          className={`w-10 h-10 rounded-full shadow-sm group-hover:scale-95 transition-transform ${
+                            color.id === "milky" ? "ring-1 ring-stone-200" : ""
+                          }`}
                           style={{ backgroundColor: color.hex }}
                         ></span>
                       </button>
                     );
                   })}
                 </div>
+                <p className="mt-3 text-[11px] font-medium text-stone-400">
+                  {AVAILABLE_COLORS.find((c) => c.id === selectedColor)?.label}
+                </p>
               </div>
 
               {/* ВЫБОР РАЗМЕРА */}
@@ -256,15 +279,47 @@ export const ProductPage: React.FC = () => {
                     {t("productPage.sizeChart")}
                   </button>
                 </div>
+
+                <div className="mb-4 inline-flex items-center rounded-full border border-stone-200 bg-stone-100 p-1">
+                  <button
+                    type="button"
+                    onClick={() => handleSizeGroupChange("men")}
+                    className={`rounded-full px-4 py-1.5 text-[10px] font-semibold uppercase tracking-widest transition-all ${
+                      sizeGroup === "men"
+                        ? "bg-stone-900 text-white shadow-sm"
+                        : "text-stone-500 hover:text-stone-900"
+                    }`}
+                  >
+                    {t("productPage.sizeChartMen")}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleSizeGroupChange("kids")}
+                    className={`rounded-full px-4 py-1.5 text-[10px] font-semibold uppercase tracking-widest transition-all ${
+                      sizeGroup === "kids"
+                        ? "bg-stone-900 text-white shadow-sm"
+                        : "text-stone-500 hover:text-stone-900"
+                    }`}
+                  >
+                    {t("productPage.sizeChartKids")}
+                  </button>
+                </div>
+
+                {sizeGroup === "kids" && (
+                  <p className="mb-3 text-[11px] font-medium text-stone-400">
+                    {t("productPage.sizeChartKidsHint")}
+                  </p>
+                )}
+
                 <div className="flex flex-wrap gap-2.5">
-                  {AVAILABLE_SIZES.map((size) => {
+                  {availableSizes.map((size) => {
                     const isSizeSelected = selectedSize === size;
                     return (
                       <button
                         key={size}
                         type="button"
                         onClick={() => setSelectedSize(size)}
-                        className={`min-w-14 h-12 rounded-2xl border text-xs font-bold transition-all uppercase tracking-wider flex items-center justify-center px-3 active:scale-95 ${
+                        className={`min-w-14 h-12 rounded-2xl border text-xs font-bold transition-all tracking-wider flex items-center justify-center px-3 active:scale-95 ${
                           isSizeSelected
                             ? "border-stone-900 bg-stone-900 text-white"
                             : "border-stone-200 bg-white/50 text-stone-900 hover:border-stone-900 hover:bg-white"
@@ -318,103 +373,31 @@ export const ProductPage: React.FC = () => {
                   {t("productPage.processText")}
                 </div>
               </details>
+              <details className="group py-5">
+                <summary className="flex cursor-pointer items-center justify-between text-sm font-semibold tracking-tight text-stone-900 marker:content-none select-none">
+                  {t("productPage.foreignCurrencyTitle")}
+                  <IoIosArrowDown className="text-stone-400 group-open:rotate-180 transition-transform" />
+                </summary>
+                <div className="mt-4 text-sm font-medium text-stone-500 leading-relaxed pr-8">
+                  {t("productPage.foreignCurrencyText")}
+                </div>
+              </details>
             </div>
           </div>
         </div>
       </div>
 
-      {/* МОДАЛЬНОЕ ОКНО: РАЗМЕРНАЯ СЕТКА */}
-      {isSizeChartOpen && (
-        <Portal>
-          <div className="fixed inset-0 z-100 flex items-center justify-center p-4 bg-stone-900/40 backdrop-blur-sm animate-fade-in">
-            <div
-              className="absolute inset-0"
-              onClick={() => setIsSizeChartOpen(false)}
-            />
+      <SizeChartModal
+        isOpen={isSizeChartOpen}
+        onClose={() => setIsSizeChartOpen(false)}
+        selectedSize={selectedSize}
+        activeGroup={sizeGroup}
+      />
 
-            <div className="relative bg-white rounded-[2.5rem] max-w-lg w-full p-6 sm:p-10 shadow-2xl border border-stone-100 max-h-[90vh] overflow-y-auto animate-reveal-up z-10">
-              <button
-                type="button"
-                onClick={() => setIsSizeChartOpen(false)}
-                className="absolute top-6 right-6 p-2 rounded-full text-stone-400 hover:text-stone-900 hover:bg-stone-100 transition-colors"
-              >
-                <IoMdClose size={22} />
-              </button>
-
-              <h3 className="text-2xl font-semibold tracking-tight text-stone-900 mb-6">
-                {t("productPage.sizeChartTitle")}
-              </h3>
-
-              <div className="overflow-x-auto min-w-full inline-block align-middle">
-                <table className="w-full text-left text-sm text-stone-600 border-collapse">
-                  <thead>
-                    <tr className="border-b border-stone-200 text-xs font-semibold uppercase tracking-widest text-stone-400">
-                      <th className="py-3 px-2">{t("productPage.sizeChartSize")}</th>
-                      <th className="py-3 px-2">{t("productPage.sizeChartChest")}</th>
-                      <th className="py-3 px-2">{t("productPage.sizeChartWaist")}</th>
-                      <th className="py-3 px-2">{t("productPage.sizeChartHips")}</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-stone-100 font-medium">
-                    {[
-                      {
-                        size: "XS",
-                        chest: "80-84",
-                        waist: "60-64",
-                        hips: "86-90",
-                      },
-                      {
-                        size: "S",
-                        chest: "84-88",
-                        waist: "64-68",
-                        hips: "90-94",
-                      },
-                      {
-                        size: "M",
-                        chest: "88-92",
-                        waist: "68-72",
-                        hips: "94-98",
-                      },
-                      {
-                        size: "L",
-                        chest: "92-96",
-                        waist: "72-76",
-                        hips: "98-102",
-                      },
-                      {
-                        size: "XL",
-                        chest: "96-100",
-                        waist: "76-80",
-                        hips: "102-106",
-                      },
-                    ].map((row) => (
-                      <tr
-                        key={row.size}
-                        className={
-                          selectedSize === row.size
-                            ? "bg-stone-50 font-semibold text-stone-900"
-                            : ""
-                        }
-                      >
-                        <td className="py-3.5 px-2 text-stone-900 font-bold">
-                          {row.size}
-                        </td>
-                        <td className="py-3.5 px-2">{row.chest}</td>
-                        <td className="py-3.5 px-2">{row.waist}</td>
-                        <td className="py-3.5 px-2">{row.hips}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-
-              <p className="mt-6 text-xs text-stone-400 leading-relaxed">
-                {t("productPage.sizeChartNote")}
-              </p>
-            </div>
-          </div>
-        </Portal>
-      )}
+      <ColorPaletteModal
+        isOpen={isPaletteOpen}
+        onClose={() => setIsPaletteOpen(false)}
+      />
     </div>
   );
 };
