@@ -8,14 +8,14 @@ import type { CartItem } from "../../store/cartSlice";
 import { IoTrashOutline } from "react-icons/io5";
 import { HiMinus, HiPlus, HiArrowRight } from "react-icons/hi";
 import { useProductName } from "../../utils/useLocalizedProduct";
-import { useFormattedPrice } from "../../hooks/useFormattedPrice";
+import { useCartMoney } from "../../hooks/useFormattedPrice";
 
 export const CartPage: React.FC = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const { t } = useTranslation();
   const getProductName = useProductName();
-  const formatPrice = useFormattedPrice();
+  const { formatLine, formatTotal } = useCartMoney();
 
   // 1. Селектор вытаскивает данные только из cart
   const cartItems = useAppSelector(
@@ -155,7 +155,7 @@ export const CartPage: React.FC = () => {
                       </div>
 
                       <span className="text-xl font-semibold text-stone-900">
-                        {formatPrice(item.price * item.quantity)}
+                        {formatLine(item.price, item.quantity)}
                       </span>
                     </div>
                   </div>
@@ -177,12 +177,12 @@ export const CartPage: React.FC = () => {
                 <div className="flex justify-between text-sm font-medium text-stone-500">
                   <span>{t("cart.products", { count: totalItems })}</span>
                   <span className="text-stone-900">
-                    {formatPrice(totalPrice)}
+                    {formatTotal(cartItems)}
                   </span>
                 </div>
                 <div className="flex justify-between text-sm font-medium text-stone-500">
                   <span>{t("cart.discount")}</span>
-                  <span className="text-stone-900">{formatPrice(0)}</span>
+                  <span className="text-stone-900">{formatLine(0, 1)}</span>
                 </div>
                 <div className="flex justify-between text-sm font-medium text-stone-500">
                   <span>{t("cart.delivery")}</span>
@@ -195,7 +195,7 @@ export const CartPage: React.FC = () => {
                   {t("cart.total")}
                 </span>
                 <span className="text-2xl font-semibold text-stone-900 leading-none">
-                  {formatPrice(totalPrice)}
+                  {formatTotal(cartItems)}
                 </span>
               </div>
 

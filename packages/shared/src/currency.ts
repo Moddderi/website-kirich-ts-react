@@ -41,9 +41,37 @@ export const convertFromUah = (amountUah: number, currency: Currency): number =>
   return roundTo10(afterDivision * CURRENCY_MARKUP);
 };
 
-export const formatPrice = (amountUah: number, currency: Currency): string => {
-  const converted = convertFromUah(amountUah, currency);
+/** Format an amount that is already in the target currency (no conversion). */
+export const formatConvertedPrice = (
+  amount: number,
+  currency: Currency,
+): string => {
   const symbol = CURRENCY_SYMBOLS[currency];
-
-  return `${converted.toLocaleString("uk-UA")} ${symbol}`;
+  return `${Math.round(amount).toLocaleString("uk-UA")} ${symbol}`;
 };
+
+export const formatPrice = (amountUah: number, currency: Currency): string => {
+  return formatConvertedPrice(convertFromUah(amountUah, currency), currency);
+};
+
+/**
+ * Cart/checkout line: convert unit price once, then multiply by quantity.
+ * Avoids double-rounding drift vs converting (price * qty) as one sum.
+ */
+export const convertLineFromUah = (
+  unitPriceUah: number,
+  quantity: number,
+  currency: Currency,
+): number => convertFromUah(unitPriceUah, currency) * quantity;
+
+/** Sum of line totals after converting each unit price once — matches cart UI. */
+export const convertCartTotalFromUah = (
+  items: Array<{ price: number | string; quantity: number | string }>,
+  currency: Currency,
+): number =>
+  items.reduce((sum, item) => {
+    const price = Number(item.price);
+    const quantity = Number(item.quantity);
+    if (!Number.isFinite(price) || !Number.isFinite(quantity)) return sum;
+    return sum + convertLineFromUah(price, quantity, currency);
+  }, 0);

@@ -76,7 +76,7 @@ export const MainPage = () => {
             </a>
           </div>
 
-          <div className="hidden lg:flex absolute top-1/4 -right-16 animate-float-complex items-center gap-4 rounded-3xl border border-white/60 bg-white/40 p-5 backdrop-blur-2xl shadow-[0_20px_40px_rgba(28,25,23,0.05)] w-72 text-left glass-reflection hover:bg-white/60 transition-all duration-500 z-20">
+          <div className="hidden lg:flex absolute top-1/2 -right-16 animate-float-complex items-center gap-4 rounded-3xl border border-white/60 bg-white/40 p-5 backdrop-blur-2xl shadow-[0_20px_40px_rgba(28,25,23,0.05)] w-72 text-left glass-reflection hover:bg-white/60 transition-all duration-500 z-20">
             <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-stone-900 text-white shadow-lg shadow-stone-900/20 relative">
               <div className="absolute inset-0 rounded-2xl border border-white/20 animate-pulse-glow"></div>
               <FaPencilRuler size={20} color="white" />

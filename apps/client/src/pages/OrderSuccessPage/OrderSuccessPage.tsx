@@ -2,7 +2,7 @@ import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { getOrderById } from "../../api/orderApi";
-import { useFormattedPrice } from "../../hooks/useFormattedPrice";
+import { useCartMoney } from "../../hooks/useFormattedPrice";
 
 interface OrderItem {
   id?: string;
@@ -30,7 +30,7 @@ interface OrderData {
 
 export const OrderSuccessPage = () => {
   const { t } = useTranslation();
-  const formatPrice = useFormattedPrice();
+  const { formatLine, formatTotal } = useCartMoney();
   const { orderId } = useParams<{ orderId?: string }>();
   const navigate = useNavigate();
   const location = useLocation();
@@ -126,12 +126,11 @@ export const OrderSuccessPage = () => {
   const orderData = order?.data;
   if (!orderData) return null;
 
-  const itemsTotal =
-    orderData.items?.reduce(
-      (acc: number, item: OrderItem) =>
-        acc + Number(item.price) * item.quantity,
-      0,
-    ) || 0;
+  const cartItems =
+    orderData.items?.map((item) => ({
+      price: Number(item.price),
+      quantity: Number(item.quantity),
+    })) ?? [];
 
   return (
     <div className="mx-auto max-w-7xl px-6 lg:px-8 py-12 lg:py-24 animate-reveal-up">
@@ -211,7 +210,7 @@ export const OrderSuccessPage = () => {
                         </p>
                       )}
                       <p className="text-xs font-semibold text-stone-900 mt-0.5">
-                        {formatPrice(Number(item.price))}
+                        {formatLine(Number(item.price), Number(item.quantity))}
                       </p>
                     </div>
                   </div>
@@ -222,7 +221,7 @@ export const OrderSuccessPage = () => {
                 <div className="flex justify-between text-sm font-medium text-stone-500">
                   <span>{t("orderSuccess.products")}</span>
                   <span className="text-stone-900">
-                    {formatPrice(itemsTotal)}
+                    {formatTotal(cartItems)}
                   </span>
                 </div>
                 <div className="flex justify-between text-sm font-medium text-stone-500">
@@ -240,7 +239,7 @@ export const OrderSuccessPage = () => {
                   {t("orderSuccess.total")}
                 </span>
                 <span className="text-2xl font-semibold text-stone-900">
-                  {formatPrice(Number(orderData.totalAmount))}
+                  {formatTotal(cartItems)}
                 </span>
               </div>
             </div>

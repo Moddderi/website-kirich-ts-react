@@ -41,6 +41,7 @@ export const ProductSchema = z.object({
   sub_type: SubTypeEnum,
   stock: z.number().int().min(0).default(0),
   dance_program: DanceProgramEnum.nullable().optional(),
+  colors: z.array(z.string().min(1)).default([]),
 });
 
 export const IdParamSchema = z.object({

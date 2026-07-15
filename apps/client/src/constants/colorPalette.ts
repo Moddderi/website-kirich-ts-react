@@ -70,3 +70,22 @@ export const FULL_COLOR_PALETTE: PaletteColor[] = [
   { id: "darkCharcoal", hex: "#2C2C2C" },
   { id: "earth", hex: "#3B2F2F" },
 ];
+
+const ALL_COLORS: PaletteColor[] = [
+  ...PRODUCT_COLORS,
+  ...FULL_COLOR_PALETTE.filter(
+    (c) => !PRODUCT_COLORS.some((p) => p.id === c.id),
+  ),
+];
+
+export const getColorById = (id: string): PaletteColor | undefined =>
+  ALL_COLORS.find((c) => c.id === id);
+
+export const resolveProductColors = (
+  colorIds: string[] | null | undefined,
+): PaletteColor[] => {
+  if (!colorIds?.length) return [];
+  return colorIds
+    .map((id) => getColorById(id))
+    .filter((c): c is PaletteColor => Boolean(c));
+};

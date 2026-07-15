@@ -10,7 +10,7 @@ export interface CartItem {
   productCode?: string;
   quantity: number;
   options: {
-    color: string;
+    color?: string;
     size: string;
   };
 }
@@ -32,7 +32,7 @@ const cartSlice = createSlice({
       action: PayloadAction<Omit<CartItem, "quantity" | "cartItemId">>,
     ) => {
       const { productId, options } = action.payload;
-      const cartItemId = `${productId}-${options.color}-${options.size}`;
+      const cartItemId = `${productId}-${options.color ?? "none"}-${options.size}`;
 
       const existingItem = state.items.find(
         (item) => item.cartItemId === cartItemId,

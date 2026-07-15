@@ -22,22 +22,17 @@ import {
   getSizesForGroup,
   type SizeGroup,
 } from "../../constants/sizeCharts";
-import { PRODUCT_COLORS } from "../../constants/colorPalette";
+import { resolveProductColors } from "../../constants/colorPalette";
 
 export const ProductPage: React.FC = () => {
   const { t } = useTranslation();
   const getProductName = useProductName();
   const formatPrice = useFormattedPrice();
-
-  const AVAILABLE_COLORS = PRODUCT_COLORS.map((color) => ({
-    ...color,
-    label: t(`productPage.colors.${color.id}`),
-  }));
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
 
-  const [selectedColor, setSelectedColor] = useState<string>("black");
+  const [selectedColor, setSelectedColor] = useState<string>("");
   const [sizeGroup, setSizeGroup] = useState<SizeGroup>("men");
   const [selectedSize, setSelectedSize] = useState<string>("M");
   const [isSizeChartOpen, setIsSizeChartOpen] = useState<boolean>(false);
@@ -66,6 +61,20 @@ export const ProductPage: React.FC = () => {
     staleTime: 1000 * 60 * 10,
   });
 
+  const productColorIds = product?.colors ?? [];
+  const productColors = resolveProductColors(productColorIds);
+  const AVAILABLE_COLORS = productColors.map((color) => ({
+    ...color,
+    label: t(`productPage.colors.${color.id}`, {
+      defaultValue: t(`productPage.paletteColors.${color.id}`, {
+        defaultValue: color.id,
+      }),
+    }),
+  }));
+  const activeColorId = productColorIds.includes(selectedColor)
+    ? selectedColor
+    : (productColorIds[0] ?? "");
+
   // Проверяем, находится ли текущий товар в избранном
   const isFavorite = useAppSelector(selectIsFavorite(product?.id ?? 0));
 
@@ -81,8 +90,8 @@ export const ProductPage: React.FC = () => {
   const handleAddToCart = () => {
     if (!product) return;
 
-    const colorObj = AVAILABLE_COLORS.find((c) => c.id === selectedColor);
-    const colorLabel = colorObj ? colorObj.label : selectedColor;
+    const colorObj = AVAILABLE_COLORS.find((c) => c.id === activeColorId);
+    const colorLabel = colorObj ? colorObj.label : activeColorId || undefined;
 
     dispatch(
       addToCart({
@@ -219,6 +228,7 @@ export const ProductPage: React.FC = () => {
 
             <div className="space-y-10 border-t border-stone-200/60 pt-10">
               {/* МАТЕРИАЛ ОСНОВЫ */}
+              {AVAILABLE_COLORS.length > 0 && (
               <div>
                 <div className="flex items-center justify-between mb-5">
                   <h3 className="text-xs font-semibold uppercase tracking-widest text-stone-900">
@@ -234,7 +244,7 @@ export const ProductPage: React.FC = () => {
                 </div>
                 <div className="flex flex-wrap gap-4">
                   {AVAILABLE_COLORS.map((color) => {
-                    const isColorSelected = selectedColor === color.id;
+                    const isColorSelected = activeColorId === color.id;
                     return (
                       <button
                         key={color.id}
@@ -252,7 +262,9 @@ export const ProductPage: React.FC = () => {
                         ></span>
                         <span
                           className={`w-10 h-10 rounded-full shadow-sm group-hover:scale-95 transition-transform ${
-                            color.id === "milky" ? "ring-1 ring-stone-200" : ""
+                            color.id === "milky" || color.id === "white"
+                              ? "ring-1 ring-stone-200"
+                              : ""
                           }`}
                           style={{ backgroundColor: color.hex }}
                         ></span>
@@ -261,9 +273,10 @@ export const ProductPage: React.FC = () => {
                   })}
                 </div>
                 <p className="mt-3 text-[11px] font-medium text-stone-400">
-                  {AVAILABLE_COLORS.find((c) => c.id === selectedColor)?.label}
+                  {AVAILABLE_COLORS.find((c) => c.id === activeColorId)?.label}
                 </p>
               </div>
+              )}
 
               {/* ВЫБОР РАЗМЕРА */}
               <div>

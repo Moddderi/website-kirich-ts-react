@@ -32,9 +32,10 @@ const tailoringSlice = createSlice({
     ) => {
       state.measurements[action.payload.field] = action.payload.value;
     },
+    clearTailoring: () => initialState,
   },
 });
 
-export const { setType, setMeasurementUnit, setMeasurement } =
+export const { setType, setMeasurementUnit, setMeasurement, clearTailoring } =
   tailoringSlice.actions;
 export default tailoringSlice.reducer;
