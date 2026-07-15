@@ -1,9 +1,10 @@
 import { Resend } from "resend";
 import {
   MEASUREMENT_LABELS_UK,
-  MEASUREMENT_CONFIG,
   MEASUREMENT_UNIT_LABELS,
-  formatPrice,
+  convertCartTotalFromUah,
+  convertLineFromUah,
+  formatConvertedPrice,
   isCurrency,
   type Currency,
   type MeasurementType,
@@ -69,18 +70,45 @@ const getDisplayCurrency = (order: { displayCurrency?: unknown }): Currency =>
 const getOrderIdShort = (orderId?: string) =>
   orderId ? orderId.split("-")[0].toUpperCase() : "CUSTOM";
 
+const TAILORING_TYPE_META: Record<
+  MeasurementType,
+  { label: string; category: string }
+> = {
+  body: { label: "Боді", category: "Комбідрези" },
+  jacket: { label: "Піджак / жилет", category: "Плечові вироби (верх)" },
+  pants: { label: "Штани", category: "Низ" },
+  suit: { label: "Костюм", category: "Повноцінний комплект" },
+};
+
+const resolveTailoringType = (
+  customItem: { name?: string } | undefined,
+): { key: MeasurementType; label: string; category: string } | null => {
+  const name = customItem?.name ?? "";
+  const typeMatch = name.match(/:\s*([^:]+)$/);
+  const typeKey = typeMatch?.[1]?.trim().toLowerCase();
+
+  if (typeKey && typeKey in TAILORING_TYPE_META) {
+    const key = typeKey as MeasurementType;
+    return { key, ...TAILORING_TYPE_META[key] };
+  }
+
+  const keys = Object.keys(TAILORING_TYPE_META) as MeasurementType[];
+  for (const key of keys) {
+    if (new RegExp(`(?:^|[^a-z])${key}(?:[^a-z]|$)`, "i").test(name)) {
+      return { key, ...TAILORING_TYPE_META[key] };
+    }
+  }
+
+  return null;
+};
+
 const getTailoringTypeLabel = (
   customItem: { name?: string } | undefined,
 ): string => {
-  const name = customItem?.name ?? "";
-  const typeMatch = name.match(/:\s*([^:]+)$/);
-  const typeKey = typeMatch?.[1]?.trim();
-
-  if (typeKey && typeKey in MEASUREMENT_CONFIG) {
-    return MEASUREMENT_CONFIG[typeKey as MeasurementType].label;
-  }
-
-  return typeKey || "Не вказано";
+  const resolved = resolveTailoringType(customItem);
+  if (!resolved) return "Не вказано";
+  if (resolved.label === resolved.category) return resolved.label;
+  return `${resolved.label} — ${resolved.category}`;
 };
 
 const getCommunicationLabel = (method?: string | null) => {
@@ -184,13 +212,25 @@ const buildReadyMadeEmailHtml = (order: any) => {
             </p>
             ${details ? `<p style="margin:0 0 4px;font-size:12px;color:#78716c;">${details}</p>` : ""}
             <p style="margin:0;font-size:13px;color:#1c1917;">
-              ${formatPrice(Number(item.price) * Number(item.quantity), displayCurrency)}
+              ${formatConvertedPrice(
+                convertLineFromUah(
+                  Number(item.price),
+                  Number(item.quantity),
+                  displayCurrency,
+                ),
+                displayCurrency,
+              )}
             </p>
           </td>
         </tr>
       `;
     })
     .join("");
+
+  const orderTotal = formatConvertedPrice(
+    convertCartTotalFromUah(order.items || [], displayCurrency),
+    displayCurrency,
+  );
 
   const body = `
     <p style="margin:0 0 16px;font-size:15px;line-height:1.6;">
@@ -211,7 +251,7 @@ const buildReadyMadeEmailHtml = (order: any) => {
     <div style="margin-top:20px;padding:16px;border-radius:16px;background:#fafaf9;">
       ${getDeliveryHtml(order)}
       <p style="margin:12px 0 0;font-size:16px;">
-        <strong>Всього:</strong> ${formatPrice(Number(order.totalAmount), displayCurrency)}
+        <strong>Всього:</strong> ${orderTotal}
       </p>
     </div>
   `;
@@ -222,6 +262,7 @@ const buildReadyMadeEmailHtml = (order: any) => {
 const buildCustomOrderEmailHtml = (order: any) => {
   const orderIdShort = getOrderIdShort(order.id);
   const customItem = order.items?.[0];
+  const resolvedType = resolveTailoringType(customItem);
   const tailoringTypeLabel = getTailoringTypeLabel(customItem);
 
   let measurementsHtml = `
@@ -268,6 +309,15 @@ const buildCustomOrderEmailHtml = (order: any) => {
     console.error("❌ Не вдалося розпарсити мірки для email:", error);
   }
 
+  const typeBlock = resolvedType
+    ? `
+      <p style="margin:0 0 6px;"><strong>Тип виробу:</strong> ${escapeHtml(resolvedType.label)}</p>
+      <p style="margin:0 0 6px;"><strong>Категорія:</strong> ${escapeHtml(resolvedType.category)}</p>
+    `
+    : `
+      <p style="margin:0 0 6px;"><strong>Тип виробу:</strong> ${escapeHtml(tailoringTypeLabel)}</p>
+    `;
+
   const body = `
     <p style="margin:0 0 16px;font-size:15px;line-height:1.6;">
       Вітаємо, <strong>${escapeHtml(order.firstName)} ${escapeHtml(order.lastName)}</strong>!
@@ -281,12 +331,14 @@ const buildCustomOrderEmailHtml = (order: any) => {
     </p>
 
     <div style="margin:0 0 20px;padding:16px;border-radius:16px;background:#fafaf9;">
-      <p style="margin:0 0 6px;"><strong>Тип виробу:</strong> ${escapeHtml(tailoringTypeLabel)}</p>
+      ${typeBlock}
       ${getDeliveryHtml(order)}
       <p style="margin:12px 0 0;"><strong>Вартість:</strong> розраховується менеджером</p>
     </div>
 
-    <h2 style="margin:0 0 12px;font-size:13px;letter-spacing:0.12em;text-transform:uppercase;color:#78716c;">Ваші мірки</h2>
+    <h2 style="margin:0 0 12px;font-size:13px;letter-spacing:0.12em;text-transform:uppercase;color:#78716c;">
+      Ваші мірки${resolvedType ? ` · ${escapeHtml(resolvedType.label)}` : ""}
+    </h2>
     ${measurementsHtml}
   `;
 

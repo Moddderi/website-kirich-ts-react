@@ -83,7 +83,7 @@
     "baseMaterial": "Base Material",
     "palette": "Palette",
     "paletteTitle": "Color Palette",
-    "paletteSubtitle": "Studio fabric palette. Ready-to-wear comes in milky, black, and red; other shades via custom tailoring",
+    "paletteSubtitle": "Main in-stock palette: black, milky, and red. All other colors are available for tailoring only with a custom order",
     "paletteCustomNote": "Want a different or custom color? Choose custom tailoring — we'll match the shade to your look.",
     "paletteCustomCta": "Go to Custom Tailoring",
     "size": "Size",
@@ -107,7 +107,8 @@
     "colors": {
       "milky": "Milky",
       "black": "Black",
-      "red": "Red"
+      "red": "Red",
+      "white": "White"
     },
     "paletteColors": {
       "taupe": "Taupe",
@@ -166,7 +167,7 @@
     "products": "Products ({{count}})",
     "discount": "Discount",
     "delivery": "Delivery",
-    "deliveryNP": "Nova Poshta rates",
+    "deliveryNP": "Postal rates",
     "total": "Total",
     "checkout": "Proceed to Checkout"
   },
@@ -255,14 +256,14 @@
     "stepLabel": "Step 1 of 2",
     "title": "What shall we make?",
     "description": "Choose the garment type. On the next step, we'll provide a measurement guide with detailed descriptions and a convenient form to fill in",
-    "body": "Bodysuit",
+    "body": "Body",
     "bodyDesc": "Unitards",
     "jacket": "Jacket / Vest",
-    "jacketDesc": "Shoulder garments",
+    "jacketDesc": "Tops",
     "pants": "Pants",
-    "pantsDesc": "Pants",
+    "pantsDesc": "Bottoms",
     "suit": "Suit",
-    "suitDesc": "Complete set",
+    "suitDesc": "Full set",
     "select": "Select"
   },
   "measurements": {
@@ -280,7 +281,7 @@
     "vanguardCollection": "Now available on the website",
     "heroTitle1": "Clothing that highlights",
     "heroTitle2": "your uniqueness",
-    "heroDescription": "Ballroom wear without compromise. Every detail crafted for your confidence on the dance floor.",
+    "heroDescription": "Men's ballroom wear without compromise. Every detail crafted for your confidence on the dance floor.",
     "goToCollection": "Browse Catalog",
     "brandPhilosophy": "Brand Philosophy",
     "precisionTitle": "Precise tailoring",
@@ -338,7 +339,7 @@
     "paymentMethods": "Payment Methods",
     "paymentDesc": "Payment for orders within Ukraine is made in the national currency — Ukrainian hryvnia (₴). If you are abroad, you can pay in dollars ($) or euros (€) according to the provided invoice.",
     "recommended": "Recommended",
-    "cardTransfer": "Payment to the studio IBAN for payments within Ukraine",
+    "cardTransfer": "Payment to the studio IBAN",
     "cardTransferDesc": "The client transfers money to the IBAN account via their online banking, which takes just a few minutes.",
     "workOrder": "How it works:",
     "workOrderDesc": "After receiving the prepayment, we start working on the order. When it's ready and the remaining amount is paid, we ship the order to the specified address.",
@@ -347,9 +348,10 @@
     "swiftNote": "Please note: such transfers are credited to the studio's account within 1-5 business days. The fixed bank commission for currency crediting, as well as the customs commission, is paid by the Buyer.",
     "swiftWarning": "When making a SWIFT transfer, be sure to specify the commission type <strong>\"FULL\"</strong> or <strong>\"OUR\"</strong>.",
     "swiftImportant": "!!! Important:",
+    "forUkraine": "For payments within Ukraine",
     "forInternational": "For international payments",
     "photoRightsTitle": "Photo publication rights",
-    "photoRightsDesc": "The studio reserves the right to publish photos of finished garments on the website and social media."
+    "photoRightsDesc": "The studio reserves the right to publish photos of finished garments on the website and social media, and to use them for marketing purposes."
   },
   "privacyPolicy": {
     "title": "Privacy Policy",
@@ -367,7 +369,7 @@
     "process2": "Identifying and eliminating service shortcomings.",
     "process3": "Notifying about studio news, new arrivals, current promotions and discounts.",
     "process4": "Technical support for users.",
-    "process5": "Sending promotional offers.",
+
     "staticInfo": "Static Information",
     "staticInfoDesc": "To ensure the smooth functioning of the website and for personal analysis of traffic statistics, we study IP addresses of site visits. The collected data does not affect the personal space of clients, does not concern deeply personal information, and is processed exclusively as generalized user statistics.",
     "analytics": "Web Analytics",

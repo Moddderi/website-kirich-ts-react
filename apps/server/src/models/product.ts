@@ -27,6 +27,7 @@ class Product extends Model<
   declare sub_type: string;
   declare stock: number;
   declare dance_program: CreationOptional<string | null>;
+  declare colors: string[];
 
   declare createdAt: CreationOptional<Date>;
   declare updatedAt: CreationOptional<Date>;
@@ -113,6 +114,24 @@ export default (sequelize: Sequelize) => {
         type: DataTypes.INTEGER,
         allowNull: false,
         defaultValue: 0,
+      },
+      colors: {
+        type: DataTypes.ARRAY(DataTypes.STRING),
+        allowNull: false,
+        defaultValue: ["milky", "black", "red"],
+        get() {
+          const rawValue = this.getDataValue("colors") as any;
+          if (typeof rawValue === "string" && rawValue.startsWith("{")) {
+            const cleaned = rawValue.replace(/^\{/, "").replace(/\}$/, "");
+            return cleaned
+              ? cleaned.split(",").map((s: string) => s.replace(/^"|"$/g, ""))
+              : [];
+          }
+          if (Array.isArray(rawValue)) {
+            return rawValue;
+          }
+          return [];
+        },
       },
       createdAt: DataTypes.DATE,
       updatedAt: DataTypes.DATE,

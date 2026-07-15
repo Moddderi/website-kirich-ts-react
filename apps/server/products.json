@@ -9,7 +9,10 @@
     "sub_type": "shirt",
     "stock": 10,
     "product_code": "3010",
-    "dance_program": "ST"
+    "dance_program": "ST",
+    "colors": [
+      "white"
+    ]
   },
   {
     "name": "Сорочка-боді фактурна",
@@ -21,7 +24,11 @@
     "sub_type": "shirt",
     "stock": 10,
     "product_code": "3042",
-    "dance_program": "ST"
+    "dance_program": "ST",
+    "colors": [
+      "white",
+      "black"
+    ]
   },
   {
     "name": "Сорочка TR короткий рукав",
@@ -33,7 +40,12 @@
     "sub_type": "shirt",
     "stock": 10,
     "product_code": "3033",
-    "dance_program": "ST"
+    "dance_program": "ST",
+    "colors": [
+      "milky",
+      "black",
+      "red"
+    ]
   },
   {
     "name": "Сорочка TR довгий рукав",
@@ -45,7 +57,12 @@
     "sub_type": "shirt",
     "stock": 15,
     "product_code": "3011",
-    "dance_program": "ST"
+    "dance_program": "ST",
+    "colors": [
+      "milky",
+      "black",
+      "red"
+    ]
   },
   {
     "name": "Сорочка контраст",
@@ -57,7 +74,11 @@
     "sub_type": "shirt",
     "stock": 10,
     "product_code": "3040",
-    "dance_program": "ST"
+    "dance_program": "ST",
+    "colors": [
+      "white",
+      "black"
+    ]
   },
   {
     "name": "Футболка поло короткий рукав",
@@ -69,7 +90,12 @@
     "sub_type": "t-shirt",
     "stock": 20,
     "product_code": "3013",
-    "dance_program": "ST"
+    "dance_program": "ST",
+    "colors": [
+      "milky",
+      "black",
+      "red"
+    ]
   },
   {
     "name": "Футболка поло довгий рукав",
@@ -81,7 +107,12 @@
     "sub_type": "t-shirt",
     "stock": 15,
     "product_code": "3014",
-    "dance_program": "ST"
+    "dance_program": "ST",
+    "colors": [
+      "milky",
+      "black",
+      "red"
+    ]
   },
   {
     "name": "Футболка поло контраст",
@@ -93,7 +124,11 @@
     "sub_type": "t-shirt",
     "stock": 10,
     "product_code": "3041",
-    "dance_program": "ST"
+    "dance_program": "ST",
+    "colors": [
+      "white",
+      "black"
+    ]
   },
   {
     "name": "Футболка короткий рукав",
@@ -105,7 +140,12 @@
     "sub_type": "t-shirt",
     "stock": 20,
     "product_code": "3015",
-    "dance_program": "LAT"
+    "dance_program": "LAT",
+    "colors": [
+      "milky",
+      "black",
+      "red"
+    ]
   },
   {
     "name": "Футболка діагональ",
@@ -117,7 +157,12 @@
     "sub_type": "t-shirt",
     "stock": 15,
     "product_code": "3039",
-    "dance_program": "LAT"
+    "dance_program": "LAT",
+    "colors": [
+      "milky",
+      "black",
+      "red"
+    ]
   },
   {
     "name": "Лонгслів довгий рукав",
@@ -129,7 +174,12 @@
     "sub_type": "longsleeve",
     "stock": 12,
     "product_code": "3016",
-    "dance_program": "LAT"
+    "dance_program": "LAT",
+    "colors": [
+      "milky",
+      "black",
+      "red"
+    ]
   },
   {
     "name": "Лонгслів \"крило кажана\"",
@@ -141,7 +191,12 @@
     "sub_type": "longsleeve",
     "stock": 10,
     "product_code": "3034",
-    "dance_program": "LAT"
+    "dance_program": "LAT",
+    "colors": [
+      "milky",
+      "black",
+      "red"
+    ]
   },
   {
     "name": "Лонгслів з манжетами на кнопках",
@@ -153,7 +208,12 @@
     "sub_type": "longsleeve",
     "stock": 10,
     "product_code": "3045",
-    "dance_program": "LAT"
+    "dance_program": "LAT",
+    "colors": [
+      "milky",
+      "black",
+      "red"
+    ]
   },
   {
     "name": "Сорочка TR довгий рукав",
@@ -165,7 +225,12 @@
     "sub_type": "shirt",
     "stock": 10,
     "product_code": "3035",
-    "dance_program": "LAT"
+    "dance_program": "LAT",
+    "colors": [
+      "milky",
+      "black",
+      "red"
+    ]
   },
   {
     "name": "Сорочка-боді фрачна",
@@ -177,7 +242,10 @@
     "sub_type": "shirt",
     "stock": 5,
     "product_code": "3047",
-    "dance_program": "ST"
+    "dance_program": "ST",
+    "colors": [
+      "white"
+    ]
   },
   {
     "name": "Штани",
@@ -189,7 +257,10 @@
     "sub_type": "pants",
     "stock": 15,
     "product_code": "3019",
-    "dance_program": "ST"
+    "dance_program": "ST",
+    "colors": [
+      "black"
+    ]
   },
   {
     "name": "Штани зі шльовками под ремінь",
@@ -201,7 +272,10 @@
     "sub_type": "pants",
     "stock": 15,
     "product_code": "3038",
-    "dance_program": "ST"
+    "dance_program": "ST",
+    "colors": [
+      "black"
+    ]
   },
   {
     "name": "Штани",
@@ -213,7 +287,10 @@
     "sub_type": "pants",
     "stock": 10,
     "product_code": "3023",
-    "dance_program": "LAT"
+    "dance_program": "LAT",
+    "colors": [
+      "black"
+    ]
   },
   {
     "name": "Штани фрачні",
@@ -225,7 +302,10 @@
     "sub_type": "pants",
     "stock": 8,
     "product_code": "3048",
-    "dance_program": "ST"
+    "dance_program": "ST",
+    "colors": [
+      "black"
+    ]
   },
   {
     "name": "Краватка-метелик атласна",
@@ -236,7 +316,10 @@
     "main_category": "accessories",
     "sub_type": "tie",
     "stock": 50,
-    "product_code": "3027"
+    "product_code": "3027",
+    "colors": [
+      "black"
+    ]
   },
   {
     "name": "Краватка-метелик вишиванка",
@@ -247,7 +330,10 @@
     "main_category": "accessories",
     "sub_type": "tie",
     "stock": 30,
-    "product_code": "3036"
+    "product_code": "3036",
+    "colors": [
+      "black"
+    ]
   },
   {
     "name": "Краватка атласна",
@@ -259,7 +345,10 @@
     "sub_type": "tie",
     "stock": 40,
     "product_code": "3029",
-    "dance_program": "LAT"
+    "dance_program": "LAT",
+    "colors": [
+      "black"
+    ]
   },
   {
     "name": "Краватка вишиванка",
@@ -270,7 +359,10 @@
     "main_category": "accessories",
     "sub_type": "tie",
     "stock": 30,
-    "product_code": "3037"
+    "product_code": "3037",
+    "colors": [
+      "black"
+    ]
   },
   {
     "name": "Ремінь шкіряний",
@@ -281,7 +373,10 @@
     "main_category": "accessories",
     "sub_type": "belt",
     "stock": 25,
-    "product_code": "3032"
+    "product_code": "3032",
+    "colors": [
+      "black"
+    ]
   },
   {
     "name": "Магніти для кріплення номеру",
@@ -292,7 +387,8 @@
     "main_category": "accessories",
     "sub_type": "other",
     "stock": 100,
-    "product_code": "3046"
+    "product_code": "3046",
+    "colors": []
   },
   {
     "name": "Шкарпетки чоловічі",
@@ -303,7 +399,10 @@
     "main_category": "accessories",
     "sub_type": "socks",
     "stock": 100,
-    "product_code": "3043"
+    "product_code": "3043",
+    "colors": [
+      "black"
+    ]
   },
   {
     "name": "Хустинка нагрудна фрачна",
@@ -314,7 +413,10 @@
     "main_category": "accessories",
     "sub_type": "other",
     "stock": 40,
-    "product_code": "3049"
+    "product_code": "3049",
+    "colors": [
+      "white"
+    ]
   },
   {
     "name": "Метелик фрачний",
@@ -325,7 +427,10 @@
     "main_category": "accessories",
     "sub_type": "tie",
     "stock": 20,
-    "product_code": "3050"
+    "product_code": "3050",
+    "colors": [
+      "white"
+    ]
   },
   {
     "name": "Пояс до фраку",
@@ -336,7 +441,10 @@
     "main_category": "accessories",
     "sub_type": "belt",
     "stock": 15,
-    "product_code": "3051"
+    "product_code": "3051",
+    "colors": [
+      "white"
+    ]
   },
   {
     "name": "Комірець фрачний",
@@ -347,6 +455,9 @@
     "main_category": "accessories",
     "sub_type": "other",
     "stock": 15,
-    "product_code": "3052"
+    "product_code": "3052",
+    "colors": [
+      "white"
+    ]
   }
 ]

@@ -2,6 +2,7 @@
 const fs = require("fs");
 const path = require("path");
 const https = require("https");
+const { Sequelize } = require("sequelize");
 require("dotenv").config();
 
 // Хелпер для быстрой HEAD-проверки существования картинки
@@ -79,6 +80,10 @@ module.exports = {
           dance_program: product.dance_program,
           sub_type: product.sub_type,
           stock: product.stock || 0,
+          colors:
+            Array.isArray(product.colors) && product.colors.length > 0
+              ? product.colors
+              : Sequelize.literal("ARRAY[]::VARCHAR[]"),
           imageUrl: foundUrls,
           createdAt: new Date(),
           updatedAt: new Date(),

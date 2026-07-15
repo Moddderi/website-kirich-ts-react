@@ -1,16 +1,17 @@
 /* eslint-disable react-hooks/incompatible-library */
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import axios from "axios";
 import { useAppDispatch, useAppSelector } from "../../store/store";
 import { clearCart } from "../../store/cartSlice";
+import { clearTailoring } from "../../store/tailoringSlice";
 import { IoIosArrowForward } from "react-icons/io";
 import { FaTelegramPlane, FaInstagram, FaWhatsapp } from "react-icons/fa";
 import { createOrder } from "../../api/orderApi";
-import { useFormattedPrice } from "../../hooks/useFormattedPrice";
+import { useCartMoney } from "../../hooks/useFormattedPrice";
 
 import { checkoutSchema } from "@project/shared";
 import type { CheckoutFormValues, OrderPayload } from "@project/shared";
@@ -21,9 +22,10 @@ import {
 
 export const CheckoutPage = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const dispatch = useAppDispatch();
   const { t } = useTranslation();
-  const formatPrice = useFormattedPrice();
+  const { formatTotal } = useCartMoney();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const cartItems = useAppSelector((state) => state.cart.items);
@@ -32,7 +34,11 @@ export const CheckoutPage = () => {
     (state) => state.tailoring,
   );
 
-  const orderType: "ready-made" | "custom" = tailoringType
+  // Cart checkout is /checkout; custom flow is /individual-tailoring/checkout.
+  // Do not infer from leftover Redux tailoring state — that caused cart → custom bug.
+  const orderType: "ready-made" | "custom" = location.pathname.includes(
+    "/individual-tailoring",
+  )
     ? "custom"
     : "ready-made";
 
@@ -143,6 +149,8 @@ export const CheckoutPage = () => {
       if (result.success) {
         if (orderType === "ready-made") {
           dispatch(clearCart());
+        } else {
+          dispatch(clearTailoring());
         }
 
         const orderUuid = result.data?.id || result.orderId;
@@ -529,7 +537,7 @@ export const CheckoutPage = () => {
                   <div className="flex justify-between text-sm font-medium text-stone-500">
                     <span>{t("checkout.products", { count: totalQuantity })}</span>
                     <span className="text-stone-900">
-                      {formatPrice(totalPrice)}
+                      {formatTotal(cartItems)}
                     </span>
                   </div>
                   <div className="flex justify-between text-sm font-medium text-stone-500">
@@ -598,7 +606,7 @@ export const CheckoutPage = () => {
                 </span>
                 <span className="text-2xl font-semibold text-stone-900 leading-none">
                   {orderType === "ready-made"
-                    ? formatPrice(totalPrice)
+                    ? formatTotal(cartItems)
                     : t("checkout.calculated")}
                 </span>
               </div>

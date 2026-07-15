@@ -3,8 +3,9 @@ dotenv.config();
 
 import {
   MEASUREMENT_LABELS_UK,
-  MEASUREMENT_CONFIG,
   MEASUREMENT_UNIT_LABELS,
+  convertCartTotalFromUah,
+  formatConvertedPrice,
   formatPrice,
   isCurrency,
   type Currency,
@@ -58,20 +59,45 @@ const parseMeasurementsPayload = (measurementsData: unknown): { unit: Measuremen
   return { unit: "cm", values };
 };
 
-const getTailoringTypeLabel = (customItem: { name?: string } | undefined): string => {
+const TAILORING_TYPE_META: Record<
+  MeasurementType,
+  { label: string; category: string }
+> = {
+  body: { label: "Боді", category: "Комбідрези" },
+  jacket: { label: "Піджак / жилет", category: "Плечові вироби (верх)" },
+  pants: { label: "Штани", category: "Низ" },
+  suit: { label: "Костюм", category: "Повноцінний комплект" },
+};
+
+const resolveTailoringType = (
+  customItem: { name?: string } | undefined,
+): { key: MeasurementType; label: string; category: string } | null => {
   const name = customItem?.name ?? "";
   const typeMatch = name.match(/:\s*([^:]+)$/);
-  const typeKey = typeMatch?.[1]?.trim();
+  const typeKey = typeMatch?.[1]?.trim().toLowerCase();
 
-  if (typeKey && typeKey in MEASUREMENT_CONFIG) {
-    return MEASUREMENT_CONFIG[typeKey as MeasurementType].label;
+  if (typeKey && typeKey in TAILORING_TYPE_META) {
+    const key = typeKey as MeasurementType;
+    return { key, ...TAILORING_TYPE_META[key] };
   }
 
-  if (typeKey) {
-    return typeKey;
+  const keys = Object.keys(TAILORING_TYPE_META) as MeasurementType[];
+  for (const key of keys) {
+    if (new RegExp(`(?:^|[^a-z])${key}(?:[^a-z]|$)`, "i").test(name)) {
+      return { key, ...TAILORING_TYPE_META[key] };
+    }
   }
 
-  return "Не вказано";
+  return null;
+};
+
+const getTailoringTypeLabel = (
+  customItem: { name?: string } | undefined,
+): string => {
+  const resolved = resolveTailoringType(customItem);
+  if (!resolved) return "Не вказано";
+  if (resolved.label === resolved.category) return resolved.label;
+  return `${resolved.label} — ${resolved.category}`;
 };
 
 const getDisplayCurrency = (order: { displayCurrency?: unknown }): Currency =>
@@ -82,6 +108,11 @@ const formatOrderPrice = (
   currency: Currency,
 ): string => formatPrice(Number(amountUah), currency);
 
+const formatOrderTotal = (
+  items: Array<{ price: number | string; quantity: number | string }>,
+  currency: Currency,
+): string =>
+  formatConvertedPrice(convertCartTotalFromUah(items, currency), currency);
 /**
  * Функція для відправки сповіщення в Telegram-чат менеджерів
  */
@@ -102,11 +133,15 @@ export const sendTelegramNotification = async (order: any) => {
   let itemsList = "";
   if (isCustomOrder) {
     const customItem = order.items?.[0];
+    const resolvedType = resolveTailoringType(customItem);
     const tailoringTypeLabel = getTailoringTypeLabel(customItem);
 
     itemsList =
-      `• 🧵 *Індивідуальний пошив*\n` +
-      `  *Тип виробу:* ${tailoringTypeLabel}\n`;
+      `🧵 *Індивідуальний пошиття*\n` +
+      (resolvedType
+        ? `  *Тип виробу:* ${resolvedType.label}\n` +
+          `  *Категорія:* ${resolvedType.category}\n`
+        : `  *Тип виробу:* ${tailoringTypeLabel}\n`);
 
     const measurementsData = customItem?.measurements;
 
@@ -177,8 +212,13 @@ export const sendTelegramNotification = async (order: any) => {
     ? order.id.split("-")[0].toUpperCase()
     : "CUSTOM";
 
+  const readyMadeTotal =
+    order.items && order.items.length > 0
+      ? formatOrderTotal(order.items, displayCurrency)
+      : formatOrderPrice(order.totalAmount, displayCurrency);
+
   const message = `
-🔥 *${isCustomOrder ? "НОВИЙ ЗАПИТ НА ПОШИВ" : "НОВЕ ЗАМОВЛЕННЯ"} № ${orderIdPrefix}* 🔥
+🔥 *${isCustomOrder ? "НОВИЙ ЗАПИТ НА ПОШИТТЯ" : "НОВЕ ЗАМОВЛЕННЯ"} № ${orderIdPrefix}* 🔥
 ---
 👤 *Клієнт:* ${order.firstName} ${order.lastName}
 📞 *Телефон:* ${order.phone}
@@ -201,9 +241,7 @@ ${itemsList}
 
 ---
 💰 *Всього до сплати:* *${
-    isCustomOrder
-      ? "Розраховується менеджером"
-      : formatOrderPrice(order.totalAmount, displayCurrency)
+    isCustomOrder ? "Розраховується менеджером" : readyMadeTotal
   }*
 `;
 

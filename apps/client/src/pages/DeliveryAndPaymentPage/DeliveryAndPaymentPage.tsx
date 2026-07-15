@@ -136,7 +136,7 @@ export const DeliveryAndPaymentPage: React.FC = () => {
                   {t("deliveryAndPayment.deliveryNote2")}
                 </span>
               </li>
-              <li className="flex gap-2 text-red-600/90 font-medium">
+              <li className="flex gap-2">
                 <span>•</span>
                 <span>
                   {t("deliveryAndPayment.deliveryWarning")}
@@ -172,6 +172,9 @@ export const DeliveryAndPaymentPage: React.FC = () => {
                 <h3 className="text-base font-semibold text-stone-900">
                   {t("deliveryAndPayment.cardTransfer")}
                 </h3>
+                <p className="text-xs text-stone-400 font-medium mt-1 uppercase tracking-widest">
+                  {t("deliveryAndPayment.forUkraine")}
+                </p>
 
                 <p className="text-sm text-stone-600 mt-6 leading-relaxed">
                   {t("deliveryAndPayment.cardTransferDesc")}
