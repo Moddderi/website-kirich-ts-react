@@ -65,7 +65,7 @@ export function Footer() {
 
             <div className="mt-12 pt-8 border-t border-stone-800/60 max-w-sm">
               <a
-                href="https://my-portfolio-app-two-hazel.vercel.app/"
+                href="https://olehkyrych.xyz"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="group/author flex flex-col gap-3 p-4 bg-stone-900/50 border border-stone-800 rounded-3xl hover:bg-stone-800/60 hover:border-stone-700 transition-all duration-300"
