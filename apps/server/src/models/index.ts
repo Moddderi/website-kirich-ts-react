@@ -23,6 +23,12 @@ interface DbInterface {
 
 const db: DbInterface = {} as DbInterface;
 
+// Невеликий магазин: кілька з'єднань достатньо. Менше сокетів/буферів = менше RAM на Railway.
+const LOW_MEMORY_DB_OPTIONS = {
+  logging: false,
+  pool: { max: 3, min: 0, idle: 10_000, acquire: 30_000, evict: 10_000 },
+};
+
 let sequelize: Sequelize;
 if (config.use_env_variable) {
   const envVar = process.env[config.use_env_variable];
@@ -30,13 +36,13 @@ if (config.use_env_variable) {
     throw new Error(
       `Environment variable ${config.use_env_variable} not found`,
     );
-  sequelize = new Sequelize(envVar, config);
+  sequelize = new Sequelize(envVar, { ...config, ...LOW_MEMORY_DB_OPTIONS });
 } else {
   sequelize = new Sequelize(
     config.database,
     config.username,
     config.password,
-    config,
+    { ...config, ...LOW_MEMORY_DB_OPTIONS },
   );
 }
 
