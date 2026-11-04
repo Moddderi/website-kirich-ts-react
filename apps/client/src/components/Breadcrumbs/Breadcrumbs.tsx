@@ -1,14 +1,18 @@
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { IoIosArrowForward } from "react-icons/io";
 import { GoHome } from "react-icons/go";
-import { getProductById } from "../../api/productApi";
+import {
+  findProductInListCache,
+  productQueryOptions,
+} from "../../api/productQueries";
 import { useProductName } from "../../utils/useLocalizedProduct";
 
 export const Breadcrumbs: React.FC = () => {
   const location = useLocation();
+  const queryClient = useQueryClient();
   const { t } = useTranslation();
   const getProductName = useProductName();
 
@@ -48,11 +52,11 @@ export const Breadcrumbs: React.FC = () => {
   const lastSegment = pathnames[pathnames.length - 1] || "";
   const isDynamicProductParam = !!lastSegment && !routeLabels[lastSegment];
 
+  // Same query key as ProductPage → one network request instead of two.
   const { data: product, isLoading } = useQuery({
-    queryKey: ["productName", lastSegment],
-    queryFn: () => getProductById(lastSegment),
+    ...productQueryOptions(lastSegment),
     enabled: isDynamicProductParam && !pathnames.includes("order-success"),
-    staleTime: 1000 * 60 * 10,
+    placeholderData: () => findProductInListCache(queryClient, lastSegment),
   });
 
   if (pathnames.length === 0) return null;

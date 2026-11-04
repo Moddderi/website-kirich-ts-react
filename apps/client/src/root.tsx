@@ -6,20 +6,25 @@ import "./i18n/i18n";
 
 import { App } from "./App";
 import { MainPage } from "./pages/MainPage/MainPage";
-import { CatalogPage } from "./pages/CatalogPage/CatalogPage";
-import { IndividualTailoringPage } from "./pages/IndividualTailoringPage/IndividualTailoringPage";
 import { ScrollToTop } from "./components/shared/ScrollToTop";
-import { ProductPage } from "./pages/ProductPage/ProductPage";
-import { CartPage } from "./pages/CartPage/CartPage";
 import { store } from "./store/store";
-import { CheckoutPage } from "./pages/CheckoutPage/CheckoutPage";
-import { OrderSuccessPage } from "./pages/OrderSuccessPage/OrderSuccessPage";
-import { SelectTypePage } from "./pages/SelectTypePage/SelectTypePage";
 import { TailoringLayout } from "./components/TailoringLayout/TailoringLayout";
-import { MeasurementsPage } from "./pages/MeasurementsPage/MeasurementsPage";
-import { FavoritesPage } from "./pages/FavoritesPage/FavoritesPage";
-import { DeliveryAndPaymentPage } from "./pages/DeliveryAndPaymentPage/DeliveryAndPaymentPage";
-import { PrivacyPolicyPage } from "./pages/PrivacyPolicyPage/PrivacyPolicyPage";
+import {
+  CatalogPage,
+  ProductPage,
+  CartPage,
+  CheckoutPage,
+  OrderSuccessPage,
+  FavoritesPage,
+  IndividualTailoringPage,
+  SelectTypePage,
+  MeasurementsPage,
+  DeliveryAndPaymentPage,
+  PrivacyPolicyPage,
+  preloadLikelyPages,
+} from "./routes/lazyPages";
+
+preloadLikelyPages();
 
 const queryClient = new QueryClient({
   defaultOptions: {
