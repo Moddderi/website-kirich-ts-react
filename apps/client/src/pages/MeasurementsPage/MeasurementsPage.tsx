@@ -1,7 +1,7 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { Link, Navigate, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import type { RootState } from "../../store/store";
 import { setMeasurement, setMeasurementUnit } from "../../store/tailoringSlice";
@@ -9,10 +9,9 @@ import { ProductImage } from "../../components/shared/ProductImage/ProductImage"
 import { optimizeCloudinaryUrl } from "../../utils/cloudinary";
 import {
   FINAL_MEASUREMENT_FIELD,
-  MEASUREMENT_CONFIG,
   MEASUREMENTS_CATALOG,
-  getMeasurementSchema,
-  type MeasurementType,
+  getMeasurementFieldsForTypes,
+  getMeasurementSchemaForTypes,
   type MeasurementUnit,
 } from "@project/shared";
 
@@ -22,11 +21,13 @@ export const MeasurementsPage = () => {
   const { t } = useTranslation();
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { type, measurements, measurementUnit } = useSelector(
+  const { types, measurements, measurementUnit } = useSelector(
     (state: RootState) => state.tailoring,
   );
 
-  const config = type ? MEASUREMENT_CONFIG[type as MeasurementType] : null;
+  const hasTypes = types.length > 0;
+  const fields = getMeasurementFieldsForTypes(types);
+  const typesTitle = types.map((type) => t(`measurementConfig.${type}`)).join(" + ");
   const unitLabel = t(`measurementUnits.${measurementUnit}`);
   const heightLimits =
     measurementUnit === "cm"
@@ -38,8 +39,8 @@ export const MeasurementsPage = () => {
     handleSubmit,
     formState: { errors },
   } = useForm({
-    resolver: type
-      ? zodResolver(getMeasurementSchema(type as MeasurementType, measurementUnit))
+    resolver: hasTypes
+      ? zodResolver(getMeasurementSchemaForTypes(types, measurementUnit))
       : undefined,
     defaultValues: {
       [FINAL_MEASUREMENT_FIELD]: measurements[FINAL_MEASUREMENT_FIELD] ?? "",
@@ -47,9 +48,8 @@ export const MeasurementsPage = () => {
     },
   });
 
-  if (!type || !config) {
-    navigate("/individual-tailoring");
-    return null;
+  if (!hasTypes) {
+    return <Navigate to="/individual-tailoring/step-1" replace />;
   }
 
   const handleUnitChange = (unit: MeasurementUnit) => {
@@ -63,7 +63,7 @@ export const MeasurementsPage = () => {
       dispatch(setMeasurement({ field, value: String(value) }));
     });
 
-    navigate("/individual-tailoring/checkout");
+    navigate("/individual-tailoring/step-4");
   };
 
   return (
@@ -74,15 +74,20 @@ export const MeasurementsPage = () => {
             {t("measurements.stepLabel")}
           </span>
           <h1 className="text-4xl sm:text-5xl font-semibold tracking-tighter text-stone-900 mb-6">
-            {t("measurements.title", { type: t(`measurementConfig.${type}`) })}
+            {t("measurements.title", { type: typesTitle })}
           </h1>
           <p className="text-base font-medium text-stone-500 leading-relaxed">
             {t("measurements.description")}
           </p>
+          {types.length > 1 && (
+            <p className="mt-3 text-xs font-medium text-stone-400">
+              {t("measurements.forItems")}
+            </p>
+          )}
         </div>
 
         <form
-          key={`${type}-${measurementUnit}`}
+          key={`${types.join("-")}-${measurementUnit}`}
           onSubmit={handleSubmit(onSubmit)}
           className="max-w-6xl mx-auto space-y-12"
         >
@@ -115,7 +120,7 @@ export const MeasurementsPage = () => {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {config.fields.map((field, index) => {
+            {fields.map((field, index) => {
               const measurementInfo =
                 MEASUREMENTS_CATALOG[
                   field as keyof typeof MEASUREMENTS_CATALOG
@@ -188,7 +193,7 @@ export const MeasurementsPage = () => {
 
           <div
             className="product-card-enter max-w-xl mx-auto bg-white rounded-4xl p-8 md:p-10 border border-stone-200/60 shadow-sm"
-            style={{ animationDelay: `${(config.fields.length + 1) * 60}ms` }}
+            style={{ animationDelay: `${(fields.length + 1) * 60}ms` }}
           >
             <h2 className="text-xl font-semibold tracking-tighter text-stone-900 mb-6 text-center">
               {t("measurements.finalData")}
@@ -221,8 +226,14 @@ export const MeasurementsPage = () => {
                 type="submit"
                 className="w-full mt-2 flex items-center justify-center gap-2 rounded-2xl bg-stone-900 py-4 px-8 text-sm font-semibold text-white hover:bg-stone-800 transition-all active:scale-[0.98] shadow-lg shadow-stone-900/20 group"
               >
-                {t("measurements.proceedToCheckout")}
+                {t("measurements.proceedToPrepayment")}
               </button>
+              <Link
+                to="/individual-tailoring/step-2"
+                className="block text-center text-xs font-semibold text-stone-500 underline underline-offset-4 hover:text-stone-900"
+              >
+                {t("measurements.back")}
+              </Link>
             </div>
           </div>
         </form>

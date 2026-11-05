@@ -20,6 +20,10 @@ export const loadIndividualTailoringPage = () =>
   import("../pages/IndividualTailoringPage/IndividualTailoringPage");
 export const loadSelectTypePage = () =>
   import("../pages/SelectTypePage/SelectTypePage");
+export const loadAvailabilityPage = () =>
+  import("../pages/AvailabilityPage/AvailabilityPage");
+export const loadPrepaymentPage = () =>
+  import("../pages/PrepaymentPage/PrepaymentPage");
 export const loadMeasurementsPage = () =>
   import("../pages/MeasurementsPage/MeasurementsPage");
 export const loadDeliveryAndPaymentPage = () =>
@@ -52,6 +56,12 @@ export const IndividualTailoringPage = lazy(() =>
 );
 export const SelectTypePage = lazy(() =>
   loadSelectTypePage().then((m) => ({ default: m.SelectTypePage })),
+);
+export const AvailabilityPage = lazy(() =>
+  loadAvailabilityPage().then((m) => ({ default: m.AvailabilityPage })),
+);
+export const PrepaymentPage = lazy(() =>
+  loadPrepaymentPage().then((m) => ({ default: m.PrepaymentPage })),
 );
 export const MeasurementsPage = lazy(() =>
   loadMeasurementsPage().then((m) => ({ default: m.MeasurementsPage })),

@@ -22,6 +22,10 @@ export const checkoutFieldsSchema = z.object({
   socialUsername: z
     .string()
     .min(1, "Будь ласка, вкажіть ваш нікнейм або телефон для зв'язку"),
+  comment: z
+    .string()
+    .max(1000, "Коментар має містити не більше 1000 символів")
+    .optional(),
 });
 
 const isPostalDelivery = (method: string) =>
@@ -68,6 +72,10 @@ export const customOrderSchema = checkoutFieldsSchema.extend({
   status: z.string(),
   displayCurrency: currencySchema.optional().default("UAH"),
   measurements: customMeasurementsSchema,
+  /** Garments the client selected; the server recomputes price range / dates from them */
+  tailoringTypes: z
+    .array(z.enum(["body", "jacket", "pants", "suit"]))
+    .min(1, "Оберіть хоча б один виріб"),
   items: z.array(orderItemSchema),
 });
 

@@ -223,6 +223,44 @@ export const MEASUREMENT_CONFIG = {
   },
 } as const;
 
+/**
+ * Measurement fields needed for several garments at once.
+ * Shared fields (waist, hips…) appear only once; order of first appearance is kept.
+ */
+export const getMeasurementFieldsForTypes = (
+  types: readonly (keyof typeof MEASUREMENT_CONFIG)[],
+): string[] => {
+  const seen = new Set<string>();
+  const result: string[] = [];
+
+  for (const type of types) {
+    for (const field of MEASUREMENT_CONFIG[type].fields) {
+      if (!seen.has(field)) {
+        seen.add(field);
+        result.push(field);
+      }
+    }
+  }
+
+  return result;
+};
+
+export const getMeasurementSchemaForTypes = (
+  types: readonly (keyof typeof MEASUREMENT_CONFIG)[],
+  unit: MeasurementUnit = "cm",
+) => {
+  const schema: Record<string, z.ZodTypeAny> = {};
+
+  getMeasurementFieldsForTypes(types).forEach((fieldKey) => {
+    if (fieldKey === "waist_definition") return;
+    schema[fieldKey] = createRequiredMeasurementField(unit);
+  });
+
+  schema[FINAL_MEASUREMENT_FIELD] = createHeightField(unit);
+
+  return z.object(schema);
+};
+
 export const getMeasurementSchema = (
   type: keyof typeof MEASUREMENT_CONFIG,
   unit: MeasurementUnit = "cm",

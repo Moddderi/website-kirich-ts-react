@@ -9,9 +9,9 @@ import {
   formatPrice,
   isCurrency,
   type Currency,
-  type MeasurementType,
   type MeasurementUnit,
 } from "@project/shared";
+import { buildCustomOrderSummary } from "./tailoringSummary.js";
 
 type MeasurementsPayload =
   | Record<string, string>
@@ -59,46 +59,8 @@ const parseMeasurementsPayload = (measurementsData: unknown): { unit: Measuremen
   return { unit: "cm", values };
 };
 
-const TAILORING_TYPE_META: Record<
-  MeasurementType,
-  { label: string; category: string }
-> = {
-  body: { label: "Боді", category: "Комбідрези" },
-  jacket: { label: "Піджак / жилет", category: "Плечові вироби (верх)" },
-  pants: { label: "Штани", category: "Низ" },
-  suit: { label: "Костюм", category: "Повноцінний комплект" },
-};
-
-const resolveTailoringType = (
-  customItem: { name?: string } | undefined,
-): { key: MeasurementType; label: string; category: string } | null => {
-  const name = customItem?.name ?? "";
-  const typeMatch = name.match(/:\s*([^:]+)$/);
-  const typeKey = typeMatch?.[1]?.trim().toLowerCase();
-
-  if (typeKey && typeKey in TAILORING_TYPE_META) {
-    const key = typeKey as MeasurementType;
-    return { key, ...TAILORING_TYPE_META[key] };
-  }
-
-  const keys = Object.keys(TAILORING_TYPE_META) as MeasurementType[];
-  for (const key of keys) {
-    if (new RegExp(`(?:^|[^a-z])${key}(?:[^a-z]|$)`, "i").test(name)) {
-      return { key, ...TAILORING_TYPE_META[key] };
-    }
-  }
-
-  return null;
-};
-
-const getTailoringTypeLabel = (
-  customItem: { name?: string } | undefined,
-): string => {
-  const resolved = resolveTailoringType(customItem);
-  if (!resolved) return "Не вказано";
-  if (resolved.label === resolved.category) return resolved.label;
-  return `${resolved.label} — ${resolved.category}`;
-};
+/** Escapes legacy Telegram Markdown special characters in user-provided text. */
+const escapeMd = (value: string) => value.replace(/([_*`\[\]])/g, "\\$1");
 
 const getDisplayCurrency = (order: { displayCurrency?: unknown }): Currency =>
   isCurrency(order.displayCurrency) ? order.displayCurrency : "UAH";
@@ -133,15 +95,26 @@ export const sendTelegramNotification = async (order: any) => {
   let itemsList = "";
   if (isCustomOrder) {
     const customItem = order.items?.[0];
-    const resolvedType = resolveTailoringType(customItem);
-    const tailoringTypeLabel = getTailoringTypeLabel(customItem);
+    const summary = buildCustomOrderSummary(order);
 
     itemsList =
-      `🧵 *Індивідуальний пошиття*\n` +
-      (resolvedType
-        ? `  *Тип виробу:* ${resolvedType.label}\n` +
-          `  *Категорія:* ${resolvedType.category}\n`
-        : `  *Тип виробу:* ${tailoringTypeLabel}\n`);
+      `🧵 *Індивідуальний пошив*\n` +
+      summary.lines
+        .map(
+          (line) =>
+            `• *${line.label}* (${line.category})\n  _${line.priceRange} · ${line.leadDays}_`,
+        )
+        .join("\n") +
+      `\n\n📅 *Старт у студії:* ${summary.startDate}\n` +
+      `⏳ *Орієнтовна готовність:* ${summary.readyRange}\n` +
+      `💰 *Орієнтовна вартість:* ${summary.priceRange}\n` +
+      `💳 *Передоплата ${summary.prepaymentPercent}%:* ${summary.prepaymentRange}\n`;
+
+    if (summary.comment) {
+      itemsList += `\n💬 *Коментар клієнта:*\n${escapeMd(summary.comment)}\n`;
+    }
+
+    itemsList += `\n`;
 
     const measurementsData = customItem?.measurements;
 
@@ -240,9 +213,11 @@ export const sendTelegramNotification = async (order: any) => {
 ${itemsList}
 
 ---
-💰 *Всього до сплати:* *${
-    isCustomOrder ? "Розраховується менеджером" : readyMadeTotal
-  }*
+${
+    isCustomOrder
+      ? "💰 *Точну вартість і передоплату узгодити з клієнтом*"
+      : `💰 *Всього до сплати:* *${readyMadeTotal}*`
+  }
 `;
 
   try {

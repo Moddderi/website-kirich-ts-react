@@ -48,6 +48,16 @@ export const IndividualTailoringPage = () => {
                 title: t("individualTailoring.step3Title"),
                 desc: t("individualTailoring.step3Desc"),
               },
+              {
+                id: 4,
+                title: t("individualTailoring.step4Title"),
+                desc: t("individualTailoring.step4Desc"),
+              },
+              {
+                id: 5,
+                title: t("individualTailoring.step5Title"),
+                desc: t("individualTailoring.step5Desc"),
+              },
             ].map((step, idx) => (
               <div
                 key={step.id}
@@ -58,7 +68,7 @@ export const IndividualTailoringPage = () => {
                   <span className="flex h-8 w-8 items-center justify-center rounded-full border border-white/20 bg-white/5 text-xs font-semibold text-stone-300">
                     {step.id}
                   </span>
-                  {step.id !== 3 && (
+                  {step.id !== 5 && (
                     <div className="h-12 w-px bg-white/10 mt-2"></div>
                   )}
                 </div>

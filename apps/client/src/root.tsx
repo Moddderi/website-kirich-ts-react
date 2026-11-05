@@ -19,6 +19,8 @@ import {
   IndividualTailoringPage,
   SelectTypePage,
   MeasurementsPage,
+  AvailabilityPage,
+  PrepaymentPage,
   DeliveryAndPaymentPage,
   PrivacyPolicyPage,
   preloadLikelyPages,
@@ -55,7 +57,9 @@ export const Root = () => {
 
                 {/* Отдельные страницы шагов */}
                 <Route path="step-1" element={<SelectTypePage />} />
-                <Route path="step-2" element={<MeasurementsPage />} />
+                <Route path="step-2" element={<AvailabilityPage />} />
+                <Route path="step-3" element={<MeasurementsPage />} />
+                <Route path="step-4" element={<PrepaymentPage />} />
                 <Route path="checkout" element={<CheckoutPage />} />
                 <Route path="order-success" element={<OrderSuccessPage />} />
               </Route>

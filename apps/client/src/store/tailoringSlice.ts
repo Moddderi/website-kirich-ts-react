@@ -1,24 +1,32 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
-import type { MeasurementType, MeasurementUnit } from "@project/shared";
+import {
+  toggleTailoringType,
+  type MeasurementType,
+  type MeasurementUnit,
+} from "@project/shared";
 
 interface TailoringState {
-  type: MeasurementType | null;
+  /** Garments the client wants to order (suit excludes jacket/pants) */
+  types: MeasurementType[];
   measurementUnit: MeasurementUnit;
   measurements: Record<string, string>;
+  comment: string;
 }
 
 const initialState: TailoringState = {
-  type: null,
+  types: [],
   measurementUnit: "cm",
   measurements: {},
+  comment: "",
 };
 
 const tailoringSlice = createSlice({
   name: "tailoring",
   initialState,
   reducers: {
-    setType: (state, action: PayloadAction<MeasurementType>) => {
-      state.type = action.payload;
+    toggleType: (state, action: PayloadAction<MeasurementType>) => {
+      state.types = toggleTailoringType(state.types, action.payload);
+      // The set of required measurements changed → old values may not fit.
       state.measurements = {};
       state.measurementUnit = "cm";
     },
@@ -32,10 +40,18 @@ const tailoringSlice = createSlice({
     ) => {
       state.measurements[action.payload.field] = action.payload.value;
     },
+    setComment: (state, action: PayloadAction<string>) => {
+      state.comment = action.payload;
+    },
     clearTailoring: () => initialState,
   },
 });
 
-export const { setType, setMeasurementUnit, setMeasurement, clearTailoring } =
-  tailoringSlice.actions;
+export const {
+  toggleType,
+  setMeasurementUnit,
+  setMeasurement,
+  setComment,
+  clearTailoring,
+} = tailoringSlice.actions;
 export default tailoringSlice.reducer;

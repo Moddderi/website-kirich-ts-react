@@ -29,6 +29,7 @@ export const Breadcrumbs: React.FC = () => {
     "step-1": t("breadcrumbs.step1"),
     "step-2": t("breadcrumbs.step2"),
     "step-3": t("breadcrumbs.step3"),
+    "step-4": t("breadcrumbs.step4"),
     "delivery-and-payment": t("breadcrumbs.deliveryAndPayment"),
     "privacy-policy": t("breadcrumbs.privacyPolicy"),
   };
@@ -38,6 +39,7 @@ export const Breadcrumbs: React.FC = () => {
     { path: "/individual-tailoring/step-1", label: t("breadcrumbs.step1") },
     { path: "/individual-tailoring/step-2", label: t("breadcrumbs.step2") },
     { path: "/individual-tailoring/step-3", label: t("breadcrumbs.step3") },
+    { path: "/individual-tailoring/step-4", label: t("breadcrumbs.step4") },
   ];
 
   // Присікаємо шлях до order-success на етапі розбиття, обрізаючи все, що йде після нього
