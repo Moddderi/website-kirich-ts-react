@@ -493,6 +493,7 @@
     "legendFree": "Available",
     "legendLimited": "Few slots",
     "legendBusy": "Booked",
+    "legendWork": "Your order (estimated timeline)",
     "prevMonth": "Previous month",
     "nextMonth": "Next month",
     "noItems": "Choose items first",
