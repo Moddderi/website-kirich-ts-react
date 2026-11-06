@@ -16,6 +16,19 @@ export default defineConfig({
     tailwindcss(),
   ],
 
+  build: {
+    rollupOptions: {
+      output: {
+        // Stable vendor chunks → better browser caching between deploys.
+        manualChunks: {
+          react: ["react", "react-dom", "react-router-dom"],
+          state: ["@reduxjs/toolkit", "react-redux", "@tanstack/react-query"],
+          i18n: ["i18next", "react-i18next"],
+        },
+      },
+    },
+  },
+
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),

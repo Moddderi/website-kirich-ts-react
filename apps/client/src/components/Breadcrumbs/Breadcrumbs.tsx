@@ -1,14 +1,18 @@
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { IoIosArrowForward } from "react-icons/io";
 import { GoHome } from "react-icons/go";
-import { getProductById } from "../../api/productApi";
+import {
+  findProductInListCache,
+  productQueryOptions,
+} from "../../api/productQueries";
 import { useProductName } from "../../utils/useLocalizedProduct";
 
 export const Breadcrumbs: React.FC = () => {
   const location = useLocation();
+  const queryClient = useQueryClient();
   const { t } = useTranslation();
   const getProductName = useProductName();
 
@@ -25,6 +29,7 @@ export const Breadcrumbs: React.FC = () => {
     "step-1": t("breadcrumbs.step1"),
     "step-2": t("breadcrumbs.step2"),
     "step-3": t("breadcrumbs.step3"),
+    "step-4": t("breadcrumbs.step4"),
     "delivery-and-payment": t("breadcrumbs.deliveryAndPayment"),
     "privacy-policy": t("breadcrumbs.privacyPolicy"),
   };
@@ -34,6 +39,7 @@ export const Breadcrumbs: React.FC = () => {
     { path: "/individual-tailoring/step-1", label: t("breadcrumbs.step1") },
     { path: "/individual-tailoring/step-2", label: t("breadcrumbs.step2") },
     { path: "/individual-tailoring/step-3", label: t("breadcrumbs.step3") },
+    { path: "/individual-tailoring/step-4", label: t("breadcrumbs.step4") },
   ];
 
   // Присікаємо шлях до order-success на етапі розбиття, обрізаючи все, що йде після нього
@@ -48,11 +54,11 @@ export const Breadcrumbs: React.FC = () => {
   const lastSegment = pathnames[pathnames.length - 1] || "";
   const isDynamicProductParam = !!lastSegment && !routeLabels[lastSegment];
 
+  // Same query key as ProductPage → one network request instead of two.
   const { data: product, isLoading } = useQuery({
-    queryKey: ["productName", lastSegment],
-    queryFn: () => getProductById(lastSegment),
+    ...productQueryOptions(lastSegment),
     enabled: isDynamicProductParam && !pathnames.includes("order-success"),
-    staleTime: 1000 * 60 * 10,
+    placeholderData: () => findProductInListCache(queryClient, lastSegment),
   });
 
   if (pathnames.length === 0) return null;

@@ -28,6 +28,9 @@ class Order extends Model<
 
   declare orderType: "ready-made" | "custom";
 
+  declare comment: CreationOptional<string | null>;
+  declare estimate: CreationOptional<object | null>;
+
   declare createdAt: CreationOptional<Date>;
   declare updatedAt: CreationOptional<Date>;
 
@@ -98,6 +101,14 @@ export default (sequelize: Sequelize) => {
         type: DataTypes.STRING,
         allowNull: false,
         defaultValue: "ready-made", // По умолчанию обычные товары
+      },
+      comment: {
+        type: DataTypes.TEXT,
+        allowNull: true,
+      },
+      estimate: {
+        type: DataTypes.JSONB,
+        allowNull: true,
       },
       createdAt: DataTypes.DATE,
       updatedAt: DataTypes.DATE,

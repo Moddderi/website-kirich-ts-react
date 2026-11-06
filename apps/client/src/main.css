@@ -1,5 +1,108 @@
 @import "tailwindcss";
 
+/* === DESIGN TOKENS === */
+@theme {
+  /* Warm beige scale — pairs with the existing stone neutrals */
+  --color-beige-50: #faf7f2;
+  --color-beige-100: #f4eee4;
+  --color-beige-200: #eae0cf;
+  --color-beige-300: #e0d5c1;
+  --color-beige-400: #cdbd9f;
+  --color-beige-500: #b6a37c;
+
+  --font-sans: "Manrope", ui-sans-serif, system-ui, -apple-system, "Segoe UI",
+    Roboto, sans-serif;
+  --font-display: "Cormorant Garamond", "Playfair Display", Georgia, serif;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--color-beige-50);
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background: #1c1917;
+  color: var(--color-beige-50);
+}
+
+:focus-visible {
+  outline: 2px solid #1c1917;
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+
+/* === SCROLL REVEAL (IntersectionObserver, see <Reveal />) === */
+.reveal {
+  opacity: 0;
+  transform: translate3d(0, 28px, 0);
+  transition:
+    opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+  transition-delay: var(--reveal-delay, 0ms);
+  will-change: opacity, transform;
+}
+.reveal.is-visible {
+  opacity: 1;
+  transform: none;
+  will-change: auto;
+}
+
+/* === MARQUEE (transform-only → cheap for the GPU) === */
+@keyframes marquee {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+.marquee-track {
+  animation: marquee 38s linear infinite;
+  width: max-content;
+}
+.marquee:hover .marquee-track {
+  animation-play-state: paused;
+}
+
+/* === HERO PHOTO FLOAT (transform-only, no blur) === */
+@keyframes float-soft {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) rotate(var(--r, 0deg));
+  }
+  50% {
+    transform: translate3d(0, -10px, 0) rotate(var(--r, 0deg));
+  }
+}
+.float-soft {
+  animation: float-soft 9s ease-in-out infinite;
+}
+
+/* === RESPECT "REDUCE MOTION" (also saves battery / avoids jank) === */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  .reveal {
+    opacity: 1;
+    transform: none;
+  }
+}
+
 /* === CUSTOM RADIO BUTTON === */
 input[type="radio"]:checked + div .radio-dot {
   opacity: 1;

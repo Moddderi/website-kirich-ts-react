@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/incompatible-library */
 import { useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { Navigate, useLocation, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -12,8 +12,12 @@ import { IoIosArrowForward } from "react-icons/io";
 import { FaTelegramPlane, FaInstagram, FaWhatsapp } from "react-icons/fa";
 import { createOrder } from "../../api/orderApi";
 import { useCartMoney } from "../../hooks/useFormattedPrice";
+import {
+  useFormatDate,
+  useTailoringEstimate,
+} from "../../hooks/useTailoringEstimate";
 
-import { checkoutSchema } from "@project/shared";
+import { PREPAYMENT_RATE, checkoutSchema } from "@project/shared";
 import type { CheckoutFormValues, OrderPayload } from "@project/shared";
 import {
   NovaPoshtaIcon,
@@ -27,12 +31,19 @@ export const CheckoutPage = () => {
   const { t } = useTranslation();
   const { formatTotal } = useCartMoney();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  // After a successful order we clear Redux; don't bounce the user back to step 1.
+  const [orderPlaced, setOrderPlaced] = useState(false);
 
   const cartItems = useAppSelector((state) => state.cart.items);
   const displayCurrency = useAppSelector((state) => state.currency.code);
-  const { type: tailoringType, measurements, measurementUnit } = useAppSelector(
-    (state) => state.tailoring,
-  );
+  const {
+    types: tailoringTypes,
+    programs: tailoringPrograms,
+    measurements,
+    measurementUnit,
+  } = useAppSelector((state) => state.tailoring);
+  const formatDate = useFormatDate();
+  const { estimate, formatRange } = useTailoringEstimate();
 
   // Cart checkout is /checkout; custom flow is /individual-tailoring/checkout.
   // Do not infer from leftover Redux tailoring state — that caused cart → custom bug.
@@ -66,6 +77,7 @@ export const CheckoutPage = () => {
       warehouse: "",
       communicationMethod: "telegram",
       socialUsername: "",
+      comment: "",
     },
   });
 
@@ -85,9 +97,9 @@ export const CheckoutPage = () => {
       return;
     }
 
-    if (orderType === "custom" && !tailoringType) {
+    if (orderType === "custom" && tailoringTypes.length === 0) {
       alert(t("checkout.noTailoringType"));
-      navigate("/individual-tailoring");
+      navigate("/individual-tailoring/step-1");
       return;
     }
 
@@ -104,16 +116,15 @@ export const CheckoutPage = () => {
             color: item.options?.color || null,
             size: item.options?.size || null,
           }))
-        : [
-            {
-              productId: null,
-              name: `Індивідуальний пошив: ${tailoringType}`,
-              quantity: 1,
-              price: 0,
-              color: null,
-              size: null,
-            },
-          ];
+        : // Prices are recomputed on the server from tailoringTypes.
+          tailoringTypes.map((type) => ({
+            productId: null,
+            name: `Індивідуальний пошив: ${type}`,
+            quantity: 1,
+            price: 0,
+            color: null,
+            size: null,
+          }));
 
     // Суворо типізований об'єкт відправки адаптований під Zod/Union схему
     let orderPayload: OrderPayload;
@@ -134,6 +145,10 @@ export const CheckoutPage = () => {
         status: "pending",
         orderType: "custom",
         displayCurrency,
+        tailoringTypes,
+        tailoringPrograms: Object.fromEntries(
+          tailoringTypes.map((type) => [type, tailoringPrograms[type] ?? "ST"]),
+        ),
         // 🟢 Виносимо мірки на рівень об'єкта замовлення, як того вимагає схема з packages/shared/src/order.schema.ts
         measurements: {
           unit: measurementUnit,
@@ -150,6 +165,7 @@ export const CheckoutPage = () => {
         if (orderType === "ready-made") {
           dispatch(clearCart());
         } else {
+          setOrderPlaced(true);
           dispatch(clearTailoring());
         }
 
@@ -188,6 +204,15 @@ export const CheckoutPage = () => {
       setIsSubmitting(false);
     }
   };
+
+  if (orderType === "custom" && !orderPlaced) {
+    if (tailoringTypes.length === 0) {
+      return <Navigate to="/individual-tailoring/step-1" replace />;
+    }
+    if (Object.keys(measurements).length === 0) {
+      return <Navigate to="/individual-tailoring/step-3" replace />;
+    }
+  }
 
   return (
     <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8 sm:py-12 lg:py-24 animate-reveal-up">
@@ -519,6 +544,33 @@ export const CheckoutPage = () => {
                 </div>
               )}
             </div>
+
+            {orderType === "custom" && (
+              <div className="bg-white p-6 sm:p-8 rounded-4xl border border-stone-200/60 shadow-sm">
+                <h2 className="text-lg font-semibold tracking-tight text-stone-900 mb-1">
+                  {t("checkout.comment")}
+                </h2>
+                <p className="text-xs font-medium text-stone-400 mb-5">
+                  {t("checkout.commentOptional")}
+                </p>
+                <textarea
+                  rows={4}
+                  maxLength={1000}
+                  {...register("comment")}
+                  placeholder={t("checkout.commentPlaceholder")}
+                  className={`block w-full resize-y rounded-xl border-0 bg-white py-3.5 px-4 text-sm font-medium text-stone-900 shadow-sm ring-1 ring-inset transition-all placeholder:text-stone-400 focus:ring-2 ${
+                    errors.comment
+                      ? "ring-red-500 focus:ring-red-500"
+                      : "ring-stone-200 focus:ring-stone-900"
+                  }`}
+                />
+                {errors.comment && (
+                  <p className="mt-1.5 text-xs font-medium text-red-500">
+                    {errors.comment.message}
+                  </p>
+                )}
+              </div>
+            )}
           </div>
         </div>
 
@@ -553,14 +605,19 @@ export const CheckoutPage = () => {
 
               {orderType === "custom" && (
                 <div className="space-y-3 sm:space-y-4 pb-6 border-b border-stone-100">
-                  <div className="flex flex-col gap-1 sm:flex-row sm:justify-between sm:gap-4 text-sm font-medium text-stone-500">
-                    <span>{t("checkout.category")}:</span>
-                    <span className="text-stone-900 font-semibold sm:text-right">
-                      {t(`measurementConfig.${tailoringType}`, {
-                        defaultValue: tailoringType,
-                      })}
-                    </span>
-                  </div>
+                  {estimate.items.map((item) => (
+                    <div
+                      key={item.type}
+                      className="flex flex-col gap-1 sm:flex-row sm:justify-between sm:gap-4 text-sm font-medium text-stone-500"
+                    >
+                      <span className="text-stone-900 font-semibold">
+                        {t(`measurementConfig.${item.type}`)}
+                      </span>
+                      <span className="text-stone-900 sm:text-right">
+                        {formatRange(item.priceFrom, item.priceTo)}
+                      </span>
+                    </div>
+                  ))}
                   <div className="flex flex-col gap-1 sm:flex-row sm:justify-between sm:gap-4 text-sm font-medium text-stone-500">
                     <span>{t("checkout.measurementUnits")}:</span>
                     <span className="text-stone-900 font-semibold sm:text-right">
@@ -607,14 +664,45 @@ export const CheckoutPage = () => {
                 <span className="text-2xl font-semibold text-stone-900 leading-none">
                   {orderType === "ready-made"
                     ? formatTotal(cartItems)
-                    : t("checkout.calculated")}
+                    : formatRange(estimate.priceFrom, estimate.priceTo)}
                 </span>
               </div>
 
               {orderType === "custom" && (
-                <p className="text-xs text-stone-500 leading-relaxed mb-6">
-                  {t("checkout.customNote")}
-                </p>
+                <div className="mb-6 space-y-3">
+                  <div className="flex flex-wrap justify-between gap-2 rounded-2xl bg-stone-900 px-5 py-4 text-white">
+                    <span className="text-xs font-semibold uppercase tracking-widest text-stone-300">
+                      {t("checkout.prepaymentLine", {
+                        percent: Math.round(PREPAYMENT_RATE * 100),
+                      })}
+                    </span>
+                    <span className="text-sm font-semibold">
+                      {formatRange(
+                        estimate.prepaymentFrom,
+                        estimate.prepaymentTo,
+                      )}
+                    </span>
+                  </div>
+                  <div className="flex justify-between gap-4 text-xs font-medium text-stone-500">
+                    <span>{t("checkout.startLabel")}</span>
+                    <span className="text-stone-900 text-right">
+                      {estimate.startDate
+                        ? formatDate(estimate.startDate)
+                        : t("checkout.pending")}
+                    </span>
+                  </div>
+                  <div className="flex justify-between gap-4 text-xs font-medium text-stone-500">
+                    <span>{t("checkout.readyLabel")}</span>
+                    <span className="text-stone-900 text-right">
+                      {estimate.readyFrom && estimate.readyTo
+                        ? `${formatDate(estimate.readyFrom, false)} – ${formatDate(estimate.readyTo)}`
+                        : t("checkout.pending")}
+                    </span>
+                  </div>
+                  <p className="pt-1 text-xs text-stone-500 leading-relaxed">
+                    {t("checkout.customNote")}
+                  </p>
+                </div>
               )}
 
               <button

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import type { Product } from "@project/shared";
 import { SUBTYPE_LABELS } from "@project/shared";
 import { useAppDispatch, useAppSelector } from "../../store/store";
@@ -14,7 +14,11 @@ import { IoHeart, IoHeartOutline } from "react-icons/io5";
 import { IoIosArrowDown } from "react-icons/io";
 import { HiOutlineArrowLeft } from "react-icons/hi";
 
-import { getProductById } from "../../api/productApi";
+import {
+  findProductInListCache,
+  productQueryOptions,
+} from "../../api/productQueries";
+import { optimizeCloudinaryUrl } from "../../utils/cloudinary";
 import { useTranslation } from "react-i18next";
 import { useProductName } from "../../utils/useLocalizedProduct";
 import { useFormattedPrice } from "../../hooks/useFormattedPrice";
@@ -50,15 +54,18 @@ export const ProductPage: React.FC = () => {
   // Стейт для активной (выбранной) картинки в галерее
   const [activeImageIndex, setActiveImageIndex] = useState<number>(0);
 
+  const queryClient = useQueryClient();
+
+  // placeholderData: if the card was already loaded in the catalog, show it
+  // immediately and refresh the full record in the background.
   const {
     data: product,
     isLoading,
     error,
   } = useQuery<Product, Error>({
-    queryKey: ["productFull", id],
-    queryFn: () => getProductById(id!),
+    ...productQueryOptions(id ?? ""),
     enabled: !!id,
-    staleTime: 1000 * 60 * 10,
+    placeholderData: () => findProductInListCache(queryClient, id),
   });
 
   const productColorIds = product?.colors ?? [];
@@ -121,8 +128,20 @@ export const ProductPage: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-[50vh] text-stone-500 font-medium text-sm">
-        <span className="animate-pulse">{t("productPage.loading")}</span>
+      <div
+        className="mx-auto max-w-7xl px-6 lg:px-8 py-12 lg:py-16"
+        aria-busy="true"
+        aria-label={t("productPage.loading")}
+      >
+        <div className="lg:grid lg:grid-cols-12 lg:gap-x-12 xl:gap-x-16">
+          <div className="lg:col-span-7 aspect-3/4 w-full rounded-[2.5rem] bg-stone-200 animate-pulse" />
+          <div className="mt-10 lg:mt-0 lg:col-span-5 space-y-4">
+            <div className="h-4 w-24 rounded-full bg-stone-200 animate-pulse" />
+            <div className="h-10 w-3/4 rounded-xl bg-stone-200 animate-pulse" />
+            <div className="h-8 w-32 rounded-xl bg-stone-200 animate-pulse" />
+            <div className="h-40 w-full rounded-3xl bg-stone-200 animate-pulse" />
+          </div>
+        </div>
       </div>
     );
   }
@@ -162,9 +181,12 @@ export const ProductPage: React.FC = () => {
               <div className="w-full h-full bg-[linear-gradient(to_right,#e5e5e5_1px,transparent_1px),linear-gradient(to_bottom,#e5e5e5_1px,transparent_1px)] bg-size-[2rem_2rem] mix-blend-multiply opacity-50"></div>
               <img
                 className="w-full h-full absolute inset-0 object-cover"
-                src={displayImages[activeImageIndex]}
+                src={optimizeCloudinaryUrl(displayImages[activeImageIndex], {
+                  width: 900,
+                })}
                 alt={`${getProductName(product)} — ${t("productCard.angle", { n: activeImageIndex + 1 })}`}
-                crossOrigin="anonymous"
+                fetchPriority="high"
+                decoding="async"
               />
             </div>
           </div>
@@ -185,10 +207,11 @@ export const ProductPage: React.FC = () => {
                     }`}
                   >
                     <img
-                      src={url}
+                      src={optimizeCloudinaryUrl(url, { width: 240 })}
                       alt={`Превью ${index + 1}`}
                       className="w-full h-full object-cover"
-                      crossOrigin="anonymous"
+                      loading="lazy"
+                      decoding="async"
                     />
                   </button>
                 );

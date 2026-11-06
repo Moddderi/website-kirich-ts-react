@@ -117,9 +117,17 @@ export const CatalogPage = () => {
       <section className="mx-auto max-w-7xl px-6 lg:px-8 mt-12">
         <Breadcrumbs />
 
-        <div className="mt-8 flex justify-end">
+        <header className="mt-8 flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <h1 className="font-display text-5xl font-semibold tracking-tight text-stone-900 sm:text-6xl">
+              {t("catalog.heading")}
+            </h1>
+            <p className="mt-3 max-w-xl text-sm font-medium text-stone-500">
+              {t("catalog.subheading")}
+            </p>
+          </div>
           <CurrencySwitcher />
-        </div>
+        </header>
 
         <CatalogFilters filters={filters} setFilters={setFilters} />
 

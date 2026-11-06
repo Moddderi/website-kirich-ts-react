@@ -1,6 +1,15 @@
-import type { OrderPayload } from "@project/shared";
+import {
+  TAILORING_GARMENTS,
+  calcTailoringEstimate,
+  type OrderPayload,
+} from "@project/shared";
 import db from "../models/index.js";
-import { sendTelegramNotification } from "../utils/telegram.js";
+import { getAvailability } from "../utils/availability.js";
+import {
+  sendTelegramNotification,
+  sendTelegramText,
+} from "../utils/telegram.js";
+import { createNotionOrder } from "../utils/notionOrders.js";
 import { sendOrderConfirmationEmail } from "../utils/email.js";
 
 export const createOrder = async (payload: OrderPayload) => {
@@ -14,6 +23,62 @@ export const createOrder = async (payload: OrderPayload) => {
   try {
     const customMeasurements =
       payload.orderType === "custom" ? payload.measurements : null;
+
+    // Individual tailoring: never trust prices/dates from the browser.
+    // Price range, prepayment and start date are recomputed here.
+    let customEstimate: Record<string, unknown> | null = null;
+    let customTotalFrom: number | null = null;
+    let customItems: Array<{
+      name: string;
+      quantity: number;
+      price: number;
+    }> | null = null;
+
+    if (payload.orderType === "custom") {
+      const tailoringTypes = payload.tailoringTypes;
+      const validTypes =
+        Array.isArray(tailoringTypes) &&
+        tailoringTypes.length > 0 &&
+        tailoringTypes.every((type) => type in TAILORING_GARMENTS);
+      if (!validTypes || !tailoringTypes) {
+        throw new Error("Для індивідуального пошиву потрібно обрати вироби.");
+      }
+
+      // Dance program per garment (ST/LAT); default ST. Only for selected types.
+      const programs = Object.fromEntries(
+        tailoringTypes.map((type) => [
+          type,
+          payload.tailoringPrograms?.[type] === "LAT" ? "LAT" : "ST",
+        ]),
+      );
+
+      const availability = await getAvailability();
+      const estimate = calcTailoringEstimate(
+        tailoringTypes,
+        "UAH",
+        availability.nearestStart,
+      );
+
+      customTotalFrom = estimate.priceFrom;
+      customItems = tailoringTypes.map((type) => ({
+        name: `Індивідуальний пошив: ${type}`,
+        quantity: 1,
+        price: TAILORING_GARMENTS[type].priceFromUah,
+      }));
+      customEstimate = {
+        types: tailoringTypes,
+        programs,
+        priceFromUah: estimate.priceFrom,
+        priceToUah: estimate.priceTo,
+        prepaymentFromUah: estimate.prepaymentFrom,
+        prepaymentToUah: estimate.prepaymentTo,
+        leadDaysMin: estimate.leadDaysMin,
+        leadDaysMax: estimate.leadDaysMax,
+        startDate: estimate.startDate,
+        readyFrom: estimate.readyFrom,
+        readyTo: estimate.readyTo,
+      };
+    }
 
     const order = await db.Order.create(
       {
@@ -33,23 +98,26 @@ export const createOrder = async (payload: OrderPayload) => {
             ? (payload.warehouse ?? null)
             : null,
         paymentMethod: payload.paymentMethod,
-        totalAmount: payload.totalAmount,
+        totalAmount: customTotalFrom ?? payload.totalAmount,
         status: "pending",
         orderType: payload.orderType,
         communicationMethod: payload.communicationMethod,
         socialUsername: payload.socialUsername,
+        comment: payload.comment?.trim() || null,
+        estimate: customEstimate,
       },
       { transaction },
     );
 
-    const orderItemsData = payload.items.map((item) => ({
+    const orderItemsData = (customItems ?? payload.items).map((item) => ({
       orderId: order.id,
-      productId: item.productId ? Number(item.productId) : null,
+      productId:
+        "productId" in item && item.productId ? Number(item.productId) : null,
       name: item.name,
       quantity: item.quantity,
       price: item.price,
-      color: item.color || null,
-      size: item.size || null,
+      color: ("color" in item && item.color) || null,
+      size: ("size" in item && item.size) || null,
       measurements: customMeasurements,
     }));
 
@@ -71,6 +139,18 @@ export const createOrder = async (payload: OrderPayload) => {
 
         // Клієнту на email (Resend)
         void sendOrderConfirmationEmail(orderForNotifications);
+
+        // У Notion (тільки індивідуальний пошив). Не блокує відповідь клієнту:
+        // якщо Notion недоступний — менеджер отримає попередження в Telegram.
+        if (fullOrder.orderType === "custom") {
+          const shortId = String(fullOrder.id).split("-")[0].toUpperCase();
+          void createNotionOrder(orderForNotifications).catch((error) => {
+            console.error("❌ Не вдалося створити замовлення в Notion:", error);
+            void sendTelegramText(
+              `⚠️ Замовлення №${shortId} не потрапило в Notion (${error instanceof Error ? error.message.slice(0, 150) : "помилка"}). Додайте його вручну.`,
+            );
+          });
+        }
       }
     } catch (notifyError) {
       console.error("Помилка відправки сповіщень:", notifyError);

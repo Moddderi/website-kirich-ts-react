@@ -1,5 +1,8 @@
 import type { Product } from "@project/shared";
 import { Link } from "react-router-dom";
+import { useQueryClient } from "@tanstack/react-query";
+import { prefetchProduct } from "../../api/productQueries";
+import { loadProductPage } from "../../routes/lazyPages";
 import { useAppDispatch, useAppSelector } from "../../store/store";
 import { toggleFavorite, selectIsFavorite } from "../../store/favoriteSlice";
 import { optimizeCloudinaryUrl } from "../../utils/cloudinary";
@@ -30,6 +33,14 @@ export const ProductCard = ({
   const localizedName = getProductName(product);
   const productId = product.id || product.product_code;
 
+  // Warm up the product page chunk + data as soon as the user shows intent
+  // (hover / focus / touch), so the click feels instant.
+  const queryClient = useQueryClient();
+  const warmUp = () => {
+    void loadProductPage();
+    void prefetchProduct(queryClient, productId);
+  };
+
   const defaultImage = optimizeCloudinaryUrl(
     "https://res.cloudinary.com/dqe2odzsc/image/upload/default.jpg",
   );
@@ -48,6 +59,9 @@ export const ProductCard = ({
   return (
     <Link
       to={`/catalog/${productId}`}
+      onMouseEnter={warmUp}
+      onFocus={warmUp}
+      onTouchStart={warmUp}
       className="product-card-enter group relative flex flex-col cursor-pointer"
       style={{ animationDelay: `${enterDelayMs}ms` }}
     >
