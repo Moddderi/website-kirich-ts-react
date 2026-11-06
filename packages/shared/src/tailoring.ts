@@ -85,6 +85,12 @@ const isoToUtc = (iso: string): number => {
 export const addDaysISO = (iso: string, days: number): string =>
   new Date(isoToUtc(iso) + days * DAY_MS).toISOString().slice(0, 10);
 
+/** Saturday / Sunday — the studio does not work (and cannot start an order). */
+export const isWeekendISO = (iso: string): boolean => {
+  const day = new Date(isoToUtc(iso)).getUTCDay();
+  return day === 0 || day === 6;
+};
+
 export const todayISO = (): string => new Date().toISOString().slice(0, 10);
 
 /* -------------------------------------------------------------------------- */
@@ -130,6 +136,7 @@ export const findNearestStart = (
 ): string | null => {
   for (let i = 0; i <= horizonDays; i++) {
     const day = addDaysISO(fromISO, i);
+    if (isWeekendISO(day)) continue;
     if (getStatusForDate(ranges, day).status !== "busy") return day;
   }
   return null;
