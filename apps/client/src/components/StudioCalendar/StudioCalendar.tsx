@@ -11,6 +11,9 @@ import {
 interface StudioCalendarProps {
   ranges: AvailabilityRange[];
   nearestStart: string | null;
+  /** Earliest / latest estimated ready date of the client's order */
+  readyFrom?: string | null;
+  readyTo?: string | null;
 }
 
 const MONTHS_AHEAD = 18;
@@ -32,9 +35,14 @@ const DOT_STYLES: Record<AvailabilityStatus, string> = {
   busy: "bg-stone-300",
 };
 
+/** The client's own order: from start day to the latest estimated ready day. */
+const WORK_STYLE = "bg-stone-900 text-white border-stone-900";
+
 export const StudioCalendar = ({
   ranges,
   nearestStart,
+  readyFrom = null,
+  readyTo = null,
 }: StudioCalendarProps) => {
   const { t, i18n } = useTranslation();
   const locale = i18n.language === "en" ? "en-GB" : "uk-UA";
@@ -125,6 +133,15 @@ export const StudioCalendar = ({
     if (target) setCursor(target);
   };
 
+  /** Is the day inside the client's own order (approximate production period)? */
+  const isInOrder = (iso: string) => {
+    const end = readyTo ?? readyFrom;
+    return Boolean(nearestStart && end && iso >= nearestStart && iso <= end);
+  };
+
+  // "Few slots" only matters when the owner actually uses it (Google Sheet rows)
+  const hasLimited = ranges.some((range) => range.status === "limited");
+
   const statusLabel: Record<AvailabilityStatus, string> = {
     free: t("availability.legendFree"),
     limited: t("availability.legendLimited"),
@@ -212,17 +229,22 @@ export const StudioCalendar = ({
             const iso = `${monthKey(year, month)}-${pad(day)}`;
             const { status, note } = getStatusForDate(ranges, iso);
             const isPast = iso < today;
-            const isStart = iso === nearestStart;
+            // Sat/Sun are non-working days → never painted as "in production"
+            // (grid is Monday-first, `index` includes the leading empty cells).
+            const isWeekend = index % 7 >= 5;
+            const inOrder = !isPast && !isWeekend && isInOrder(iso);
 
             return (
               <div
                 key={iso}
-                title={note || statusLabel[status]}
-                className={`relative flex aspect-square items-center justify-center rounded-xl border text-xs font-semibold sm:text-sm ${
+                title={inOrder ? t("availability.legendWork") : note || statusLabel[status]}
+                className={`relative flex aspect-square items-center justify-center rounded-xl border text-xs font-semibold transition-colors sm:text-sm ${
                   isPast
                     ? "border-transparent bg-transparent text-stone-300"
-                    : STATUS_STYLES[status]
-                } ${isStart ? "ring-2 ring-stone-900 ring-offset-2" : ""}`}
+                    : inOrder
+                      ? WORK_STYLE
+                      : STATUS_STYLES[status]
+                }`}
               >
                 {day}
               </div>
@@ -230,20 +252,22 @@ export const StudioCalendar = ({
           })}
         </div>
 
-        {/* Legend */}
+        {/* Legend: free / busy / client's own order timeline */}
         <div className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-2 text-xs font-medium text-stone-500">
-          {(["free", "limited", "busy"] as const).map((status) => (
-            <span key={status} className="flex items-center gap-2">
-              <span
-                className={`h-3 w-3 rounded-md border ${STATUS_STYLES[status]}`}
-              />
-              {statusLabel[status]}
-            </span>
-          ))}
-          {nearestStart && (
+          {(["free", ...(hasLimited ? (["limited"] as const) : []), "busy"] as const).map(
+            (status) => (
+              <span key={status} className="flex items-center gap-2">
+                <span
+                  className={`h-3 w-3 rounded-md border ${STATUS_STYLES[status]}`}
+                />
+                {statusLabel[status]}
+              </span>
+            ),
+          )}
+          {nearestStart && (readyTo ?? readyFrom) && (
             <span className="flex items-center gap-2">
-              <span className="h-3 w-3 rounded-md ring-2 ring-stone-900" />
-              {t("availability.nearestTitle")}
+              <span className={`h-3 w-3 rounded-md border ${WORK_STYLE}`} />
+              {t("availability.legendWork")}
             </span>
           )}
         </div>

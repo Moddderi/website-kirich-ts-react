@@ -51,6 +51,8 @@ export const AvailabilityPage = () => {
               <StudioCalendar
                 ranges={data.ranges}
                 nearestStart={data.nearestStart}
+                readyFrom={estimate.readyFrom}
+                readyTo={estimate.readyTo}
               />
             )}
 
