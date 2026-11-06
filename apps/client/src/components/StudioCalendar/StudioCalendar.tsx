@@ -29,6 +29,11 @@ const STATUS_STYLES: Record<AvailabilityStatus, string> = {
   busy: "bg-stone-100 text-stone-400 border-stone-200/60",
 };
 
+/** Day off (Sat/Sun): muted cell crossed out by two diagonals. */
+const WEEKEND_STYLE = "bg-stone-50 text-stone-400 border-stone-200/70";
+const CROSS_BG =
+  "linear-gradient(to top right, transparent calc(50% - 0.75px), rgba(168,162,158,0.7) 50%, transparent calc(50% + 0.75px)), linear-gradient(to bottom right, transparent calc(50% - 0.75px), rgba(168,162,158,0.7) 50%, transparent calc(50% + 0.75px))";
+
 const DOT_STYLES: Record<AvailabilityStatus, string> = {
   free: "bg-emerald-400",
   limited: "bg-amber-400",
@@ -237,16 +242,27 @@ export const StudioCalendar = ({
             return (
               <div
                 key={iso}
-                title={inOrder ? t("availability.legendWork") : note || statusLabel[status]}
+                title={
+                  isWeekend
+                    ? t("availability.legendWeekend")
+                    : inOrder
+                      ? t("availability.legendWork")
+                      : note || statusLabel[status]
+                }
                 className={`relative flex aspect-square items-center justify-center rounded-xl border text-xs font-semibold transition-colors sm:text-sm ${
                   isPast
                     ? "border-transparent bg-transparent text-stone-300"
-                    : inOrder
-                      ? WORK_STYLE
-                      : STATUS_STYLES[status]
+                    : isWeekend
+                      ? WEEKEND_STYLE
+                      : inOrder
+                        ? WORK_STYLE
+                        : STATUS_STYLES[status]
                 }`}
+                style={
+                  !isPast && isWeekend ? { backgroundImage: CROSS_BG } : undefined
+                }
               >
-                {day}
+                <span className="relative rounded-sm bg-inherit px-0.5">{day}</span>
               </div>
             );
           })}
@@ -264,6 +280,13 @@ export const StudioCalendar = ({
               </span>
             ),
           )}
+          <span className="flex items-center gap-2">
+            <span
+              className={`h-3 w-3 rounded-md border ${WEEKEND_STYLE}`}
+              style={{ backgroundImage: CROSS_BG }}
+            />
+            {t("availability.legendWeekend")}
+          </span>
           {nearestStart && (readyTo ?? readyFrom) && (
             <span className="flex items-center gap-2">
               <span className={`h-3 w-3 rounded-md border ${WORK_STYLE}`} />
