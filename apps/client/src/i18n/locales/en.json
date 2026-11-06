@@ -71,7 +71,9 @@
   "catalog": {
     "noProducts": "No products found",
     "page": "Page <bold>{{current}}</bold> of <bold>{{total}}</bold>",
-    "loadingProducts": "Loading products"
+    "loadingProducts": "Loading products",
+    "heading": "Catalog",
+    "subheading": "Ballroom wear ready to ship."
   },
   "productPage": {
     "loading": "Loading product details...",
@@ -266,6 +268,10 @@
     "step5Desc": "Pattern and mock-up creation, fitting (for in-person orders if needed) and final adjustments."
   },
   "selectType": {
+    "programTitle": "Program",
+    "programHint": "The program defines the cut and model of the garment",
+    "programST": "Standard · ST",
+    "programLAT": "Latin · LAT",
     "stepLabel": "Step 1 of 4",
     "title": "What shall we make?",
     "description": "Choose one or several items. Next we will show when the studio is free, plus approximate prices and lead times",
@@ -310,6 +316,13 @@
     "heroDescription": "Men's ballroom wear without compromise. Every detail crafted for your confidence on the dance floor.",
     "goToCollection": "Browse Catalog",
     "brandPhilosophy": "Brand Philosophy",
+    "featuredKicker": "Catalog",
+    "featuredTitle": "Ready-made pieces",
+    "featuredSubtitle": "Pick from the catalog — we ship within 24 hours",
+    "viewAll": "View all",
+    "processKicker": "How it works",
+    "processTitle": "From idea to the dance floor in five steps",
+    "processCta": "Start tailoring",
     "precisionTitle": "Precise tailoring",
     "precisionDesc": "High quality",
     "handmade": "Handcrafted",

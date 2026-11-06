@@ -1,5 +1,6 @@
 import { Link, Navigate, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { useAppSelector } from "../../store/store";
 import { StudioCalendar } from "../../components/StudioCalendar/StudioCalendar";
 import {
   useFormatDate,
@@ -10,6 +11,7 @@ export const AvailabilityPage = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const formatDate = useFormatDate();
+  const programs = useAppSelector((state) => state.tailoring.programs);
   const { estimate, availability, types } = useTailoringEstimate();
 
   if (types.length === 0) {
@@ -17,7 +19,7 @@ export const AvailabilityPage = () => {
   }
 
   const { data, isLoading } = availability;
-  const hasCalendar = data?.source === "sheet";
+  const hasCalendar = Boolean(data) && data?.source !== "unavailable";
 
   return (
     <main className="grow pb-32">
@@ -95,7 +97,7 @@ export const AvailabilityPage = () => {
                       className="flex items-baseline justify-between gap-4 text-sm"
                     >
                       <span className="font-semibold text-stone-900">
-                        {t(`selectType.${item.type}`)}
+                        {t(`selectType.${item.type}`)} · {programs[item.type] ?? "ST"}
                       </span>
                       <span className="whitespace-nowrap text-xs font-medium text-stone-500">
                         {t("selectType.days", {

@@ -34,15 +34,13 @@ export const Header = () => {
 
   return (
     <>
-      <div className="bg-stone-900 p-4 px-4 py-2.5 text-center relative overflow-hidden group">
-        <div className="absolute inset-0 opacity-20 bg-[linear-gradient(45deg,transparent_25%,rgba(255,255,255,0.2)_50%,transparent_75%,transparent_100%)] bg-[length:250px_250px] animate-[pulse_3s_linear_infinite] group-hover:bg-[length:300px_300px] transition-all duration-1000"></div>
-        <p className="text-xs font-medium text-white tracking-widest relative z-10 uppercase animate-reveal-up">
+      <div className="bg-stone-900 px-4 py-2.5 text-center relative overflow-hidden">
+        <p className="text-[11px] font-medium text-beige-200 tracking-[0.25em] relative z-10 uppercase">
           {t("header.topBar")}
-          
         </p>
       </div>
 
-      <nav className="sticky top-0 z-50 border-b border-stone-200/50 bg-beige-50/80 backdrop-blur-3xl transition-all duration-500">
+      <nav className="sticky top-0 z-50 border-b border-stone-200/60 bg-beige-50/90 backdrop-blur-md transition-all duration-500">
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
           <div className="relative flex h-16 items-center justify-between animate-reveal-up delay-100">
             <div className="flex shrink-0 items-center">

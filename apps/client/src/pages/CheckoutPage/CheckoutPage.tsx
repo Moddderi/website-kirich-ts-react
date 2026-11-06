@@ -38,6 +38,7 @@ export const CheckoutPage = () => {
   const displayCurrency = useAppSelector((state) => state.currency.code);
   const {
     types: tailoringTypes,
+    programs: tailoringPrograms,
     measurements,
     measurementUnit,
   } = useAppSelector((state) => state.tailoring);
@@ -145,6 +146,9 @@ export const CheckoutPage = () => {
         orderType: "custom",
         displayCurrency,
         tailoringTypes,
+        tailoringPrograms: Object.fromEntries(
+          tailoringTypes.map((type) => [type, tailoringPrograms[type] ?? "ST"]),
+        ),
         // 🟢 Виносимо мірки на рівень об'єкта замовлення, як того вимагає схема з packages/shared/src/order.schema.ts
         measurements: {
           unit: measurementUnit,

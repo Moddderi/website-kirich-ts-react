@@ -11,6 +11,7 @@ export const PrepaymentPage = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const formatDate = useFormatDate();
+  const programs = useAppSelector((state) => state.tailoring.programs);
   const { estimate, formatRange, types } = useTailoringEstimate();
   const hasMeasurements = useAppSelector(
     (state) => Object.keys(state.tailoring.measurements).length > 0,
@@ -55,7 +56,7 @@ export const PrepaymentPage = () => {
                 >
                   <div>
                     <p className="text-sm font-semibold text-stone-900">
-                      {t(`selectType.${item.type}`)}
+                      {t(`selectType.${item.type}`)} · {programs[item.type] ?? "ST"}
                     </p>
                     <p className="text-xs font-medium text-stone-500">
                       {t("selectType.days", {

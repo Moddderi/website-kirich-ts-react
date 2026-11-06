@@ -6,6 +6,10 @@ import { convertFromUah, type Currency } from "./currency.js";
 /*  >>> EDIT THESE NUMBERS to match the studio's real prices / lead times <<< */
 /* -------------------------------------------------------------------------- */
 
+/** Dance program: ST = standard (Стандарт), LAT = Latin (Латина) */
+export type TailoringProgram = "ST" | "LAT";
+export const TAILORING_PROGRAMS: TailoringProgram[] = ["ST", "LAT"];
+
 export const TAILORING_TYPES: MeasurementType[] = [
   "body",
   "jacket",
@@ -101,8 +105,8 @@ export interface AvailabilityResponse {
   /** First day the studio can start a new order, or null if unknown */
   nearestStart: string | null;
   updatedAt: string;
-  /** "sheet" = real data, "unavailable" = sheet not configured / unreachable */
-  source: "sheet" | "unavailable";
+  /** "notion" / "sheet" = real data, "unavailable" = not configured / unreachable */
+  source: "notion" | "sheet" | "unavailable";
 }
 
 /** Later rows in the sheet override earlier ones. Days nobody mentioned are free. */

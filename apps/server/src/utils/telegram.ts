@@ -59,6 +59,27 @@ const parseMeasurementsPayload = (measurementsData: unknown): { unit: Measuremen
   return { unit: "cm", values };
 };
 
+/** Plain service message to the managers' chat (errors, notices). Never throws. */
+export const sendTelegramText = async (text: string) => {
+  const token = process.env.TELEGRAM_TOKEN;
+  const chatId = process.env.TELEGRAM_CHAT_ID;
+  if (!token || !chatId) return;
+
+  try {
+    await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        chat_id: chatId,
+        text,
+        disable_web_page_preview: true,
+      }),
+    });
+  } catch (error) {
+    console.error("❌ Не вдалося відправити службове повідомлення в Telegram:", error);
+  }
+};
+
 /** Escapes legacy Telegram Markdown special characters in user-provided text. */
 const escapeMd = (value: string) => value.replace(/([_*`\[\]])/g, "\\$1");
 

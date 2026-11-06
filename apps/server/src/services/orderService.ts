@@ -5,7 +5,11 @@ import {
 } from "@project/shared";
 import db from "../models/index.js";
 import { getAvailability } from "../utils/availability.js";
-import { sendTelegramNotification } from "../utils/telegram.js";
+import {
+  sendTelegramNotification,
+  sendTelegramText,
+} from "../utils/telegram.js";
+import { createNotionOrder } from "../utils/notionOrders.js";
 import { sendOrderConfirmationEmail } from "../utils/email.js";
 
 export const createOrder = async (payload: OrderPayload) => {
@@ -40,6 +44,14 @@ export const createOrder = async (payload: OrderPayload) => {
         throw new Error("Для індивідуального пошиву потрібно обрати вироби.");
       }
 
+      // Dance program per garment (ST/LAT); default ST. Only for selected types.
+      const programs = Object.fromEntries(
+        tailoringTypes.map((type) => [
+          type,
+          payload.tailoringPrograms?.[type] === "LAT" ? "LAT" : "ST",
+        ]),
+      );
+
       const availability = await getAvailability();
       const estimate = calcTailoringEstimate(
         tailoringTypes,
@@ -55,6 +67,7 @@ export const createOrder = async (payload: OrderPayload) => {
       }));
       customEstimate = {
         types: tailoringTypes,
+        programs,
         priceFromUah: estimate.priceFrom,
         priceToUah: estimate.priceTo,
         prepaymentFromUah: estimate.prepaymentFrom,
@@ -126,6 +139,18 @@ export const createOrder = async (payload: OrderPayload) => {
 
         // Клієнту на email (Resend)
         void sendOrderConfirmationEmail(orderForNotifications);
+
+        // У Notion (тільки індивідуальний пошив). Не блокує відповідь клієнту:
+        // якщо Notion недоступний — менеджер отримає попередження в Telegram.
+        if (fullOrder.orderType === "custom") {
+          const shortId = String(fullOrder.id).split("-")[0].toUpperCase();
+          void createNotionOrder(orderForNotifications).catch((error) => {
+            console.error("❌ Не вдалося створити замовлення в Notion:", error);
+            void sendTelegramText(
+              `⚠️ Замовлення №${shortId} не потрапило в Notion (${error instanceof Error ? error.message.slice(0, 150) : "помилка"}). Додайте його вручну.`,
+            );
+          });
+        }
       }
     } catch (notifyError) {
       console.error("Помилка відправки сповіщень:", notifyError);

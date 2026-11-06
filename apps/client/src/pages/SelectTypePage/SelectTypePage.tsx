@@ -1,11 +1,13 @@
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useAppDispatch, useAppSelector } from "../../store/store";
-import { toggleType } from "../../store/tailoringSlice";
+import { setGarmentProgram, toggleType } from "../../store/tailoringSlice";
+import { CurrencySwitcher } from "../../components/CurrencySwitcher/CurrencySwitcher";
 import {
   TAILORING_GARMENTS,
   convertFromUah,
   type MeasurementType,
+  type TailoringProgram,
 } from "@project/shared";
 import { useTailoringEstimate } from "../../hooks/useTailoringEstimate";
 import { IoShirtOutline, IoCheckmark } from "react-icons/io5";
@@ -25,6 +27,7 @@ export const SelectTypePage = () => {
   const navigate = useNavigate();
 
   const selected = useAppSelector((state) => state.tailoring.types);
+  const programs = useAppSelector((state) => state.tailoring.programs);
   const currency = useAppSelector((state) => state.currency.code);
   const { estimate, formatRange } = useTailoringEstimate();
 
@@ -53,6 +56,10 @@ export const SelectTypePage = () => {
           </p>
         </div>
 
+        <div className="mx-auto mb-6 flex max-w-6xl justify-end">
+          <CurrencySwitcher />
+        </div>
+
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto perspective-1000 items-stretch">
           {OPTIONS.map((opt, index) => {
             const Icon = opt.icon;
@@ -60,8 +67,8 @@ export const SelectTypePage = () => {
             const isSelected = selected.includes(opt.type);
 
             return (
+              <div key={opt.type} className="flex flex-col gap-3">
               <button
-                key={opt.type}
                 type="button"
                 aria-pressed={isSelected}
                 onClick={() => dispatch(toggleType(opt.type))}
@@ -159,12 +166,41 @@ export const SelectTypePage = () => {
                   </span>
                 </div>
               </button>
+
+              <div
+                role="radiogroup"
+                aria-label={`${t(`selectType.${opt.type}`)} — ${t("selectType.programTitle")}`}
+                className="grid grid-cols-2 gap-1 rounded-full border border-stone-200 bg-white p-1 shadow-sm"
+              >
+                {(["ST", "LAT"] as TailoringProgram[]).map((value) => {
+                  const active = isSelected && programs[opt.type] === value;
+                  return (
+                    <button
+                      key={value}
+                      type="button"
+                      role="radio"
+                      aria-checked={active}
+                      onClick={() =>
+                        dispatch(setGarmentProgram({ type: opt.type, program: value }))
+                      }
+                      className={`rounded-full px-2 py-2.5 text-[11px] font-semibold transition-all duration-300 ${
+                        active
+                          ? "bg-stone-900 text-white shadow-md"
+                          : "text-stone-500 hover:bg-stone-100"
+                      }`}
+                    >
+                      {t(`selectType.program${value}`)}
+                    </button>
+                  );
+                })}
+              </div>
+              </div>
             );
           })}
         </div>
 
         <p className="mx-auto mt-8 max-w-2xl text-center text-xs font-medium text-stone-400 leading-relaxed">
-          {t("selectType.approxNote")} {t("selectType.suitNote")}
+          {t("selectType.programHint")}. {t("selectType.approxNote")} {t("selectType.suitNote")}
         </p>
       </div>
 
@@ -177,7 +213,9 @@ export const SelectTypePage = () => {
             </p>
             {hasSelection ? (
               <p className="truncate text-sm font-semibold text-stone-900">
-                {selected.map((type) => t(`selectType.${type}`)).join(" + ")}
+                {selected
+                  .map((type) => `${t(`selectType.${type}`)} ${programs[type] ?? "ST"}`)
+                  .join(" + ")}
                 <span className="ml-2 font-medium text-stone-500">
                   · {t("selectType.total")}{" "}
                   {formatRange(estimate.priceFrom, estimate.priceTo)}
@@ -188,6 +226,7 @@ export const SelectTypePage = () => {
                 {t("selectType.summaryEmpty")}
               </p>
             )}
+
           </div>
 
           <button

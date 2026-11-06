@@ -20,6 +20,12 @@ build/
 apps/client/dist/
 apps/server/dist/
 
+# Business / client data must never be committed or served from /public
+*.xlsx
+*.xls
+*.csv
+!apps/server/**/*.csv
+
 .DS_Store
 Thumbs.db
 

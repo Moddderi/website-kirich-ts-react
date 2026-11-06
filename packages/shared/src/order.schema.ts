@@ -73,6 +73,8 @@ export const customOrderSchema = checkoutFieldsSchema.extend({
   displayCurrency: currencySchema.optional().default("UAH"),
   measurements: customMeasurementsSchema,
   /** Garments the client selected; the server recomputes price range / dates from them */
+  /** Per garment: e.g. { pants: "LAT", body: "ST" } */
+  tailoringPrograms: z.record(z.string(), z.enum(["ST", "LAT"])).optional(),
   tailoringTypes: z
     .array(z.enum(["body", "jacket", "pants", "suit"]))
     .min(1, "Оберіть хоча б один виріб"),

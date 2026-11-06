@@ -84,6 +84,10 @@ export const buildCustomOrderSummary = (order: any): CustomOrderSummary => {
     lines: estimate.items.map((item) => ({
       type: item.type,
       ...TAILORING_TYPE_META[item.type],
+      // "Штани · LAT" — program is chosen per garment on the site
+      label: order.estimate?.programs?.[item.type]
+        ? `${TAILORING_TYPE_META[item.type].label} · ${order.estimate.programs[item.type]}`
+        : TAILORING_TYPE_META[item.type].label,
       priceRange: range(item.priceFrom, item.priceTo, currency),
       leadDays: daysRange(item.leadDaysMin, item.leadDaysMax),
     })),

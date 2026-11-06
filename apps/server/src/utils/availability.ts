@@ -8,9 +8,11 @@ import {
   type AvailabilityResponse,
   type AvailabilityStatus,
 } from "@project/shared";
+import { fetchNotionRanges, isNotionConfigured } from "./notionAvailability.js";
 
 /**
- * Studio availability is edited by the owner in a Google Sheet:
+ * Studio availability: Notion orders DB (automatic) + optional Google Sheet (manual overrides).
+ * The Google Sheet part is edited by the owner:
  *   File → Share → Publish to web → choose the sheet → format "CSV" → copy link
  *   → put it into AVAILABILITY_SHEET_CSV_URL.
  *
@@ -28,6 +30,11 @@ const CACHE_TTL_MS = 5 * 60 * 1000;
 const FETCH_TIMEOUT_MS = 6000;
 
 let cache: { data: AvailabilityResponse; fetchedAt: number } | null = null;
+
+/** Forget cached data so the next request re-reads Notion (e.g. right after a new order). */
+export const invalidateAvailabilityCache = () => {
+  cache = null;
+};
 
 const HEADER_ALIASES: Record<string, string[]> = {
   from: ["from", "start", "з", "від", "початок"],
@@ -154,42 +161,74 @@ const buildResponse = (
   source: AvailabilityResponse["source"],
 ): AvailabilityResponse => ({
   ranges,
-  nearestStart: source === "sheet" ? findNearestStart(ranges, todayISO()) : null,
+  nearestStart:
+    source !== "unavailable" ? findNearestStart(ranges, todayISO()) : null,
   updatedAt: new Date().toISOString(),
   source,
 });
 
+const fetchSheetRanges = async (url: string): Promise<AvailabilityRange[]> => {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
+  try {
+    const response = await fetch(url, { signal: controller.signal });
+    if (!response.ok) throw new Error(`Sheet responded with ${response.status}`);
+    return parseAvailabilityCsv(await response.text());
+  } finally {
+    clearTimeout(timer);
+  }
+};
+
+/**
+ * Sources (any combination):
+ *  - Notion orders DB  → automatic workload by order deadlines
+ *  - Google Sheet CSV  → manual overrides (vacations, holidays, "closed")
+ * Sheet rows are applied on top of Notion (later ranges win).
+ */
 export const getAvailability = async (): Promise<AvailabilityResponse> => {
   if (cache && Date.now() - cache.fetchedAt < CACHE_TTL_MS) {
     // nearestStart depends on "today" → recompute cheaply on every call
     return {
       ...cache.data,
       nearestStart:
-        cache.data.source === "sheet"
+        cache.data.source !== "unavailable"
           ? findNearestStart(cache.data.ranges, todayISO())
           : null,
     };
   }
 
-  const url = process.env.AVAILABILITY_SHEET_CSV_URL;
-  if (!url) return buildResponse([], "unavailable");
+  const sheetUrl = process.env.AVAILABILITY_SHEET_CSV_URL;
+  const useNotion = isNotionConfigured();
 
-  try {
-    const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
-    const response = await fetch(url, { signal: controller.signal });
-    clearTimeout(timer);
+  if (!sheetUrl && !useNotion) return buildResponse([], "unavailable");
 
-    if (!response.ok) throw new Error(`Sheet responded with ${response.status}`);
+  const [notionResult, sheetResult] = await Promise.allSettled([
+    useNotion ? fetchNotionRanges() : Promise.resolve<AvailabilityRange[]>([]),
+    sheetUrl ? fetchSheetRanges(sheetUrl) : Promise.resolve<AvailabilityRange[]>([]),
+  ]);
 
-    const ranges = parseAvailabilityCsv(await response.text());
-    const data = buildResponse(ranges, "sheet");
-    cache = { data, fetchedAt: Date.now() };
-    return data;
-  } catch (error) {
-    console.error("❌ Не вдалося завантажити таблицю доступності:", error);
+  if (notionResult.status === "rejected") {
+    console.error("❌ Не вдалося завантажити Notion:", notionResult.reason);
+  }
+  if (sheetResult.status === "rejected") {
+    console.error("❌ Не вдалося завантажити таблицю доступності:", sheetResult.reason);
+  }
+
+  const notionOk = useNotion && notionResult.status === "fulfilled";
+  const sheetOk = Boolean(sheetUrl) && sheetResult.status === "fulfilled";
+
+  if (!notionOk && !sheetOk) {
     // Prefer stale data over showing nothing
     if (cache) return cache.data;
     return buildResponse([], "unavailable");
   }
+
+  const ranges = [
+    ...(notionOk ? notionResult.value : []),
+    ...(sheetOk ? sheetResult.value : []),
+  ];
+
+  const data = buildResponse(ranges, notionOk ? "notion" : "sheet");
+  cache = { data, fetchedAt: Date.now() };
+  return data;
 };
