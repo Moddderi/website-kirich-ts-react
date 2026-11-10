@@ -35,9 +35,14 @@ export const useFormatDate = () => {
 export const useTailoringEstimate = (typesOverride?: MeasurementType[]) => {
   const storeTypes = useAppSelector((state) => state.tailoring.types);
   const currency = useAppSelector((state) => state.currency.code);
-  const availability = useAvailability();
-
   const types = typesOverride ?? storeTypes;
+
+  // The start date must leave room for the whole order (shortest lead time)
+  const windowDays = useMemo(
+    () => calcTailoringEstimate(types, "UAH", null).leadDaysMin,
+    [types],
+  );
+  const availability = useAvailability(windowDays);
   const startDate = availability.data?.nearestStart ?? null;
 
   const estimate = useMemo(
