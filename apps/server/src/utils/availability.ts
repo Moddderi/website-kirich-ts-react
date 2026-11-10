@@ -159,12 +159,27 @@ export const parseAvailabilityCsv = (csv: string): AvailabilityRange[] => {
 const buildResponse = (
   ranges: AvailabilityRange[],
   source: AvailabilityResponse["source"],
+  windowDays = 1,
 ): AvailabilityResponse => ({
   ranges,
   nearestStart:
-    source !== "unavailable" ? findNearestStart(ranges, todayISO()) : null,
+    source !== "unavailable"
+      ? findNearestStart(ranges, todayISO(), 1100, windowDays)
+      : null,
   updatedAt: new Date().toISOString(),
   source,
+});
+
+/** nearestStart depends on "today" and on the order length → computed per call. */
+const withStart = (
+  data: AvailabilityResponse,
+  windowDays: number,
+): AvailabilityResponse => ({
+  ...data,
+  nearestStart:
+    data.source !== "unavailable"
+      ? findNearestStart(data.ranges, todayISO(), 1100, windowDays)
+      : null,
 });
 
 const fetchSheetRanges = async (url: string): Promise<AvailabilityRange[]> => {
@@ -185,16 +200,11 @@ const fetchSheetRanges = async (url: string): Promise<AvailabilityRange[]> => {
  *  - Google Sheet CSV  → manual overrides (vacations, holidays, "closed")
  * Sheet rows are applied on top of Notion (later ranges win).
  */
-export const getAvailability = async (): Promise<AvailabilityResponse> => {
+export const getAvailability = async (
+  windowDays = 1,
+): Promise<AvailabilityResponse> => {
   if (cache && Date.now() - cache.fetchedAt < CACHE_TTL_MS) {
-    // nearestStart depends on "today" → recompute cheaply on every call
-    return {
-      ...cache.data,
-      nearestStart:
-        cache.data.source !== "unavailable"
-          ? findNearestStart(cache.data.ranges, todayISO())
-          : null,
-    };
+    return withStart(cache.data, windowDays);
   }
 
   const sheetUrl = process.env.AVAILABILITY_SHEET_CSV_URL;
@@ -219,7 +229,7 @@ export const getAvailability = async (): Promise<AvailabilityResponse> => {
 
   if (!notionOk && !sheetOk) {
     // Prefer stale data over showing nothing
-    if (cache) return cache.data;
+    if (cache) return withStart(cache.data, windowDays);
     return buildResponse([], "unavailable");
   }
 
@@ -230,5 +240,5 @@ export const getAvailability = async (): Promise<AvailabilityResponse> => {
 
   const data = buildResponse(ranges, notionOk ? "notion" : "sheet");
   cache = { data, fetchedAt: Date.now() };
-  return data;
+  return withStart(data, windowDays);
 };

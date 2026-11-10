@@ -129,15 +129,34 @@ export const getStatusForDate = (
   return { status: "free" };
 };
 
+/**
+ * First working day from which the studio can take an order that needs
+ * `windowDays` calendar days: the start day itself and every working day up to
+ * start + windowDays must be free. Single free days squeezed between other
+ * orders are therefore skipped — the start moves to the end of the queue.
+ */
 export const findNearestStart = (
   ranges: AvailabilityRange[],
   fromISO: string = todayISO(),
   horizonDays = 1100,
+  windowDays = 1,
 ): string | null => {
+  const isBusy = (iso: string) => getStatusForDate(ranges, iso).status === "busy";
+  const window = Math.max(0, Math.floor(windowDays));
+
   for (let i = 0; i <= horizonDays; i++) {
     const day = addDaysISO(fromISO, i);
-    if (isWeekendISO(day)) continue;
-    if (getStatusForDate(ranges, day).status !== "busy") return day;
+    if (isWeekendISO(day) || isBusy(day)) continue;
+
+    let fits = true;
+    for (let j = 1; j <= window; j++) {
+      const next = addDaysISO(day, j);
+      if (!isWeekendISO(next) && isBusy(next)) {
+        fits = false;
+        break;
+      }
+    }
+    if (fits) return day;
   }
   return null;
 };

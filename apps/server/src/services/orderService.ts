@@ -52,7 +52,13 @@ export const createOrder = async (payload: OrderPayload) => {
         ]),
       );
 
-      const availability = await getAvailability();
+      // Start = first window that fits the shortest expected production time
+      const minLeadDays = calcTailoringEstimate(
+        tailoringTypes,
+        "UAH",
+        null,
+      ).leadDaysMin;
+      const availability = await getAvailability(minLeadDays);
       const estimate = calcTailoringEstimate(
         tailoringTypes,
         "UAH",
