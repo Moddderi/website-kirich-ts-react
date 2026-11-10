@@ -30,7 +30,10 @@ import {
  *  - Дата замовлення         today
  *  - Термін виконання        start → latest ready date (this is what the site calendar reads)
  *  - Клієнт (relation)       found in [DB] Клієнти by "Прізвище Ім'я", or created
- *  - Вироби (relation)       base item of [DB] Прайс for the chosen program + garment
+ *  - Позиції замовлення      one row in [DB] Позиції замовлення per garment
+ *                            ("1", "2", …) → Виріб (base item of [DB] Прайс for the
+ *                            chosen ST/LAT program) + Кількість, linked to the order
+ *  - Телефон / Username / Тип зв'язку   (the client card rolls these up from orders)
  *  - Країна / Населений пункт / Відділення адреса
  *  - page body               contacts, comment, measurements, price estimate
  */
@@ -251,8 +254,14 @@ const findPriceItems = async (
         },
       },
     );
-    if (search.results[0]) {
-      result.push({ id: search.results[0].id, name });
+    // Archived duplicates may exist → prefer the "Активний" one.
+    const isActive = (page: any) =>
+      Object.values<any>(page.properties ?? {}).some(
+        (prop) => prop.type === "select" && /^активн/i.test(prop.select?.name ?? ""),
+      );
+    const best = search.results.find(isActive) ?? search.results[0];
+    if (best) {
+      result.push({ id: best.id, name });
     } else {
       console.warn(`⚠️ Notion: у прайсі не знайдено позицію «${name}»`);
     }
@@ -394,6 +403,67 @@ const buildBody = (order: any, unlinkedItems: string[]) => {
   return blocks.slice(0, 95); // Notion allows 100 blocks per request
 };
 
+/* -------------------------------- Positions -------------------------------- */
+
+/** The [DB] Прайс id = the relation of the positions DB that is not the orders DB. */
+const resolvePriceDbId = async (
+  positionsDbId: string,
+  ordersDbId: string,
+): Promise<string> => {
+  const schema = await getSchema(positionsDbId);
+  const rel = Object.values(schema.properties).find(
+    (p) =>
+      p.type === "relation" &&
+      p.relation &&
+      stripId(p.relation.database_id) !== stripId(ordersDbId),
+  );
+  if (!rel?.relation) throw new Error("У таблиці позицій немає зв'язку з прайсом");
+  return rel.relation.database_id;
+};
+
+const stripId = (id: string) => id.replace(/-/g, "").toLowerCase();
+
+/**
+ * One row in [DB] Позиції замовлення per garment: title "1", "2", …,
+ * «Виріб» → [DB] Прайс, «Кількість», «Замовлення» → the order page.
+ */
+const createPositions = async (
+  positionsDbId: string,
+  ordersDbId: string,
+  orderPageId: string,
+  items: Array<{ id: string; qty: number }>,
+): Promise<void> => {
+  const schema = await getSchema(positionsDbId);
+  const titleProp = findProp(schema, ["title"]);
+  const relations = Object.values(schema.properties).filter(
+    (p) => p.type === "relation" && p.relation,
+  );
+  const orderProp = relations.find(
+    (p) => stripId(p.relation!.database_id) === stripId(ordersDbId),
+  );
+  const priceProp = relations.find((p) => p !== orderProp);
+  const qtyProp = findProp(schema, ["number"], /кільк|qty|quantity/i);
+
+  if (!titleProp || !orderProp || !priceProp) {
+    throw new Error(
+      "У таблиці позицій не знайдено title / зв'язок із замовленням / зв'язок із прайсом",
+    );
+  }
+
+  for (const [index, item] of items.entries()) {
+    const properties: Record<string, unknown> = {
+      [titleProp.name]: { title: richText(String(index + 1)) },
+      [orderProp.name]: { relation: [{ id: orderPageId }] },
+      [priceProp.name]: { relation: [{ id: item.id }] },
+    };
+    if (qtyProp) properties[qtyProp.name] = { number: item.qty };
+
+    await notion("/pages", {
+      body: { parent: { database_id: positionsDbId }, properties },
+    });
+  }
+};
+
 /* --------------------------------- Public ---------------------------------- */
 
 /**
@@ -421,7 +491,10 @@ export const createNotionOrder = async (
     /термін|дедлайн|deadline|due|виконан/i,
   );
   const clientProp = findProp(schema, ["relation"], /клієнт|client/i);
-  const itemsProp = findProp(schema, ["relation"], /вироб|виріб|item|product/i);
+  const positionsProp = findProp(schema, ["relation"], /позиц/i);
+  const phoneProp = findProp(schema, ["phone_number"], /телефон|phone/i);
+  const usernameProp = findProp(schema, ["rich_text"], /username|нік|логін/i);
+  const contactProp = findProp(schema, ["select"], /зв.язк|contact/i);
   const sourceProp = findProp(
     schema,
     ["select", "status"],
@@ -478,6 +551,20 @@ export const createNotionOrder = async (
     };
   }
 
+  if (phoneProp && order.phone) {
+    props[phoneProp.name] = { phone_number: String(order.phone) };
+  }
+  if (usernameProp && order.socialUsername) {
+    props[usernameProp.name] = { rich_text: richText(String(order.socialUsername)) };
+  }
+  if (contactProp) {
+    const wantedContact = CONTACT_SELECT_NAME[String(order.communicationMethod)];
+    const option = contactProp.select?.options.find(
+      (o) => normalizeName(o.name) === wantedContact,
+    );
+    if (option) props[contactProp.name] = { select: { name: option.name } };
+  }
+
   const postal =
     order.deliveryMethod === "nova_poshta" || order.deliveryMethod === "ukrposhta";
   if (postal) {
@@ -493,32 +580,36 @@ export const createNotionOrder = async (
     props[clientProp.name] = { relation: [{ id: clientId }] };
   }
 
+  // Garments → base items of [DB] Прайс (each garment has its own ST/LAT program).
   const unlinkedItems: string[] = [];
-  if (itemsProp?.relation) {
+  const positionItems: Array<{ id: string; qty: number }> = [];
+  if (positionsProp?.relation) {
     const programs: Partial<Record<MeasurementType, TailoringProgram>> =
       order.estimate?.programs ?? {};
     const types: MeasurementType[] = Array.isArray(order.estimate?.types)
       ? order.estimate.types
       : [];
 
-    // Each garment has its own program: pants may be LAT while the body is ST.
-    const wanted: string[] = [];
+    const quantities = new Map<string, number>();
     for (const type of types) {
-      const names = BASE_PRICE_ITEMS[programs[type] ?? "ST"][type] ?? [];
+      const program = programs[type] ?? "ST";
+      const names = BASE_PRICE_ITEMS[program][type] ?? [];
       if (names.length === 0) {
-        const program = programs[type] ?? "ST";
         unlinkedItems.push(`${TAILORING_TYPE_META[type]?.label ?? type} ${program}`);
       }
-      wanted.push(...names);
+      for (const name of names) quantities.set(name, (quantities.get(name) ?? 0) + 1);
     }
 
-    const unique = [...new Set(wanted)];
-    const found = await findPriceItems(itemsProp.relation.database_id, unique);
-    if (found.length > 0) {
-      props[itemsProp.name] = { relation: found.map((item) => ({ id: item.id })) };
+    const priceDbId = await resolvePriceDbId(
+      positionsProp.relation.database_id,
+      ordersDbId,
+    );
+    const found = await findPriceItems(priceDbId, [...quantities.keys()]);
+    for (const item of found) {
+      positionItems.push({ id: item.id, qty: quantities.get(item.name) ?? 1 });
     }
     unlinkedItems.push(
-      ...unique.filter((name) => !found.some((item) => item.name === name)),
+      ...[...quantities.keys()].filter((name) => !found.some((f) => f.name === name)),
     );
   }
 
@@ -532,6 +623,22 @@ export const createNotionOrder = async (
 
   // The calendar reads these same orders → refresh it immediately.
   invalidateAvailabilityCache();
+
+  if (positionsProp?.relation && positionItems.length > 0) {
+    try {
+      await createPositions(
+        positionsProp.relation.database_id,
+        ordersDbId,
+        page.id,
+        positionItems,
+      );
+    } catch (error) {
+      // The order itself exists — only the positions need to be added by hand.
+      throw new Error(
+        `Замовлення створено, але позиції не додано (${(error as Error).message})`,
+      );
+    }
+  }
 
   console.log(
     `✅ Notion: створено замовлення ${orderNumber ?? ""} (${formatDateUk(startDate)} → ${formatDateUk(readyTo)})`,
