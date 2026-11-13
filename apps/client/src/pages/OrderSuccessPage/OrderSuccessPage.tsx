@@ -1,4 +1,4 @@
-import { useParams, useNavigate, useLocation } from "react-router-dom";
+import { useParams, useNavigate, useLocation, Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { getOrderById } from "../../api/orderApi";
@@ -34,6 +34,11 @@ export const OrderSuccessPage = () => {
   const { orderId } = useParams<{ orderId?: string }>();
   const navigate = useNavigate();
   const location = useLocation();
+
+  // Personal cabinet link (individual tailoring), passed from the checkout
+  const accessToken =
+    (location.state as { accessToken?: string | null } | null)?.accessToken ??
+    null;
 
   // Перевіряємо, чи ми знаходимось на сторінці успіху пошиття
   const isCustomTailoring = location.pathname.includes(
@@ -110,6 +115,15 @@ export const OrderSuccessPage = () => {
           <p className="text-lg font-medium text-stone-500 max-w-lg mb-8 leading-relaxed">
             {t("orderSuccess.customMessage")}
           </p>
+
+          {accessToken && (
+            <Link
+              to={`/my-order/${accessToken}`}
+              className="mt-2 rounded-2xl bg-stone-900 px-8 py-4 text-sm font-semibold uppercase tracking-widest text-white shadow-lg transition-all duration-300 hover:bg-stone-700 active:scale-95"
+            >
+              {t("orderSuccess.openCabinet")}
+            </Link>
+          )}
 
           <button
             onClick={() => navigate("/")}

@@ -30,6 +30,10 @@ export const loadDeliveryAndPaymentPage = () =>
   import("../pages/DeliveryAndPaymentPage/DeliveryAndPaymentPage");
 export const loadPrivacyPolicyPage = () =>
   import("../pages/PrivacyPolicyPage/PrivacyPolicyPage");
+export const loadOrderCabinetPage = () =>
+  import("../pages/OrderCabinetPage/OrderCabinetPage");
+export const loadFindOrderPage = () =>
+  import("../pages/FindOrderPage/FindOrderPage");
 
 export const CatalogPage = lazy(() =>
   loadCatalogPage().then((m) => ({ default: m.CatalogPage })),
@@ -73,6 +77,13 @@ export const DeliveryAndPaymentPage = lazy(() =>
 );
 export const PrivacyPolicyPage = lazy(() =>
   loadPrivacyPolicyPage().then((m) => ({ default: m.PrivacyPolicyPage })),
+);
+
+export const OrderCabinetPage = lazy(() =>
+  loadOrderCabinetPage().then((m) => ({ default: m.OrderCabinetPage })),
+);
+export const FindOrderPage = lazy(() =>
+  loadFindOrderPage().then((m) => ({ default: m.FindOrderPage })),
 );
 
 /** Warm up the most likely next pages once the browser is idle. */

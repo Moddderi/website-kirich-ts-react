@@ -2,13 +2,12 @@ import { Router } from "express";
 import {
   createOrderController,
   getOrderDetails,
-  getOrdersController,
 } from "../controllers/orderController.js";
 
 const router = Router();
 
 router.post("/", createOrderController);
-router.get("/", getOrdersController);
+// NOTE: the full orders list used to be public (names, phones, e-mails) — removed.
 
 router.get("/:id", getOrderDetails);
 

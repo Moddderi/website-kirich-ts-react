@@ -52,8 +52,12 @@ const range = (from: number, to: number, currency: Currency) =>
     ? formatConvertedPrice(from, currency)
     : `${formatConvertedPrice(from, currency)} – ${formatConvertedPrice(to, currency)}`;
 
-const daysRange = (min: number, max: number) =>
-  min === max ? `${min} дн.` : `${min}–${max} дн.`;
+// Production time can be fractional (0.25 day) → show whole days
+const daysRange = (min: number, max: number) => {
+  const a = Math.ceil(min);
+  const b = Math.ceil(max);
+  return a === b ? `${a} дн.` : `${a}–${b} дн.`;
+};
 
 /** Builds a display-ready summary of an individual tailoring order (Telegram / email). */
 export const buildCustomOrderSummary = (order: any): CustomOrderSummary => {
@@ -76,7 +80,12 @@ export const buildCustomOrderSummary = (order: any): CustomOrderSummary => {
   }
 
   const startDate: string | null = order.estimate?.startDate ?? null;
-  const estimate = calcTailoringEstimate(types, currency, startDate);
+  const estimate = calcTailoringEstimate(
+    types,
+    currency,
+    startDate,
+    order.estimate?.workDays ?? null,
+  );
 
   return {
     currency,

@@ -10,6 +10,7 @@ import {
   type MeasurementType,
   type MeasurementUnit,
 } from "@project/shared";
+import { cabinetUrl } from "./links.js";
 import { buildCustomOrderSummary } from "./tailoringSummary.js";
 
 type MeasurementsPayload =
@@ -226,7 +227,11 @@ const buildCustomOrderEmailHtml = (order: any) => {
 
   let measurementsHtml = `
     <p style="margin:0;font-size:13px;color:#78716c;">
-      Мірки будуть уточнені менеджером особисто.
+      ${
+        order.estimate?.measurementsPending
+          ? "Мірки знімемо ближче до початку: за 30 днів ми нагадаємо, а в особистому кабінеті з’явиться бланк для актуальних мірок."
+          : "Мірки будуть уточнені менеджером особисто."
+      }
     </p>
   `;
 
@@ -237,7 +242,7 @@ const buildCustomOrderEmailHtml = (order: any) => {
       ([key]) => key !== "waist_definition",
     );
 
-    if (entries.length > 0) {
+    if (entries.length > 0 && !order.estimate?.measurementsPending) {
       measurementsHtml = `
         <p style="margin:0 0 10px;font-size:13px;color:#57534e;">
           <strong>Одиниці виміру:</strong> ${unitLabel}
@@ -294,6 +299,15 @@ const buildCustomOrderEmailHtml = (order: any) => {
       ${order.socialUsername ? `(${escapeHtml(String(order.socialUsername))})` : ""}
       для уточнення деталей, точної вартості та суми передоплати.
     </p>
+
+    ${
+      order.accessToken
+        ? `<div style="margin:0 0 24px;padding:18px;border-radius:16px;background:#1c1917;text-align:center;">
+             <p style="margin:0 0 12px;font-size:13px;line-height:1.5;color:#d6d3d1;">Слідкуйте за статусом замовлення, датою старту та мірками в особистому кабінеті — реєстрація не потрібна.</p>
+             <a href="${escapeHtml(cabinetUrl(order.accessToken))}" style="display:inline-block;padding:12px 24px;border-radius:12px;background:#ffffff;color:#1c1917;font-size:13px;font-weight:600;text-decoration:none;">Відкрити кабінет замовлення</a>
+           </div>`
+        : ""
+    }
 
     <h2 style="margin:0 0 12px;font-size:13px;letter-spacing:0.12em;text-transform:uppercase;color:#78716c;">Обрані вироби</h2>
     <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="margin:0 0 20px;">
@@ -377,5 +391,95 @@ export const sendOrderConfirmationEmail = async (order: any) => {
     console.log("✅ Email підтвердження відправлено:", data?.id);
   } catch (error) {
     console.error("❌ Не вдалося відправити email підтвердження:", error);
+  }
+};
+
+/**
+ * "Find my order" on the website: sends the cabinet links of the client's orders.
+ * Never throws — the endpoint always answers the same.
+ */
+export const sendCabinetLinksEmail = async (
+  email: string,
+  orders: Array<{ number: string; createdAt: Date | string; url: string }>,
+) => {
+  const apiKey = process.env.RESEND_API_KEY;
+  if (!apiKey) {
+    console.warn("⚠️ В .env не знайдено RESEND_API_KEY. Пропускаю лист із посиланнями.");
+    return;
+  }
+
+  const rows = orders
+    .map((o) => {
+      const date = new Date(o.createdAt).toLocaleDateString("uk-UA", {
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+      });
+      return `<tr>
+        <td style="padding:12px 0;border-bottom:1px solid #f0eeeb;font-size:14px;color:#1c1917;">
+          <strong>Замовлення № ${escapeHtml(o.number)}</strong>
+          <span style="display:block;font-size:12px;color:#78716c;">від ${escapeHtml(date)}</span>
+        </td>
+        <td style="padding:12px 0;border-bottom:1px solid #f0eeeb;text-align:right;">
+          <a href="${escapeHtml(o.url)}" style="display:inline-block;padding:9px 16px;border-radius:10px;background:#1c1917;color:#ffffff;font-size:12px;font-weight:600;text-decoration:none;">Відкрити</a>
+        </td>
+      </tr>`;
+    })
+    .join("");
+
+  const html = emailShell(
+    "Ваші замовлення",
+    `<p style="margin:0 0 20px;font-size:14px;line-height:1.6;color:#57534e;">
+       Ви просили посилання на кабінет замовлення. Воно особисте — не передавайте його іншим.
+     </p>
+     <table role="presentation" width="100%" cellspacing="0" cellpadding="0">${rows}</table>`,
+  );
+
+  try {
+    const resend = new Resend(apiKey);
+    const { error } = await resend.emails.send({
+      from: process.env.EMAIL_FROM || "K.I.RICH <onboarding@resend.dev>",
+      to: [email],
+      subject: "K.I.RICH — ваші замовлення",
+      html,
+      replyTo: process.env.EMAIL_REPLY_TO || "kirich.sewing.studio@gmail.com",
+    });
+    if (error) console.error("❌ Помилка Resend API:", error);
+  } catch (error) {
+    console.error("❌ Не вдалося відправити лист із посиланнями:", error);
+  }
+};
+
+/** "Time to take measurements" — sent by the daily job ~30 days before the start. */
+export const sendMeasurementsReminderEmail = async (order: any) => {
+  const apiKey = process.env.RESEND_API_KEY;
+  if (!apiKey || !order?.email || !order?.accessToken) return;
+
+  const html = emailShell(
+    "Час зняти мірки",
+    `<p style="margin:0 0 16px;font-size:15px;line-height:1.6;">
+       Вітаємо, <strong>${escapeHtml(order.firstName)}</strong>!
+     </p>
+     <p style="margin:0 0 24px;font-size:14px;line-height:1.6;color:#57534e;">
+       Наближається початок пошиття вашого замовлення. Щоб почати вчасно, потрібні
+       актуальні мірки — заповніть бланк в особистому кабінеті.
+     </p>
+     <div style="margin:0 0 8px;text-align:center;">
+       <a href="${escapeHtml(cabinetUrl(order.accessToken))}" style="display:inline-block;padding:14px 28px;border-radius:12px;background:#1c1917;color:#ffffff;font-size:14px;font-weight:600;text-decoration:none;">Заповнити мірки</a>
+     </div>`,
+  );
+
+  try {
+    const resend = new Resend(apiKey);
+    const { error } = await resend.emails.send({
+      from: process.env.EMAIL_FROM || "K.I.RICH <onboarding@resend.dev>",
+      to: [order.email],
+      subject: "K.I.RICH — час зняти мірки",
+      html,
+      replyTo: process.env.EMAIL_REPLY_TO || "kirich.sewing.studio@gmail.com",
+    });
+    if (error) console.error("❌ Помилка Resend API:", error);
+  } catch (error) {
+    console.error("❌ Не вдалося відправити нагадування про мірки:", error);
   }
 };

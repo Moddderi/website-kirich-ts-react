@@ -1,7 +1,15 @@
 import {
   TAILORING_GARMENTS,
+  addDaysISO,
   calcTailoringEstimate,
+  canStartOn,
+  isFarOrder,
+  pickWorkDays,
+  sumWorkDays,
+  todayISO,
+  type MeasurementType,
   type OrderPayload,
+  type TailoringProgram,
 } from "@project/shared";
 import db from "../models/index.js";
 import { getAvailability } from "../utils/availability.js";
@@ -9,7 +17,8 @@ import {
   sendTelegramNotification,
   sendTelegramText,
 } from "../utils/telegram.js";
-import { createNotionOrder } from "../utils/notionOrders.js";
+import { createNotionOrder, getWorkDaysTable } from "../utils/notionOrders.js";
+import { generateAccessToken } from "../utils/cabinet.js";
 import { sendOrderConfirmationEmail } from "../utils/email.js";
 
 export const createOrder = async (payload: OrderPayload) => {
@@ -52,17 +61,39 @@ export const createOrder = async (payload: OrderPayload) => {
         ]),
       );
 
-      // Start = first window that fits the shortest expected production time
-      const minLeadDays = calcTailoringEstimate(
+      // Real production time (working days) from the Notion price list, if known
+      const table = await getWorkDaysTable().catch(() => null);
+      const workDays = pickWorkDays(
+        table,
         tailoringTypes,
-        "UAH",
-        null,
-      ).leadDaysMin;
-      const availability = await getAvailability(minLeadDays);
+        programs as Partial<Record<MeasurementType, TailoringProgram>>,
+      );
+      const baseEstimate = calcTailoringEstimate(tailoringTypes, "UAH", null, workDays);
+
+      // Start = first window in the calendar that fits the whole order
+      const availability = await getAvailability({
+        windowDays: Math.ceil(baseEstimate.leadDaysMin),
+        workDays: sumWorkDays(workDays),
+      });
+
+      // The client may pick their own start date in the calendar — accept it
+      // only if it is still free for the whole order; otherwise use the nearest.
+      const preferred = payload.preferredStartDate;
+      const preferredOk =
+        !!preferred &&
+        preferred >= todayISO() &&
+        preferred <= addDaysISO(todayISO(), 600) &&
+        canStartOn(
+          availability.ranges,
+          preferred,
+          Math.ceil(baseEstimate.leadDaysMin),
+          sumWorkDays(workDays),
+        );
       const estimate = calcTailoringEstimate(
         tailoringTypes,
         "UAH",
-        availability.nearestStart,
+        preferredOk ? preferred : availability.nearestStart,
+        workDays,
       );
 
       customTotalFrom = estimate.priceFrom;
@@ -74,6 +105,7 @@ export const createOrder = async (payload: OrderPayload) => {
       customEstimate = {
         types: tailoringTypes,
         programs,
+        workDays,
         priceFromUah: estimate.priceFrom,
         priceToUah: estimate.priceTo,
         prepaymentFromUah: estimate.prepaymentFrom,
@@ -83,6 +115,9 @@ export const createOrder = async (payload: OrderPayload) => {
         startDate: estimate.startDate,
         readyFrom: estimate.readyFrom,
         readyTo: estimate.readyTo,
+        // A booking for the future: fresh measurements are requested ~30 days
+        // before the start (cabinet form), whatever was sent now is preliminary.
+        measurementsPending: isFarOrder(estimate.startDate),
       };
     }
 
@@ -111,6 +146,8 @@ export const createOrder = async (payload: OrderPayload) => {
         socialUsername: payload.socialUsername,
         comment: payload.comment?.trim() || null,
         estimate: customEstimate,
+        // Secret link to the client cabinet (individual tailoring only)
+        accessToken: payload.orderType === "custom" ? generateAccessToken() : null,
       },
       { transaction },
     );
@@ -150,7 +187,19 @@ export const createOrder = async (payload: OrderPayload) => {
         // якщо Notion недоступний — менеджер отримає попередження в Telegram.
         if (fullOrder.orderType === "custom") {
           const shortId = String(fullOrder.id).split("-")[0].toUpperCase();
-          void createNotionOrder(orderForNotifications).catch((error) => {
+          void createNotionOrder(orderForNotifications)
+            .then(async (created) => {
+              // Remember the Notion page → live status in the client cabinet
+              if (created?.id && created.id !== "dry-run-page-id") {
+                await db.Order.update(
+                  { notionPageId: created.id },
+                  { where: { id: fullOrder.id } },
+                ).catch((e: unknown) =>
+                  console.error("❌ Не вдалося зберегти notionPageId:", e),
+                );
+              }
+            })
+            .catch((error) => {
             console.error("❌ Не вдалося створити замовлення в Notion:", error);
             void sendTelegramText(
               `⚠️ Замовлення №${shortId} не потрапило в Notion (${error instanceof Error ? error.message.slice(0, 150) : "помилка"}). Додайте його вручну.`,

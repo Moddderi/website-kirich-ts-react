@@ -1,9 +1,9 @@
 import { useState } from "react";
-import { Link, NavLink } from "react-router-dom";
+import { Link, NavLink, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Portal } from "../shared/Portal/Portal";
 
-import { IoBagHandleOutline } from "react-icons/io5";
+import { IoBagHandleOutline, IoPersonOutline } from "react-icons/io5";
 import { GiHamburgerMenu } from "react-icons/gi";
 import { IoMdClose } from "react-icons/io";
 import { MdFavoriteBorder } from "react-icons/md";
@@ -11,6 +11,7 @@ import { MdFavoriteBorder } from "react-icons/md";
 import { useAppSelector } from "../../store/store";
 import type { CartItem } from "../../store/cartSlice";
 import { selectFavoriteItems } from "../../store/favoriteSlice";
+import { getCabinetToken } from "../../utils/cabinetStorage";
 import logoDark from "../../assets/logo-dark.svg";
 
 export const Header = () => {
@@ -31,6 +32,11 @@ export const Header = () => {
   );
 
   const favoriteItems = useAppSelector(selectFavoriteItems);
+
+  // Re-read the saved cabinet link on every navigation (it is saved after checkout / cabinet visit)
+  useLocation();
+  const cabinetToken = getCabinetToken();
+  const cabinetPath = cabinetToken ? `/my-order/${cabinetToken}` : "/my-orders";
 
   return (
     <>
@@ -110,6 +116,15 @@ export const Header = () => {
                   EN
                 </span>
               </button>
+
+              <Link
+                to={cabinetPath}
+                aria-label={t("header.cabinet")}
+                title={t("header.cabinet")}
+                className="text-stone-400 hover:text-stone-900 transition-colors flex items-center transform hover:scale-110 duration-300"
+              >
+                <IoPersonOutline size={26} />
+              </Link>
 
               <Link
                 to="/favorite"
@@ -199,6 +214,14 @@ export const Header = () => {
                     <span className="relative z-10">{t("header.tailoring")}</span>
                     <span className="absolute left-0 bottom-0 h-[1px] bg-white transition-all duration-500 w-0 group-hover:w-full [.active_&]:w-full" />
                   </NavLink>
+
+                  <Link
+                    to={cabinetPath}
+                    onClick={closeMenu}
+                    className="group relative text-2xl font-light tracking-wide py-1 transition-colors duration-500 block text-stone-400 hover:text-white"
+                  >
+                    <span className="relative z-10">{t("header.cabinet")}</span>
+                  </Link>
                 </div>
               </div>
 

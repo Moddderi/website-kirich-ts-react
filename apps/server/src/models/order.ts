@@ -31,6 +31,11 @@ class Order extends Model<
   declare comment: CreationOptional<string | null>;
   declare estimate: CreationOptional<object | null>;
 
+  // Client cabinet
+  declare accessToken: CreationOptional<string | null>;
+  declare notionPageId: CreationOptional<string | null>;
+  declare measurementsRequestedAt: CreationOptional<Date | null>;
+
   declare createdAt: CreationOptional<Date>;
   declare updatedAt: CreationOptional<Date>;
 
@@ -108,6 +113,19 @@ export default (sequelize: Sequelize) => {
       },
       estimate: {
         type: DataTypes.JSONB,
+        allowNull: true,
+      },
+      accessToken: {
+        type: DataTypes.STRING,
+        allowNull: true,
+        unique: true,
+      },
+      notionPageId: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
+      measurementsRequestedAt: {
+        type: DataTypes.DATE,
         allowNull: true,
       },
       createdAt: DataTypes.DATE,

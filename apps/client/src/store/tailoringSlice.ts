@@ -14,6 +14,8 @@ interface TailoringState {
   measurementUnit: MeasurementUnit;
   measurements: Record<string, string>;
   comment: string;
+  /** Start date picked in the calendar; null → nearest free start */
+  startDate: string | null;
 }
 
 const initialState: TailoringState = {
@@ -22,6 +24,7 @@ const initialState: TailoringState = {
   measurementUnit: "cm",
   measurements: {},
   comment: "",
+  startDate: null,
 };
 
 const tailoringSlice = createSlice({
@@ -64,6 +67,9 @@ const tailoringSlice = createSlice({
     ) => {
       state.measurements[action.payload.field] = action.payload.value;
     },
+    setStartDate: (state, action: PayloadAction<string | null>) => {
+      state.startDate = action.payload;
+    },
     setComment: (state, action: PayloadAction<string>) => {
       state.comment = action.payload;
     },
@@ -77,6 +83,7 @@ export const {
   setMeasurementUnit,
   setMeasurement,
   setComment,
+  setStartDate,
   clearTailoring,
 } = tailoringSlice.actions;
 export default tailoringSlice.reducer;

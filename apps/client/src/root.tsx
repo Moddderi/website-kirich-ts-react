@@ -23,6 +23,8 @@ import {
   PrepaymentPage,
   DeliveryAndPaymentPage,
   PrivacyPolicyPage,
+  OrderCabinetPage,
+  FindOrderPage,
   preloadLikelyPages,
 } from "./routes/lazyPages";
 
@@ -80,6 +82,10 @@ export const Root = () => {
                 element={<DeliveryAndPaymentPage />}
               />
               <Route path="privacy-policy" element={<PrivacyPolicyPage />} />
+
+              {/* Client cabinet: personal link from the e-mail */}
+              <Route path="my-order/:token" element={<OrderCabinetPage />} />
+              <Route path="my-orders" element={<FindOrderPage />} />
             </Route>
           </Routes>
           <Analytics />
