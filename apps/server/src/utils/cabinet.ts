@@ -13,7 +13,7 @@ export const mapNotionStatus = (name: string | null | undefined): CabinetStage =
   if (/передпл|предоплат/.test(s)) return "awaiting_prepayment";
   if (/в черзі|черзі на пошит|заброньов|бронь/.test(s)) return "booked";
   // "примірки" (fitting) contains "мірки" → check it before measurements
-  if (/примірк/.test(s)) return "fitting";
+  if (/примірк/.test(s)) return "in_progress";
   if (/зняття мірок|мірк/.test(s)) return "measurements";
   if (/в роботі|в работе/.test(s)) return "in_progress";
   if (/розрахун/.test(s)) return "awaiting_payment";

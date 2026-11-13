@@ -120,15 +120,6 @@ export const Header = () => {
               </button>
 
               <Link
-                to={cabinetPath}
-                aria-label={t("header.cabinet")}
-                title={t("header.cabinet")}
-                className="text-stone-400 hover:text-stone-900 transition-colors flex items-center transform hover:scale-110 duration-300"
-              >
-                <IoPersonOutline size={26} />
-              </Link>
-
-              <Link
                 to="/favorite"
                 className="text-stone-400 hover:text-stone-900 transition-colors flex items-center relative transform hover:scale-110 duration-300 group"
               >
@@ -150,6 +141,15 @@ export const Header = () => {
                     {totalItemsCount}
                   </span>
                 )}
+              </Link>
+
+              <Link
+                to={cabinetPath}
+                aria-label={t("header.cabinet")}
+                title={t("header.cabinet")}
+                className="text-stone-400 hover:text-stone-900 transition-colors flex items-center transform hover:scale-110 duration-300"
+              >
+                <IoPersonOutline size={26} />
               </Link>
 
               <button
