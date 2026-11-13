@@ -6,7 +6,11 @@
     "navigation": "Navigation",
     "deliveryAndPayment": "Delivery & Payment",
     "privacyPolicy": "Privacy Policy",
-    "cabinet": "My orders"
+    "cabinet": "My orders",
+    "favorites": "Favorites",
+    "cart": "Cart",
+    "menu": "Menu",
+    "close": "Close"
   },
   "footer": {
     "brandDescription": "Absolute ballroom aesthetics. A brand born in Ukraine to set global standards for dancewear.",
@@ -315,12 +319,14 @@
     "back": "Back to calendar"
   },
   "main": {
-    "vanguardCollection": "Now available on the website",
+    "vanguardCollection": "Men's ballroom wear · Poltava",
     "heroTitle1": "Clothing that highlights",
     "heroTitle2": "your uniqueness",
     "heroDescription": "Men's ballroom wear without compromise. Every detail crafted for your confidence on the dance floor.",
     "goToCollection": "Browse Catalog",
     "brandPhilosophy": "Brand Philosophy",
+    "comingSoon": "Coming soon",
+    "comingSoonDesc": "Ready-to-wear is returning soon. For now we sew exclusively to measure — made just for you.",
     "featuredKicker": "Catalog",
     "featuredTitle": "Ready-made pieces",
     "featuredSubtitle": "Pick from the catalog — we ship within 24 hours",

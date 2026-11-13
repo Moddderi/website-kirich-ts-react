@@ -9,10 +9,6 @@ import { toggleFavorite, selectIsFavorite } from "../../store/favoriteSlice";
 import { SizeChartModal } from "../../components/SizeChartModal/SizeChartModal";
 import { ColorPaletteModal } from "../../components/ColorPaletteModal/ColorPaletteModal";
 
-import { IoBagHandleOutline } from "react-icons/io5";
-import { IoHeart, IoHeartOutline } from "react-icons/io5";
-import { IoIosArrowDown } from "react-icons/io";
-import { HiOutlineArrowLeft } from "react-icons/hi";
 
 import {
   findProductInListCache,
@@ -27,6 +23,7 @@ import {
   type SizeGroup,
 } from "../../constants/sizeCharts";
 import { resolveProductColors } from "../../constants/colorPalette";
+import { LuArrowLeft, LuChevronDown, LuHeart, LuShoppingBag } from "react-icons/lu";
 
 export const ProductPage: React.FC = () => {
   const { t } = useTranslation();
@@ -134,7 +131,7 @@ export const ProductPage: React.FC = () => {
         aria-label={t("productPage.loading")}
       >
         <div className="lg:grid lg:grid-cols-12 lg:gap-x-12 xl:gap-x-16">
-          <div className="lg:col-span-7 aspect-3/4 w-full rounded-[2.5rem] bg-stone-200 animate-pulse" />
+          <div className="lg:col-span-7 aspect-3/4 w-full rounded-4xl bg-stone-200 animate-pulse" />
           <div className="mt-10 lg:mt-0 lg:col-span-5 space-y-4">
             <div className="h-4 w-24 rounded-full bg-stone-200 animate-pulse" />
             <div className="h-10 w-3/4 rounded-xl bg-stone-200 animate-pulse" />
@@ -167,7 +164,7 @@ export const ProductPage: React.FC = () => {
           onClick={() => navigate(-1)}
           className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-stone-600 bg-stone-50 border border-stone-200/60 hover:bg-white hover:border-stone-900 hover:text-stone-900 px-5 py-3.5 rounded-2xl transition-all duration-300 active:scale-95 shadow-xs"
         >
-          <HiOutlineArrowLeft size={16} />
+          <LuArrowLeft size={16} />
           {t("productPage.backToCatalog")}
         </button>
       </div>
@@ -176,7 +173,7 @@ export const ProductPage: React.FC = () => {
         {/* ЛЕВАЯ ЧАСТЬ — ГАЛЕРЕЯ С ПРЕВЬЮ */}
         <div className="lg:col-span-7 flex flex-col gap-4 relative">
           {/* Главное изображение */}
-          <div className="aspect-3/4 w-full overflow-hidden rounded-[2.5rem] bg-stone-200 border border-stone-200/60 relative group">
+          <div className="aspect-3/4 w-full overflow-hidden rounded-4xl bg-stone-200 border border-stone-200/60 relative group">
             <div className="absolute inset-0 bg-stone-300 transition-transform duration-1000">
               <div className="w-full h-full bg-[linear-gradient(to_right,#e5e5e5_1px,transparent_1px),linear-gradient(to_bottom,#e5e5e5_1px,transparent_1px)] bg-size-[2rem_2rem] mix-blend-multiply opacity-50"></div>
               <img
@@ -376,7 +373,7 @@ export const ProductPage: React.FC = () => {
                 onClick={handleAddToCart}
                 className="flex-1 rounded-2xl bg-stone-900 px-8 py-4 text-sm font-semibold uppercase tracking-widest text-white shadow-[0_8px_30px_rgba(28,25,23,0.12)] hover:bg-stone-800 hover:shadow-[0_8px_30px_rgba(28,25,23,0.2)] transition-all duration-300 active:scale-95 flex items-center justify-center gap-2"
               >
-                <IoBagHandleOutline size={18} /> {t("productPage.addToCart")}
+                <LuShoppingBag size={18} /> {t("productPage.addToCart")}
               </button>
 
               {/* КНОПКА ИЗБРАННОГО */}
@@ -391,9 +388,9 @@ export const ProductPage: React.FC = () => {
                 title={isFavorite ? t("productPage.removeFromFavorites") : t("productPage.addToFavorites")}
               >
                 {isFavorite ? (
-                  <IoHeart size={22} className="text-red-500" />
+                  <LuHeart size={22} className="fill-current text-red-500" />
                 ) : (
-                  <IoHeartOutline size={22} />
+                  <LuHeart size={22} />
                 )}
               </button>
             </div>
@@ -403,7 +400,7 @@ export const ProductPage: React.FC = () => {
               <details className="group py-5">
                 <summary className="flex cursor-pointer items-center justify-between text-sm font-semibold tracking-tight text-stone-900 marker:content-none select-none">
                   {t("productPage.processDescription")}
-                  <IoIosArrowDown className="text-stone-400 group-open:rotate-180 transition-transform" />
+                  <LuChevronDown className="text-stone-400 group-open:rotate-180 transition-transform" />
                 </summary>
                 <div className="mt-4 text-sm font-medium text-stone-500 leading-relaxed pr-8">
                   {t("productPage.processText")}
@@ -412,7 +409,7 @@ export const ProductPage: React.FC = () => {
               <details className="group py-5">
                 <summary className="flex cursor-pointer items-center justify-between text-sm font-semibold tracking-tight text-stone-900 marker:content-none select-none">
                   {t("productPage.foreignCurrencyTitle")}
-                  <IoIosArrowDown className="text-stone-400 group-open:rotate-180 transition-transform" />
+                  <LuChevronDown className="text-stone-400 group-open:rotate-180 transition-transform" />
                 </summary>
                 <div className="mt-4 text-sm font-medium text-stone-500 leading-relaxed pr-8">
                   {t("productPage.foreignCurrencyText")}

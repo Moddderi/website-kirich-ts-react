@@ -1,15 +1,8 @@
 import React from "react";
 import { useTranslation, Trans } from "react-i18next";
 import { Breadcrumbs } from "../../components/Breadcrumbs/Breadcrumbs";
+import { LuCamera, LuCreditCard, LuFileText, LuGlobe, LuShieldCheck, LuTruck } from "react-icons/lu";
 
-import {
-  HiOutlineTruck,
-  HiOutlineCreditCard,
-  HiOutlineDocumentText,
-  HiOutlineShieldCheck,
-  HiOutlineCamera,
-} from "react-icons/hi";
-import { LiaGlobeSolid } from "react-icons/lia";
 
 export const DeliveryAndPaymentPage: React.FC = () => {
   const { t } = useTranslation();
@@ -34,7 +27,7 @@ export const DeliveryAndPaymentPage: React.FC = () => {
           <div className="bg-white p-8 rounded-3xl border border-stone-200/60 flex flex-col gap-6">
             <div className="flex items-center gap-4">
               <div className="p-3 bg-stone-100 rounded-2xl text-stone-900">
-                <HiOutlineDocumentText size={24} />
+                <LuFileText size={24} />
               </div>
               <h2 className="text-lg font-semibold text-stone-900">
                 {t("deliveryAndPayment.generalConditions")}
@@ -61,7 +54,7 @@ export const DeliveryAndPaymentPage: React.FC = () => {
             <div className="absolute top-0 right-0 w-48 h-48 bg-white/5 rounded-full blur-3xl pointer-events-none"></div>
             <div className="flex items-center gap-4 relative z-10">
               <div className="p-3 bg-white/10 backdrop-blur-md rounded-2xl text-white">
-                <HiOutlineShieldCheck size={24} />
+                <LuShieldCheck size={24} />
               </div>
               <h2 className="text-lg font-semibold">{t("deliveryAndPayment.customTailoring")}</h2>
             </div>
@@ -94,7 +87,7 @@ export const DeliveryAndPaymentPage: React.FC = () => {
         <section className="bg-beige-50 border border-stone-200/40 p-8 sm:p-12 rounded-4xl flex flex-col md:flex-row gap-8 items-start">
           <div className="flex-shrink-0">
             <div className="p-4 bg-white shadow-sm border border-stone-200/60 rounded-2xl text-stone-900">
-              <HiOutlineTruck size={32} />
+              <LuTruck size={32} />
             </div>
           </div>
           <div className="flex flex-col gap-6 w-full">
@@ -163,7 +156,7 @@ export const DeliveryAndPaymentPage: React.FC = () => {
               <div>
                 <div className="flex items-center justify-between mb-4">
                   <div className="p-3 bg-stone-100 rounded-2xl text-stone-900">
-                    <HiOutlineCreditCard size={24} />
+                    <LuCreditCard size={24} />
                   </div>
                   <span className="text-[10px] font-bold uppercase tracking-wider bg-stone-100 px-3 py-1 rounded-full text-stone-600">
                     {t("deliveryAndPayment.recommended")}
@@ -194,7 +187,7 @@ export const DeliveryAndPaymentPage: React.FC = () => {
               <div>
                 <div className="flex items-center gap-4 mb-4">
                   <div className="p-3 bg-stone-100 rounded-2xl text-stone-900">
-                    <LiaGlobeSolid size={24} />
+                    <LuGlobe size={24} />
                   </div>
                 </div>
                 <h3 className="text-base font-semibold text-stone-900">
@@ -227,7 +220,7 @@ export const DeliveryAndPaymentPage: React.FC = () => {
         {/* Право на публікацію фото */}
         <section className="bg-white border border-stone-200/60 p-8 rounded-3xl flex gap-5 items-start">
           <div className="p-3 bg-stone-100 rounded-2xl text-stone-900 shrink-0">
-            <HiOutlineCamera size={24} />
+            <LuCamera size={24} />
           </div>
           <div>
             <h2 className="text-lg font-semibold text-stone-900">

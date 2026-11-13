@@ -1,4 +1,6 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import type { ReactElement } from "react";
+import { CATALOG_ENABLED } from "./constants/features";
 import { Analytics } from "@vercel/analytics/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Provider } from "react-redux";
@@ -30,6 +32,10 @@ import {
 
 preloadLikelyPages();
 
+/** Ready-made shop pages are frozen (see constants/features.ts) → back to the landing page. */
+const shop = (element: ReactElement) =>
+  CATALOG_ENABLED ? element : <Navigate to="/" replace />;
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -49,9 +55,9 @@ export const Root = () => {
           <Routes>
             <Route path="/" element={<App />}>
               <Route index element={<MainPage />} />
-              <Route path="catalog" element={<CatalogPage />} />
+              <Route path="catalog" element={shop(<CatalogPage />)} />
 
-              <Route path="catalog/:id" element={<ProductPage />} />
+              <Route path="catalog/:id" element={shop(<ProductPage />)} />
 
               <Route path="individual-tailoring" element={<TailoringLayout />}>
                 {/* Основная страница "Как это работает" */}
@@ -66,15 +72,15 @@ export const Root = () => {
                 <Route path="order-success" element={<OrderSuccessPage />} />
               </Route>
 
-              <Route path="cart" element={<CartPage />} />
-              <Route path="favorite" element={<FavoritesPage />} />
+              <Route path="cart" element={shop(<CartPage />)} />
+              <Route path="favorite" element={shop(<FavoritesPage />)} />
 
-              <Route path="checkout" element={<CheckoutPage />} />
+              <Route path="checkout" element={shop(<CheckoutPage />)} />
 
               {/* ИСПРАВЛЕНО: убрали слэш в начале */}
               <Route
                 path="order-success/:orderId"
-                element={<OrderSuccessPage />}
+                element={shop(<OrderSuccessPage />)}
               />
 
               <Route

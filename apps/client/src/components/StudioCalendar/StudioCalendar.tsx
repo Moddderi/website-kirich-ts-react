@@ -1,12 +1,12 @@
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { HiOutlineArrowLeft, HiOutlineArrowRight } from "react-icons/hi";
 import {
   getStatusForDate,
   todayISO,
   type AvailabilityRange,
   type AvailabilityStatus,
 } from "@project/shared";
+import { LuArrowLeft, LuArrowRight } from "react-icons/lu";
 
 interface StudioCalendarProps {
   ranges: AvailabilityRange[];
@@ -209,7 +209,7 @@ export const StudioCalendar = ({
             aria-label={t("availability.prevMonth")}
             className="flex h-11 w-11 items-center justify-center rounded-2xl border border-stone-200 text-stone-600 transition-all hover:border-stone-900 hover:text-stone-900 disabled:pointer-events-none disabled:opacity-30"
           >
-            <HiOutlineArrowLeft size={18} />
+            <LuArrowLeft size={18} />
           </button>
 
           <h3 className="text-lg font-semibold capitalize tracking-tight text-stone-900">
@@ -223,7 +223,7 @@ export const StudioCalendar = ({
             aria-label={t("availability.nextMonth")}
             className="flex h-11 w-11 items-center justify-center rounded-2xl border border-stone-200 text-stone-600 transition-all hover:border-stone-900 hover:text-stone-900 disabled:pointer-events-none disabled:opacity-30"
           >
-            <HiOutlineArrowRight size={18} />
+            <LuArrowRight size={18} />
           </button>
         </div>
 

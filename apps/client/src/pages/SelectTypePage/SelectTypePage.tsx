@@ -13,15 +13,13 @@ import {
   useScheduleFormat,
   useTailoringEstimate,
 } from "../../hooks/useTailoringEstimate";
-import { IoShirtOutline, IoCheckmark } from "react-icons/io5";
-import { ImScissors } from "react-icons/im";
-import { GiClothes, GiSuitcase } from "react-icons/gi";
+import { LuCheck, LuCrown, LuRuler, LuScissors, LuShirt } from "react-icons/lu";
 
 const OPTIONS = [
-  { type: "body" as const, icon: IoShirtOutline, dark: false },
-  { type: "jacket" as const, icon: ImScissors, dark: false },
-  { type: "pants" as const, icon: GiClothes, dark: false },
-  { type: "suit" as const, icon: GiSuitcase, dark: true },
+  { type: "body" as const, icon: LuShirt, dark: false },
+  { type: "jacket" as const, icon: LuScissors, dark: false },
+  { type: "pants" as const, icon: LuRuler, dark: false },
+  { type: "suit" as const, icon: LuCrown, dark: true },
 ];
 
 export const SelectTypePage = () => {
@@ -76,7 +74,7 @@ export const SelectTypePage = () => {
                 type="button"
                 aria-pressed={isSelected}
                 onClick={() => dispatch(toggleType(opt.type))}
-                className={`group relative flex h-full min-h-[24rem] flex-col overflow-hidden rounded-[2.5rem] transition-all duration-500 hover:-translate-y-2 hover:shadow-[0_20px_40px_-15px_rgba(28,25,23,0.2)] text-left animate-reveal-up opacity-0 [animation-fill-mode:forwards]
+                className={`group relative flex h-full min-h-[24rem] flex-col overflow-hidden rounded-4xl transition-all duration-500 hover:-translate-y-2 hover:shadow-[0_20px_40px_-15px_rgba(28,25,23,0.2)] text-left animate-reveal-up opacity-0 [animation-fill-mode:forwards]
                   ${
                     opt.dark
                       ? "bg-stone-900 border border-stone-800 hover:border-stone-600"
@@ -100,7 +98,7 @@ export const SelectTypePage = () => {
                         : "bg-stone-900 text-white"
                     }`}
                   >
-                    <IoCheckmark size={18} />
+                    <LuCheck size={18} />
                   </span>
                 )}
 

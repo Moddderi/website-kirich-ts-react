@@ -16,8 +16,8 @@ import { Breadcrumbs } from "../../components/Breadcrumbs/Breadcrumbs";
 import { CatalogLoadingBar } from "../../components/shared/CatalogLoadingBar/CatalogLoadingBar";
 import { CurrencySwitcher } from "../../components/CurrencySwitcher/CurrencySwitcher";
 import { useCallback } from "react";
-import { HiOutlineArrowLeft, HiOutlineArrowRight } from "react-icons/hi";
 import { Trans, useTranslation } from "react-i18next";
+import { LuArrowLeft, LuArrowRight } from "react-icons/lu";
 
 const ProductSkeleton = () => (
   <div>
@@ -165,7 +165,7 @@ export const CatalogPage = () => {
               disabled={currentPage === 1 || isFetching}
               className="flex h-12 w-12 items-center justify-center rounded-2xl border border-stone-200 bg-white text-stone-600 transition-all duration-300 hover:border-stone-900 hover:text-stone-900 disabled:opacity-30 disabled:pointer-events-none active:scale-95 shadow-xs"
             >
-              <HiOutlineArrowLeft size={18} />
+              <LuArrowLeft size={18} />
             </button>
 
             <span className="text-xs font-semibold tracking-widest uppercase text-stone-500">
@@ -183,7 +183,7 @@ export const CatalogPage = () => {
               disabled={currentPage >= totalPages || isFetching}
               className="flex h-12 w-12 items-center justify-center rounded-2xl border border-stone-200 bg-white text-stone-600 transition-all duration-300 hover:border-stone-900 hover:text-stone-900 disabled:opacity-30 disabled:pointer-events-none active:scale-95 shadow-xs"
             >
-              <HiOutlineArrowRight size={18} />
+              <LuArrowRight size={18} />
             </button>
           </div>
         )}

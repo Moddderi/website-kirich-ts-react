@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { IoMdClose } from "react-icons/io";
 import { Portal } from "../shared/Portal/Portal";
 import {
   KIDS_SIZE_CHART,
@@ -8,6 +7,7 @@ import {
   getSizeGroup,
   type SizeGroup,
 } from "../../constants/sizeCharts";
+import { LuX } from "react-icons/lu";
 
 interface SizeChartModalProps {
   isOpen: boolean;
@@ -47,14 +47,14 @@ export const SizeChartModal = ({
       <div className="fixed inset-0 z-100 flex items-center justify-center p-4 bg-stone-900/50 backdrop-blur-sm animate-fade-in">
         <div className="absolute inset-0" onClick={onClose} />
 
-        <div className="relative bg-stone-900 rounded-4xl sm:rounded-[2.5rem] max-w-2xl w-full p-6 sm:p-10 shadow-2xl border border-stone-700/60 max-h-[90vh] overflow-y-auto animate-reveal-up z-10">
+        <div className="relative bg-stone-900 rounded-4xl sm:rounded-4xl max-w-2xl w-full p-6 sm:p-10 shadow-2xl border border-stone-700/60 max-h-[90vh] overflow-y-auto animate-reveal-up z-10">
           <button
             type="button"
             onClick={onClose}
             className="absolute top-5 right-5 sm:top-6 sm:right-6 p-2 rounded-full text-stone-400 hover:text-white hover:bg-white/10 transition-colors"
             aria-label="Close"
           >
-            <IoMdClose size={22} />
+            <LuX size={22} />
           </button>
 
           <div className="text-center mb-8 pr-8">

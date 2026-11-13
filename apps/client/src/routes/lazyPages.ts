@@ -1,4 +1,5 @@
 import { lazy } from "react";
+import { CATALOG_ENABLED } from "../constants/features";
 
 /**
  * Route-level code splitting: every page except the landing page is loaded
@@ -89,9 +90,14 @@ export const FindOrderPage = lazy(() =>
 /** Warm up the most likely next pages once the browser is idle. */
 export const preloadLikelyPages = () => {
   const run = () => {
-    void loadCatalogPage();
-    void loadProductPage();
-    void loadCartPage();
+    if (CATALOG_ENABLED) {
+      void loadCatalogPage();
+      void loadProductPage();
+      void loadCartPage();
+    } else {
+      void loadSelectTypePage();
+      void loadIndividualTailoringPage();
+    }
   };
 
   if (typeof window === "undefined") return;

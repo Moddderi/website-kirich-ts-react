@@ -1,14 +1,8 @@
 import React from "react";
 import { useTranslation, Trans } from "react-i18next";
 import { Breadcrumbs } from "../../components/Breadcrumbs/Breadcrumbs";
+import { LuChartColumn, LuCopy, LuServer, LuShieldCheck, LuUserRound } from "react-icons/lu";
 
-import {
-  HiOutlineShieldCheck,
-  HiOutlineUser,
-  HiOutlineServer,
-  HiOutlineChartBar,
-  HiOutlineDocumentDuplicate,
-} from "react-icons/hi";
 
 export const PrivacyPolicyPage: React.FC = () => {
   const { t } = useTranslation();
@@ -31,7 +25,7 @@ export const PrivacyPolicyPage: React.FC = () => {
         {/* Введение */}
         <section className="bg-beige-50 border border-stone-200/40 p-8 sm:p-10 rounded-4xl flex flex-col md:flex-row gap-6 items-center">
           <div className="flex-shrink-0 p-4 bg-white shadow-sm border border-stone-200/60 rounded-2xl text-stone-900">
-            <HiOutlineShieldCheck size={32} />
+            <LuShieldCheck size={32} />
           </div>
           <p className="text-sm text-stone-600 leading-relaxed">
             <Trans i18nKey="privacyPolicy.intro" components={{ strong: <strong /> }} />
@@ -42,7 +36,7 @@ export const PrivacyPolicyPage: React.FC = () => {
         <section className="space-y-6">
           <div className="flex items-center gap-4">
             <div className="p-3 bg-stone-100 rounded-2xl text-stone-900">
-              <HiOutlineUser size={24} />
+              <LuUserRound size={24} />
             </div>
             <h2 className="text-lg font-semibold text-stone-900">
               {t("privacyPolicy.personalInfo")}
@@ -78,7 +72,7 @@ export const PrivacyPolicyPage: React.FC = () => {
         <section className="space-y-6 bg-white p-8 rounded-3xl border border-stone-200/60">
           <div className="flex items-center gap-4">
             <div className="p-3 bg-stone-100 rounded-2xl text-stone-900">
-              <HiOutlineChartBar size={24} />
+              <LuChartColumn size={24} />
             </div>
             <h2 className="text-lg font-semibold text-stone-900">
               {t("privacyPolicy.howProcessed")}
@@ -120,7 +114,7 @@ export const PrivacyPolicyPage: React.FC = () => {
             <div className="absolute top-0 right-0 w-48 h-48 bg-white/5 rounded-full blur-3xl pointer-events-none"></div>
             <div className="flex items-center gap-4 relative z-10">
               <div className="p-3 bg-white/10 backdrop-blur-md rounded-2xl text-white">
-                <HiOutlineServer size={24} />
+                <LuServer size={24} />
               </div>
               <h2 className="text-lg font-semibold">{t("privacyPolicy.staticInfo")}</h2>
             </div>
@@ -154,7 +148,7 @@ export const PrivacyPolicyPage: React.FC = () => {
           <div>
             <h2 className="text-xl font-semibold text-stone-900 flex items-center gap-4">
               <div className="p-3 bg-stone-100 rounded-2xl text-stone-900">
-                <HiOutlineDocumentDuplicate size={24} />
+                <LuCopy size={24} />
               </div>
               {t("privacyPolicy.cookies")}
             </h2>

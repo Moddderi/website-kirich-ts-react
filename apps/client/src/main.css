@@ -1,17 +1,31 @@
 @import "tailwindcss";
 
-/* === DESIGN TOKENS === */
+/* === DESIGN TOKENS — "Ink & Ivory" ===
+   Deep ink on warm ivory with a single champagne accent. Overriding the
+   theme tokens re-skins every existing component at once. */
 @theme {
-  /* Warm beige scale — pairs with the existing stone neutrals */
-  --color-beige-50: #faf7f2;
-  --color-beige-100: #f4eee4;
-  --color-beige-200: #eae0cf;
-  --color-beige-300: #e0d5c1;
-  --color-beige-400: #cdbd9f;
-  --color-beige-500: #b6a37c;
+  /* Ivory surfaces (page = 50, tinted bands = 100/200) */
+  --color-beige-50: #f8f4ec;
+  --color-beige-100: #f1eadd;
+  --color-beige-200: #e8dec9;
+  --color-beige-300: #ddceb1;
+  --color-beige-400: #cdb68c;
+  /* Champagne accent: hairlines, small labels, highlights — never large fills */
+  --color-beige-500: #b39463;
+  --color-beige-600: #967a4c;
 
-  --font-sans: "Manrope", ui-sans-serif, system-ui, -apple-system, "Segoe UI",
-    Roboto, sans-serif;
+  /* Ink: slightly deeper & warmer than the default stone-900/950 */
+  --color-stone-900: #171412;
+  --color-stone-950: #0c0a09;
+
+  /* Calmer corners: hairline cards instead of bubbly ones */
+  --radius-xl: 0.625rem;
+  --radius-2xl: 0.875rem;
+  --radius-3xl: 1.125rem;
+  --radius-4xl: 1.25rem;
+
+  --font-sans: "Manrope Variable", "Manrope", ui-sans-serif, system-ui,
+    -apple-system, "Segoe UI", Roboto, sans-serif;
   --font-display: "Cormorant Garamond", "Playfair Display", Georgia, serif;
 }
 
@@ -28,12 +42,12 @@ body {
 }
 
 ::selection {
-  background: #1c1917;
+  background: #171412;
   color: var(--color-beige-50);
 }
 
 :focus-visible {
-  outline: 2px solid #1c1917;
+  outline: 2px solid #171412;
   outline-offset: 3px;
   border-radius: 6px;
 }
@@ -69,20 +83,6 @@ body {
 }
 .marquee:hover .marquee-track {
   animation-play-state: paused;
-}
-
-/* === HERO PHOTO FLOAT (transform-only, no blur) === */
-@keyframes float-soft {
-  0%,
-  100% {
-    transform: translate3d(0, 0, 0) rotate(var(--r, 0deg));
-  }
-  50% {
-    transform: translate3d(0, -10px, 0) rotate(var(--r, 0deg));
-  }
-}
-.float-soft {
-  animation: float-soft 9s ease-in-out infinite;
 }
 
 /* === RESPECT "REDUCE MOTION" (also saves battery / avoids jank) === */
@@ -220,39 +220,6 @@ input[type="number"] {
 }
 
 /* === KEYFRAMES === */
-@keyframes float-complex {
-  0%,
-  100% {
-    transform: translateY(0) rotate(0deg) scale(1);
-  }
-  33% {
-    transform: translateY(-12px) rotate(2deg) scale(1.02);
-  }
-  66% {
-    transform: translateY(8px) rotate(-1deg) scale(0.98);
-  }
-}
-
-@keyframes float-slow {
-  0%,
-  100% {
-    transform: translateY(0) translateX(0);
-  }
-  50% {
-    transform: translateY(-20px) translateX(10px);
-  }
-}
-
-@keyframes float-reverse {
-  0%,
-  100% {
-    transform: translateY(0) translateX(0) rotate(0deg);
-  }
-  50% {
-    transform: translateY(15px) translateX(-15px) rotate(-2deg);
-  }
-}
-
 @keyframes reveal-up {
   0% {
     opacity: 0;
@@ -261,21 +228,6 @@ input[type="number"] {
   100% {
     opacity: 1;
     transform: translateY(0) scale(1);
-  }
-}
-
-@keyframes shimmer {
-  0% {
-    transform: translateX(-100%) skewX(-25deg);
-  }
-  100% {
-    transform: translateX(200%) skewX(-25deg);
-  }
-}
-
-@keyframes spin-slow {
-  100% {
-    transform: rotate(360deg);
   }
 }
 
@@ -322,23 +274,8 @@ input[type="number"] {
 
 /* === UTILITIES (анимации как в Tailwind) === */
 @layer utilities {
-  .animate-float-complex {
-    animation: float-complex 8s ease-in-out infinite;
-  }
-  .animate-float-slow {
-    animation: float-slow 12s ease-in-out infinite;
-  }
-  .animate-float-reverse {
-    animation: float-reverse 10s ease-in-out infinite;
-  }
   .animate-reveal-up {
     animation: reveal-up 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-  }
-  .animate-shimmer {
-    animation: shimmer 2.5s infinite;
-  }
-  .animate-spin-slow {
-    animation: spin-slow 25s linear infinite;
   }
   .animate-pulse-glow {
     animation: pulse-glow 4s ease-in-out infinite;
@@ -362,4 +299,10 @@ input[type="number"] {
     opacity: 0;
     animation: product-card-enter 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
   }
+}
+
+/* === ICONS: one Lucide family, a touch lighter than the default 2px stroke ===
+   (CSS beats the presentation attribute; icons passing an explicit strokeWidth keep theirs) */
+svg[stroke="currentColor"][stroke-width="2"] {
+  stroke-width: 1.6;
 }

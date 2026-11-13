@@ -8,8 +8,6 @@ import axios from "axios";
 import { useAppDispatch, useAppSelector } from "../../store/store";
 import { clearCart } from "../../store/cartSlice";
 import { clearTailoring } from "../../store/tailoringSlice";
-import { IoIosArrowForward } from "react-icons/io";
-import { FaTelegramPlane, FaInstagram, FaWhatsapp } from "react-icons/fa";
 import { createOrder } from "../../api/orderApi";
 import { useCartMoney } from "../../hooks/useFormattedPrice";
 import {
@@ -25,6 +23,7 @@ import {
   NovaPoshtaIcon,
   UkrposhtaIcon,
 } from "../../components/DeliveryIcons/DeliveryIcons";
+import { LuChevronRight, LuInstagram, LuMessageCircle, LuSend } from "react-icons/lu";
 
 export const CheckoutPage = () => {
   const navigate = useNavigate();
@@ -357,7 +356,7 @@ export const CheckoutPage = () => {
                       {...register("communicationMethod")}
                       className="h-4 w-4 text-stone-900 accent-stone-900"
                     />
-                    <FaTelegramPlane size={16} className="text-[#0088cc]" />
+                    <LuSend size={16} className="text-stone-700" />
                     <span className="text-sm font-semibold text-stone-900">
                       Telegram
                     </span>
@@ -376,7 +375,7 @@ export const CheckoutPage = () => {
                       {...register("communicationMethod")}
                       className="h-4 w-4 text-stone-900 accent-stone-900"
                     />
-                    <FaInstagram size={16} className="text-[#e1306c]" />
+                    <LuInstagram size={16} className="text-stone-700" />
                     <span className="text-sm font-semibold text-stone-900">
                       Instagram
                     </span>
@@ -395,7 +394,7 @@ export const CheckoutPage = () => {
                       {...register("communicationMethod")}
                       className="h-4 w-4 text-stone-900 accent-stone-900"
                     />
-                    <FaWhatsapp size={16} className="text-[#25d366]" />
+                    <LuMessageCircle size={16} className="text-stone-700" />
                     <span className="text-sm font-semibold text-stone-900">
                       WhatsApp
                     </span>
@@ -728,7 +727,7 @@ export const CheckoutPage = () => {
               >
                 {isSubmitting ? t("checkout.processing") : t("checkout.confirmOrder")}
                 {!isSubmitting && (
-                  <IoIosArrowForward
+                  <LuChevronRight
                     size={16}
                     className="group-hover:translate-x-1 transition-transform"
                   />

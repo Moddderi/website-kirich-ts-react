@@ -12,7 +12,7 @@ import { submitCabinetMeasurements, useCabinetOrder } from "../../api/cabinetApi
 import { MeasurementsForm } from "../../components/MeasurementsForm/MeasurementsForm";
 import { saveCabinetToken } from "../../utils/cabinetStorage";
 import { useFormatDate } from "../../hooks/useTailoringEstimate";
-import { IoCheckmark } from "react-icons/io5";
+import { LuCheck } from "react-icons/lu";
 
 export const OrderCabinetPage = () => {
   const { t } = useTranslation();
@@ -150,7 +150,7 @@ export const OrderCabinetPage = () => {
                             : "border-stone-200 bg-white text-stone-300"
                       }`}
                     >
-                      {done ? <IoCheckmark size={16} /> : index + 1}
+                      {done ? <LuCheck size={16} /> : index + 1}
                     </span>
                     <div className="pt-1">
                       <p
