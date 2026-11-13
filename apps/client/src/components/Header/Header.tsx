@@ -10,7 +10,7 @@ import type { CartItem } from "../../store/cartSlice";
 import { selectFavoriteItems } from "../../store/favoriteSlice";
 import { getCabinetToken, getSession } from "../../utils/cabinetStorage";
 import { CATALOG_ENABLED } from "../../constants/features";
-import logoDark from "../../assets/logo-dark.svg";
+import logoLight from "../../assets/logo-mini.png";
 
 const ICON_CLASS =
   "relative flex h-10 w-10 items-center justify-center rounded-full text-stone-600 transition-colors duration-300 hover:bg-stone-900/5 hover:text-stone-900";
@@ -67,7 +67,7 @@ export const Header = () => {
 
   return (
     <>
-      <div className="bg-stone-900 px-4 py-2 text-center">
+      <div className="palette-original border-b border-white/5 bg-stone-900 px-4 py-2 text-center">
         <p className="text-[10px] font-medium uppercase tracking-[0.32em] text-beige-300/90 sm:text-[11px]">
           {t("header.topBar")}
         </p>
@@ -83,11 +83,11 @@ export const Header = () => {
               aria-label="K.I.RICH POLTAVA"
             >
               <img
-                src={logoDark}
+                src={logoLight}
                 alt="K.I.RICH POLTAVA"
                 width={64}
                 height={64}
-                className="h-12 w-auto object-contain sm:h-14"
+                className="h-11 w-auto object-contain sm:h-12"
               />
             </Link>
 
@@ -166,7 +166,7 @@ export const Header = () => {
               onClick={closeMenu}
             />
 
-            <div className="animate-reveal-up relative z-10 flex h-full w-full max-w-full flex-col justify-between overflow-y-auto bg-stone-950 p-6 sm:w-[420px] sm:p-10">
+            <div className="palette-original animate-reveal-up relative z-10 flex h-full w-full max-w-full flex-col justify-between overflow-y-auto bg-stone-950 p-6 sm:w-[420px] sm:p-10">
               <div>
                 <div className="mb-10 flex items-center justify-between">
                   <span className="text-[10px] font-semibold uppercase tracking-[0.32em] text-beige-400">

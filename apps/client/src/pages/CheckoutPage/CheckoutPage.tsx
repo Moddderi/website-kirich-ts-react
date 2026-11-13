@@ -682,7 +682,7 @@ export const CheckoutPage = () => {
 
               {orderType === "custom" && (
                 <div className="mb-6 space-y-3">
-                  <div className="flex flex-wrap justify-between gap-2 rounded-2xl bg-stone-900 px-5 py-4 text-white">
+                  <div className="palette-original flex flex-wrap justify-between gap-2 rounded-2xl bg-stone-900 px-5 py-4 text-white">
                     <span className="text-xs font-semibold uppercase tracking-widest text-stone-300">
                       {t("checkout.prepaymentLine", {
                         percent: Math.round(PREPAYMENT_RATE * 100),

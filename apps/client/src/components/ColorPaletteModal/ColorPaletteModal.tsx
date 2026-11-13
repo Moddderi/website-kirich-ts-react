@@ -19,10 +19,10 @@ export const ColorPaletteModal = ({
 
   return (
     <Portal>
-      <div className="fixed inset-0 z-100 flex items-center justify-center p-4 bg-stone-900/50 backdrop-blur-sm animate-fade-in">
+      <div className="fixed inset-0 z-100 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in">
         <div className="absolute inset-0" onClick={onClose} />
 
-        <div className="relative z-10 w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-4xl sm:rounded-4xl bg-stone-900 p-6 sm:p-10 shadow-2xl border border-stone-700/60 animate-reveal-up">
+        <div className="palette-original relative z-10 w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-4xl sm:rounded-4xl bg-stone-900 p-6 sm:p-10 shadow-2xl border border-stone-700/60 animate-reveal-up">
           <button
             type="button"
             onClick={onClose}

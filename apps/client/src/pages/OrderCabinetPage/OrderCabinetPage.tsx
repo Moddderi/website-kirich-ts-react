@@ -89,7 +89,7 @@ export const OrderCabinetPage = () => {
 
         {order.measurements.needed && (
           <section className="mx-auto mb-12 max-w-4xl">
-            <div className="mb-8 rounded-4xl bg-stone-900 p-7 text-white shadow-xl">
+            <div className="palette-original mb-8 rounded-4xl border border-white/10 bg-stone-900 p-7 text-white shadow-xl">
               <p className="text-[10px] font-semibold uppercase tracking-widest text-stone-400">
                 {t("cabinet.measurementsTitle")}
               </p>
@@ -174,7 +174,7 @@ export const OrderCabinetPage = () => {
 
           {/* Details */}
           <aside className="mt-8 space-y-5 lg:col-span-5 lg:mt-0">
-            <div className="rounded-4xl bg-stone-900 p-7 text-white shadow-xl">
+            <div className="palette-original rounded-4xl border border-white/10 bg-stone-900 p-7 text-white shadow-xl">
               <p className="text-[10px] font-semibold uppercase tracking-widest text-stone-400">
                 {t("cabinet.startLabel")}
               </p>

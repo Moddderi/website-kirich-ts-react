@@ -1,24 +1,53 @@
 @import "tailwindcss";
 
-/* === DESIGN TOKENS — "Ink & Ivory" ===
-   Deep ink on warm ivory with a single champagne accent. Overriding the
-   theme tokens re-skins every existing component at once. */
+/* === DESIGN TOKENS — "Noir" ===
+   Pure black surfaces, cool white type, neutral silver as the only "accent".
+   Components were written against light-theme classes, so the neutral scale is
+   *inverted* here (stone-900 = primary text / primary button, white = card surface …).
+   Panels that are meant to stay "classically dark" opt out with `.palette-original`. */
 @theme {
-  /* Ivory surfaces (page = 50, tinted bands = 100/200) */
-  --color-beige-50: #f8f4ec;
-  --color-beige-100: #f1eadd;
-  --color-beige-200: #e8dec9;
-  --color-beige-300: #ddceb1;
-  --color-beige-400: #cdb68c;
-  /* Champagne accent: hairlines, small labels, highlights — never large fills */
-  --color-beige-500: #b39463;
-  --color-beige-600: #967a4c;
+  /* Surfaces (beige-50 = page, then progressively lighter tints) */
+  --color-beige-50: #050505;
+  --color-beige-100: #0b0b0b;
+  --color-beige-200: #141414;
+  /* "Accent" = silver (kept under the old token names) */
+  --color-beige-300: #ececec;
+  --color-beige-400: #d0d0d0;
+  --color-beige-500: #8f8f8f;
+  --color-beige-600: #bdbdbd;
 
-  /* Ink: slightly deeper & warmer than the default stone-900/950 */
-  --color-stone-900: #171412;
-  --color-stone-950: #0c0a09;
+  /* Inverted neutral scale */
+  --color-white: #0c0c0c;
+  --color-stone-50: #090909;
+  --color-stone-100: #101010;
+  --color-stone-200: #1d1d1d;
+  --color-stone-300: #303030;
+  --color-stone-400: #707070;
+  --color-stone-500: #8f8f8f;
+  --color-stone-600: #ababab;
+  --color-stone-700: #c6c6c6;
+  --color-stone-800: #e2e2e2;
+  --color-stone-900: #f6f6f6;
+  --color-stone-950: #ffffff;
 
-  /* Calmer corners: hairline cards instead of bubbly ones */
+  /* Status tints (notices, calendar, errors) re-tuned for a dark surface */
+  --color-amber-50: #161616;
+  --color-amber-200: #3a3a3a;
+  --color-amber-800: #e6e6e6;
+  --color-amber-900: #f2f2f2;
+  --color-amber-950: #ffffff;
+  --color-emerald-50: #0c241b;
+  --color-emerald-200: #1c5640;
+  --color-emerald-800: #86e5b8;
+  --color-emerald-900: #a9f1cd;
+  --color-red-50: #2b1414;
+  --color-red-100: #3b1919;
+  --color-red-200: #5d2525;
+  --color-red-600: #f28d8d;
+  --color-red-800: #fca5a5;
+  --color-red-900: #fecaca;
+
+  /* Calmer corners */
   --radius-xl: 0.625rem;
   --radius-2xl: 0.875rem;
   --radius-3xl: 1.125rem;
@@ -29,7 +58,28 @@
   --font-display: "Cormorant Garamond", "Playfair Display", Georgia, serif;
 }
 
+/* Opt-out: restores the classic palette (white = white, stone-900 = ink …) inside a panel */
+.palette-original {
+  --color-white: #ffffff;
+  --color-beige-50: #f5f5f5;
+  --color-beige-100: #ececec;
+  --color-beige-200: #dedede;
+  --color-stone-50: #fafafa;
+  --color-stone-100: #f4f4f4;
+  --color-stone-200: #e5e5e5;
+  --color-stone-300: #d4d4d4;
+  --color-stone-400: #a3a3a3;
+  --color-stone-500: #737373;
+  --color-stone-600: #525252;
+  --color-stone-700: #404040;
+  --color-stone-800: #1f1f1f;
+  --color-stone-900: #0e0e0e;
+  --color-stone-950: #000000;
+  color: #ffffff;
+}
+
 html {
+  color-scheme: dark;
   scroll-behavior: smooth;
   -webkit-tap-highlight-color: transparent;
 }
@@ -42,12 +92,12 @@ body {
 }
 
 ::selection {
-  background: #171412;
+  background: var(--color-stone-900);
   color: var(--color-beige-50);
 }
 
 :focus-visible {
-  outline: 2px solid #171412;
+  outline: 2px solid var(--color-beige-400);
   outline-offset: 3px;
   border-radius: 6px;
 }
@@ -112,14 +162,14 @@ input[type="radio"]:not(:checked) + div .radio-dot {
   transform: scale(0.5);
 }
 input[type="radio"]:checked + div .radio-border {
-  border-color: #1c1917;
+  border-color: var(--color-stone-900);
 }
 
 /* === GRID BACKGROUND PATTERN === */
 .bg-grid-pattern {
   background-image:
-    linear-gradient(to right, rgba(28, 25, 23, 0.03) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(28, 25, 23, 0.03) 1px, transparent 1px);
+    linear-gradient(to right, rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
   background-size: 32px 32px;
 }
 
@@ -305,4 +355,281 @@ input[type="number"] {
    (CSS beats the presentation attribute; icons passing an explicit strokeWidth keep theirs) */
 svg[stroke="currentColor"][stroke-width="2"] {
   stroke-width: 1.6;
+}
+
+
+/* =====================================================================
+   FX — futuristic touches for the landing page (compositor-friendly)
+   ===================================================================== */
+
+/* Drifting grid, faded out with a radial mask */
+.fx-grid-wrap {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  -webkit-mask-image: radial-gradient(65% 60% at 50% 25%, #000 15%, transparent 78%);
+  mask-image: radial-gradient(65% 60% at 50% 25%, #000 15%, transparent 78%);
+}
+.fx-grid {
+  position: absolute;
+  inset: -64px 0 0 0;
+  background-image:
+    linear-gradient(to right, rgba(255, 255, 255, 0.07) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.07) 1px, transparent 1px);
+  background-size: 64px 64px;
+  animation: fx-grid-drift 7s linear infinite;
+}
+@keyframes fx-grid-drift {
+  to {
+    transform: translate3d(0, 64px, 0);
+  }
+}
+
+/* Soft light beam falling from the top edge */
+.fx-beam {
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 80%;
+  pointer-events: none;
+  background: conic-gradient(
+    from 180deg at 50% 0%,
+    transparent 158deg,
+    rgba(255, 255, 255, 0.11) 180deg,
+    transparent 202deg
+  );
+  -webkit-mask-image: linear-gradient(to bottom, #000 0%, transparent 85%);
+  mask-image: linear-gradient(to bottom, #000 0%, transparent 85%);
+  transform-origin: 50% 0;
+  animation: fx-beam-sway 9s ease-in-out infinite alternate;
+}
+@keyframes fx-beam-sway {
+  from {
+    transform: rotate(-4deg);
+  }
+  to {
+    transform: rotate(4deg);
+  }
+}
+
+/* Cursor-following glow (position set from JS through --mx / --my) */
+.fx-cursor-glow {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.4s;
+  background: radial-gradient(
+    520px circle at var(--mx, 50%) var(--my, 30%),
+    rgba(255, 255, 255, 0.075),
+    transparent 60%
+  );
+}
+.fx-cursor-host:hover .fx-cursor-glow {
+  opacity: 1;
+}
+
+/* Spotlight card: glowing hairline + soft fill that follow the pointer */
+.spot {
+  position: relative;
+  isolation: isolate;
+  --mx: 50%;
+  --my: 50%;
+}
+.spot::before,
+.spot::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.35s;
+}
+.spot::before {
+  padding: 1px;
+  background: radial-gradient(
+    260px circle at var(--mx) var(--my),
+    rgba(255, 255, 255, 0.7),
+    transparent 65%
+  );
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask:
+    linear-gradient(#000 0 0) content-box exclude,
+    linear-gradient(#000 0 0);
+  z-index: 2;
+}
+.spot::after {
+  background: radial-gradient(
+    380px circle at var(--mx) var(--my),
+    rgba(255, 255, 255, 0.07),
+    transparent 65%
+  );
+  z-index: 0;
+}
+.spot:hover::before,
+.spot:hover::after {
+  opacity: 1;
+}
+
+/* Headline: word-by-word blur-in */
+.word-in {
+  display: inline-block;
+  opacity: 0;
+  transform: translate3d(0, 0.5em, 0);
+  filter: blur(10px);
+  animation: word-in 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation-delay: var(--d, 0ms);
+}
+@keyframes word-in {
+  to {
+    opacity: 1;
+    transform: none;
+    filter: blur(0);
+  }
+}
+
+/* Silver light sweeping across text */
+.text-sweep {
+  background: linear-gradient(
+    100deg,
+    #6d6d6d 0%,
+    #ffffff 35%,
+    #ffffff 55%,
+    #6d6d6d 100%
+  );
+  background-size: 220% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  animation: text-sweep 7s linear infinite;
+}
+@keyframes text-sweep {
+  to {
+    background-position: -220% center;
+  }
+}
+
+/* Outline lettering */
+.text-outline {
+  color: transparent;
+  -webkit-text-stroke: 1px rgba(255, 255, 255, 0.4);
+}
+
+/* Measuring scan line over the hero photo */
+.scan-line {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #fff, transparent);
+  box-shadow: 0 0 22px 5px rgba(255, 255, 255, 0.35);
+  animation: scan 5s ease-in-out infinite;
+  pointer-events: none;
+}
+@keyframes scan {
+  0% {
+    top: 2%;
+    opacity: 0;
+  }
+  12% {
+    opacity: 1;
+  }
+  88% {
+    opacity: 1;
+  }
+  100% {
+    top: 98%;
+    opacity: 0;
+  }
+}
+
+/* Pulsing measurement dot */
+.ping-dot {
+  position: relative;
+}
+.ping-dot::after {
+  content: "";
+  position: absolute;
+  inset: -4px;
+  border-radius: 9999px;
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  animation: ping-ring 2.4s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+@keyframes ping-ring {
+  0% {
+    transform: scale(0.6);
+    opacity: 0.9;
+  }
+  100% {
+    transform: scale(2.4);
+    opacity: 0;
+  }
+}
+
+/* Gentle floating for glass chips */
+.float-y {
+  animation: float-y 6s ease-in-out infinite;
+}
+@keyframes float-y {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(0, -9px, 0);
+  }
+}
+
+/* Slowly rotating ring */
+.spin-slower {
+  animation: spin-slower 40s linear infinite;
+}
+@keyframes spin-slower {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Rotating conic border for the final CTA */
+.border-beam {
+  position: relative;
+  isolation: isolate;
+}
+.border-beam::before {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  padding: 1px;
+  background: conic-gradient(
+    from var(--beam-angle, 0deg),
+    transparent 0 70%,
+    rgba(255, 255, 255, 0.9) 85%,
+    transparent 100%
+  );
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask:
+    linear-gradient(#000 0 0) content-box exclude,
+    linear-gradient(#000 0 0);
+  animation: beam-rotate 6s linear infinite;
+  pointer-events: none;
+}
+@property --beam-angle {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0deg;
+}
+@keyframes beam-rotate {
+  to {
+    --beam-angle: 360deg;
+  }
 }

@@ -44,10 +44,10 @@ export const SizeChartModal = ({
 
   return (
     <Portal>
-      <div className="fixed inset-0 z-100 flex items-center justify-center p-4 bg-stone-900/50 backdrop-blur-sm animate-fade-in">
+      <div className="fixed inset-0 z-100 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in">
         <div className="absolute inset-0" onClick={onClose} />
 
-        <div className="relative bg-stone-900 rounded-4xl sm:rounded-4xl max-w-2xl w-full p-6 sm:p-10 shadow-2xl border border-stone-700/60 max-h-[90vh] overflow-y-auto animate-reveal-up z-10">
+        <div className="palette-original relative bg-stone-900 rounded-4xl sm:rounded-4xl max-w-2xl w-full p-6 sm:p-10 shadow-2xl border border-stone-700/60 max-h-[90vh] overflow-y-auto animate-reveal-up z-10">
           <button
             type="button"
             onClick={onClose}

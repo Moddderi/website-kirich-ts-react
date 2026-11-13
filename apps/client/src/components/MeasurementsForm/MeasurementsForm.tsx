@@ -203,7 +203,7 @@ export const MeasurementsForm = ({
               <button
                 type="submit"
                 disabled={submitting}
-                className="w-full mt-2 disabled:opacity-60 flex items-center justify-center gap-2 rounded-2xl bg-stone-900 py-4 px-8 text-sm font-semibold text-white hover:bg-stone-800 transition-all active:scale-[0.98] shadow-lg shadow-stone-900/20 group"
+                className="w-full mt-2 disabled:opacity-60 flex items-center justify-center gap-2 rounded-2xl bg-stone-900 py-4 px-8 text-sm font-semibold text-white hover:bg-stone-800 transition-all active:scale-[0.98] shadow-lg shadow-black/40 group"
               >
                 {submitLabel}
               </button>

@@ -77,10 +77,10 @@ export const SelectTypePage = () => {
                 className={`group relative flex h-full min-h-[24rem] flex-col overflow-hidden rounded-4xl transition-all duration-500 hover:-translate-y-2 hover:shadow-[0_20px_40px_-15px_rgba(28,25,23,0.2)] text-left animate-reveal-up opacity-0 [animation-fill-mode:forwards]
                   ${
                     opt.dark
-                      ? "bg-stone-900 border border-stone-800 hover:border-stone-600"
+                      ? "palette-original bg-stone-900 border border-beige-500/40 hover:border-beige-400"
                       : "bg-white border border-stone-200/60 hover:border-stone-400"
                   }
-                  ${isSelected ? "ring-2 ring-offset-2 ring-stone-900" : ""}`}
+                  ${isSelected ? "ring-2 ring-offset-2 ring-offset-beige-50 ring-stone-900" : ""}`}
                 style={{ animationDelay: `${400 + index * 100}ms` }}
               >
                 {!opt.dark && (
@@ -239,7 +239,7 @@ export const SelectTypePage = () => {
             type="button"
             disabled={!hasSelection}
             onClick={() => navigate("/individual-tailoring/step-2")}
-            className="rounded-2xl bg-stone-900 px-8 py-4 text-sm font-semibold text-white shadow-lg shadow-stone-900/20 transition-all hover:bg-stone-800 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40"
+            className="rounded-2xl bg-stone-900 px-8 py-4 text-sm font-semibold text-white shadow-lg shadow-black/40 transition-all hover:bg-stone-800 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40"
           >
             {t("selectType.continue")}
           </button>

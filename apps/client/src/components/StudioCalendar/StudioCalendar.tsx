@@ -263,7 +263,7 @@ export const StudioCalendar = ({
               selectable
                 ? "cursor-pointer hover:ring-2 hover:ring-stone-900/40 focus-visible:ring-2 focus-visible:ring-stone-900"
                 : ""
-            } ${isSelected ? "ring-2 ring-stone-900 ring-offset-2" : ""}`;
+            } ${isSelected ? "ring-2 ring-stone-900 ring-offset-2 ring-offset-white" : ""}`;
             const title = isWeekend
               ? t("availability.legendWeekend")
               : inOrder

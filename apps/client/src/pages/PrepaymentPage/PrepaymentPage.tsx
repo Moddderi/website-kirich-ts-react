@@ -84,7 +84,7 @@ export const PrepaymentPage = () => {
           </section>
 
           {/* Prepayment */}
-          <section className="rounded-4xl bg-stone-900 p-7 text-white shadow-xl sm:p-9">
+          <section className="palette-original rounded-4xl border border-white/10 bg-stone-900 p-7 text-white shadow-xl sm:p-9">
             <p className="text-[10px] font-semibold uppercase tracking-widest text-stone-400">
               {t("prepayment.prepaymentTitle", { percent })}
             </p>
@@ -148,7 +148,7 @@ export const PrepaymentPage = () => {
             <button
               type="button"
               onClick={() => navigate("/individual-tailoring/checkout")}
-              className="rounded-2xl bg-stone-900 px-10 py-4 text-sm font-semibold text-white shadow-lg shadow-stone-900/20 transition-all hover:bg-stone-800 active:scale-[0.98]"
+              className="rounded-2xl bg-stone-900 px-10 py-4 text-sm font-semibold text-white shadow-lg shadow-black/40 transition-all hover:bg-stone-800 active:scale-[0.98]"
             >
               {t("prepayment.continue")}
             </button>

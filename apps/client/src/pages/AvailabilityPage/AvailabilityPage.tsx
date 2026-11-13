@@ -79,7 +79,7 @@ export const AvailabilityPage = () => {
           {/* Summary */}
           <aside className="mt-10 lg:mt-0 lg:col-span-4">
             <div className="sticky top-32 space-y-5">
-              <div className="rounded-4xl bg-stone-900 p-7 text-white shadow-xl">
+              <div className="palette-original rounded-4xl border border-white/10 bg-stone-900 p-7 text-white shadow-xl">
                 <p className="text-[10px] font-semibold uppercase tracking-widest text-stone-400">
                   {isCustomStart
                     ? t("availability.chosenTitle")
@@ -161,7 +161,7 @@ export const AvailabilityPage = () => {
                       : "/individual-tailoring/step-3",
                   )
                 }
-                className="w-full rounded-2xl bg-stone-900 px-8 py-4 text-sm font-semibold text-white shadow-lg shadow-stone-900/20 transition-all hover:bg-stone-800 active:scale-[0.98]"
+                className="w-full rounded-2xl bg-stone-900 px-8 py-4 text-sm font-semibold text-white shadow-lg shadow-black/40 transition-all hover:bg-stone-800 active:scale-[0.98]"
               >
                 {far ? t("availability.continueFar") : t("availability.continue")}
               </button>

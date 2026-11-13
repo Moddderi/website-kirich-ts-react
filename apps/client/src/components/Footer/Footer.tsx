@@ -25,7 +25,7 @@ export function Footer() {
   const { t } = useTranslation();
 
   return (
-    <footer className="relative overflow-hidden bg-stone-950 text-white">
+    <footer className="palette-original relative overflow-hidden border-t border-white/5 bg-stone-950 text-white">
       <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-beige-500/60 to-transparent" />
 
       <div className="mx-auto max-w-7xl px-5 py-16 sm:px-6 lg:px-8 lg:py-20">

@@ -50,7 +50,7 @@ export const DeliveryAndPaymentPage: React.FC = () => {
             </ul>
           </div>
 
-          <div className="bg-stone-900 text-white p-8 rounded-3xl flex flex-col justify-between gap-6 relative overflow-hidden">
+          <div className="palette-original bg-stone-900 text-white p-8 rounded-3xl flex flex-col justify-between gap-6 relative overflow-hidden">
             <div className="absolute top-0 right-0 w-48 h-48 bg-white/5 rounded-full blur-3xl pointer-events-none"></div>
             <div className="flex items-center gap-4 relative z-10">
               <div className="p-3 bg-white/10 backdrop-blur-md rounded-2xl text-white">
