@@ -554,7 +554,7 @@
     "stage": {
       "new": "Request received",
       "awaiting_prepayment": "Waiting for prepayment",
-      "booked": "Slot booked, waiting for the date",
+      "booked": "In the tailoring queue",
       "measurements": "Taking measurements",
       "in_progress": "Tailoring",
       "fitting": "Fitting",
@@ -565,7 +565,7 @@
     "stageDesc": {
       "new": "We have received your request. The manager will contact you to confirm details and price.",
       "awaiting_prepayment": "A prepayment secures your place in the schedule. The manager will send the details.",
-      "booked": "Your slot is reserved. We will remind you to take measurements a month before the start.",
+      "booked": "Prepayment received — your order is in the tailoring queue. If the start is a while away, we will remind you to take measurements a month before.",
       "measurements": "Time to take measurements so tailoring can start on time.",
       "in_progress": "Your order is in production.",
       "fitting": "The garment is ready for a fitting. The manager will arrange a convenient time.",
@@ -575,16 +575,28 @@
     },
     "sendMeasurements": "Send measurements",
     "sendError": "Could not send the measurements. Check the values and try again.",
-    "measurementsSent": "Thank you! We have received your measurements."
+    "measurementsSent": "Thank you! We have received your measurements.",
+    "allOrders": "All my orders"
   },
   "findOrder": {
     "title": "My orders",
-    "description": "Enter the email you used for the order — we will send you a link to the cabinet with the status.",
+    "description": "Enter the email from your order and we will send a sign-in code. No password needed.",
     "emailLabel": "Email",
-    "submit": "Send link",
+    "submit": "Send code",
     "sending": "Sending...",
     "error": "Could not send. Please try again.",
     "sentTitle": "Check your inbox",
-    "sentText": "If there is a tailoring order for this email, we sent a cabinet link. No email? Check your spam folder."
+    "sentText": "If there is a tailoring order for this email, we sent a cabinet link. No email? Check your spam folder.",
+    "codeDescription": "We sent a 6-digit code to {{email}}.",
+    "codeLabel": "Code from the email",
+    "codeHint": "The code is valid for 10 minutes. No email? Check your spam folder.",
+    "signIn": "Sign in",
+    "checking": "Checking...",
+    "otherEmail": "Use another email",
+    "wrongCode": "Wrong or expired code. Please try again.",
+    "tooMany": "Too many attempts. Try again in 15 minutes.",
+    "pickOrder": "Choose an order to see its status.",
+    "noOrders": "There are no tailoring orders for this email yet.",
+    "signOut": "Sign out"
   }
 }

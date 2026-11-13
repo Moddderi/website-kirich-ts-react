@@ -398,41 +398,24 @@ export const sendOrderConfirmationEmail = async (order: any) => {
  * "Find my order" on the website: sends the cabinet links of the client's orders.
  * Never throws — the endpoint always answers the same.
  */
-export const sendCabinetLinksEmail = async (
-  email: string,
-  orders: Array<{ number: string; createdAt: Date | string; url: string }>,
-) => {
+export const sendLoginCodeEmail = async (email: string, code: string) => {
   const apiKey = process.env.RESEND_API_KEY;
   if (!apiKey) {
-    console.warn("⚠️ В .env не знайдено RESEND_API_KEY. Пропускаю лист із посиланнями.");
+    console.warn("⚠️ В .env не знайдено RESEND_API_KEY. Пропускаю лист із кодом входу.");
     return;
   }
 
-  const rows = orders
-    .map((o) => {
-      const date = new Date(o.createdAt).toLocaleDateString("uk-UA", {
-        day: "numeric",
-        month: "long",
-        year: "numeric",
-      });
-      return `<tr>
-        <td style="padding:12px 0;border-bottom:1px solid #f0eeeb;font-size:14px;color:#1c1917;">
-          <strong>Замовлення № ${escapeHtml(o.number)}</strong>
-          <span style="display:block;font-size:12px;color:#78716c;">від ${escapeHtml(date)}</span>
-        </td>
-        <td style="padding:12px 0;border-bottom:1px solid #f0eeeb;text-align:right;">
-          <a href="${escapeHtml(o.url)}" style="display:inline-block;padding:9px 16px;border-radius:10px;background:#1c1917;color:#ffffff;font-size:12px;font-weight:600;text-decoration:none;">Відкрити</a>
-        </td>
-      </tr>`;
-    })
-    .join("");
-
   const html = emailShell(
-    "Ваші замовлення",
+    "Вхід до особистого кабінету",
     `<p style="margin:0 0 20px;font-size:14px;line-height:1.6;color:#57534e;">
-       Ви просили посилання на кабінет замовлення. Воно особисте — не передавайте його іншим.
+       Ваш код для входу — введіть його на сторінці «Мої замовлення». Код діє 10 хвилин.
      </p>
-     <table role="presentation" width="100%" cellspacing="0" cellpadding="0">${rows}</table>`,
+     <p style="margin:0 0 20px;text-align:center;font-size:36px;font-weight:700;letter-spacing:0.35em;color:#1c1917;">
+       ${escapeHtml(code)}
+     </p>
+     <p style="margin:0;font-size:12px;line-height:1.6;color:#78716c;">
+       Якщо ви не просили код — просто проігноруйте цей лист.
+     </p>`,
   );
 
   try {
@@ -440,13 +423,13 @@ export const sendCabinetLinksEmail = async (
     const { error } = await resend.emails.send({
       from: process.env.EMAIL_FROM || "K.I.RICH <onboarding@resend.dev>",
       to: [email],
-      subject: "K.I.RICH — ваші замовлення",
+      subject: `K.I.RICH — код входу ${code}`,
       html,
       replyTo: process.env.EMAIL_REPLY_TO || "kirich.sewing.studio@gmail.com",
     });
     if (error) console.error("❌ Помилка Resend API:", error);
   } catch (error) {
-    console.error("❌ Не вдалося відправити лист із посиланнями:", error);
+    console.error("❌ Не вдалося відправити код входу:", error);
   }
 };
 

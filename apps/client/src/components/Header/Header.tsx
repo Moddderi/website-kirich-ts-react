@@ -11,7 +11,7 @@ import { MdFavoriteBorder } from "react-icons/md";
 import { useAppSelector } from "../../store/store";
 import type { CartItem } from "../../store/cartSlice";
 import { selectFavoriteItems } from "../../store/favoriteSlice";
-import { getCabinetToken } from "../../utils/cabinetStorage";
+import { getCabinetToken, getSession } from "../../utils/cabinetStorage";
 import logoDark from "../../assets/logo-dark.svg";
 
 export const Header = () => {
@@ -36,7 +36,9 @@ export const Header = () => {
   // Re-read the saved cabinet link on every navigation (it is saved after checkout / cabinet visit)
   useLocation();
   const cabinetToken = getCabinetToken();
-  const cabinetPath = cabinetToken ? `/my-order/${cabinetToken}` : "/my-orders";
+  // Signed in → the list of orders; otherwise the last opened order or the sign-in page
+  const cabinetPath =
+    !getSession() && cabinetToken ? `/my-order/${cabinetToken}` : "/my-orders";
 
   return (
     <>

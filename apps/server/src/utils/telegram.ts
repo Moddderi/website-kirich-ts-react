@@ -132,10 +132,11 @@ export const sendTelegramNotification = async (order: any) => {
       `💰 *Орієнтовна вартість:* ${summary.priceRange}\n` +
       `💳 *Передоплата ${summary.prepaymentPercent}%:* ${summary.prepaymentRange}\n`;
 
+    itemsList += `\n💸 Статус у Notion: «Очікує передплати». Після передоплати змініть його на «В черзі на пошиття».\n`;
     if (order.estimate?.measurementsPending) {
       itemsList +=
-        `\n📆 *Замовлення на майбутню дату* — мірки клієнт передасть через кабінет за 30 днів до початку. ` +
-        `Після передоплати змініть статус у Notion на «Заброньовано».\n`;
+        `📆 *Замовлення на майбутню дату* — мірки клієнт передасть через кабінет за 30 днів до початку, ` +
+        `статус «Планове зняття мірок» сайт поставить сам.\n`;
     }
     if (order.accessToken) {
       itemsList += `\n🔗 [Кабінет клієнта — перешліть йому посилання](${cabinetUrl(order.accessToken)})\n`;

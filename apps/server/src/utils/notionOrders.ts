@@ -411,7 +411,7 @@ const buildBody = (order: any, unlinkedItems: string[]) => {
     ...(order.estimate?.measurementsPending
       ? [
           paragraph(
-            "📆 Замовлення на майбутню дату: після передоплати змініть статус на «Заброньовано» — за 30 днів до початку сайт сам поставить «Планове зняття мірок» і відкриє клієнту бланк мірок.",
+            "📆 Замовлення на майбутню дату: після передоплати змініть статус на «В черзі на пошиття» — за 30 днів до початку сайт сам поставить «Планове зняття мірок» і відкриє клієнту бланк мірок.",
           ),
         ]
       : []),
@@ -685,12 +685,10 @@ export const createNotionOrder = async (
     props[numberProp.name] = { number: orderNumber };
   }
 
-  // A booking far in the future waits for the prepayment; others are simply new.
-  const wantsPrepayment = Boolean(order.estimate?.measurementsPending);
+  // Every website order starts as "waiting for the prepayment"; the manager moves
+  // it to the queue once the prepayment has arrived.
   const newStatus =
-    (wantsPrepayment
-      ? statusProp?.status?.options.find((o) => /передпл|предоплат/i.test(o.name))
-      : undefined) ??
+    statusProp?.status?.options.find((o) => /передпл|предоплат/i.test(o.name)) ??
     statusProp?.status?.options.find((o) => /нове замовлення|new order/i.test(o.name));
   if (statusProp && newStatus) {
     props[statusProp.name] = { status: { name: newStatus.name } };

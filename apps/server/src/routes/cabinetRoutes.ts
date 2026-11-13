@@ -1,8 +1,14 @@
 import { Router } from "express";
+import { Op, col, fn, where } from "sequelize";
 import db from "../models/index.js";
 import { buildCabinetOrder, generateAccessToken } from "../utils/cabinet.js";
-import { cabinetUrl } from "../utils/links.js";
-import { sendCabinetLinksEmail } from "../utils/email.js";
+import { sendLoginCodeEmail } from "../utils/email.js";
+import {
+  createLoginCode,
+  createSessionToken,
+  verifyLoginCode,
+  verifySessionToken,
+} from "../utils/auth.js";
 import { appendNotionBlocks, buildMeasurementBlocks } from "../utils/notionOrders.js";
 import { sendTelegramText } from "../utils/telegram.js";
 import {
@@ -13,13 +19,12 @@ import {
 
 const router = Router();
 
-/* ---- tiny in-memory rate limit: 3 link requests / hour per e-mail and per IP ---- */
-const WINDOW_MS = 60 * 60 * 1000;
+/* ---- tiny in-memory rate limit (per key, sliding window) ---- */
 const hits = new Map<string, number[]>();
 
-const limited = (key: string, max = 3): boolean => {
+const limited = (key: string, max: number, windowMs = 60 * 60 * 1000): boolean => {
   const now = Date.now();
-  const recent = (hits.get(key) ?? []).filter((t) => now - t < WINDOW_MS);
+  const recent = (hits.get(key) ?? []).filter((t) => now - t < windowMs);
   if (recent.length >= max) {
     hits.set(key, recent);
     return true;
@@ -28,49 +33,107 @@ const limited = (key: string, max = 3): boolean => {
   return false;
 };
 
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const normEmail = (v: unknown) => String(v ?? "").trim().toLowerCase();
+
+const findCustomOrders = (email: string) =>
+  db.Order.findAll({
+    where: {
+      orderType: "custom",
+      [Op.and]: [where(fn("lower", col("email")), email)],
+    },
+    order: [["createdAt", "DESC"]],
+    limit: 20,
+  });
+
 /**
- * "Find my order": e-mail → cabinet links of this client's custom orders.
- * Always answers the same, so nobody can find out which e-mails have orders.
+ * Login step 1: e-mail → 6-digit code. Always answers the same, so nobody can
+ * find out which e-mails have orders. A code is only sent when orders exist.
  */
-router.post("/request-link", async (req, res) => {
-  const email = String(req.body?.email ?? "").trim().toLowerCase();
+router.post("/login/request", async (req, res) => {
+  const email = normEmail(req.body?.email);
   const ip = req.ip ?? "unknown";
 
-  if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) && !limited(`e:${email}`) && !limited(`i:${ip}`)) {
+  if (EMAIL_RE.test(email) && !limited(`req:e:${email}`, 5) && !limited(`req:i:${ip}`, 30)) {
     try {
-      const orders = await db.Order.findAll({
-        where: { orderType: "custom" },
-        order: [["createdAt", "DESC"]],
-        limit: 200,
+      const count = await db.Order.count({
+        where: {
+          orderType: "custom",
+          [Op.and]: [where(fn("lower", col("email")), email)],
+        },
       });
-      const mine = orders
-        .filter((o: any) => String(o.email).trim().toLowerCase() === email)
-        .slice(0, 10);
-
-      // Orders made before the cabinet existed have no link yet → issue one now
-      for (const o of mine as any[]) {
-        if (!o.accessToken) {
-          o.accessToken = generateAccessToken();
-          await o.update({ accessToken: o.accessToken });
-        }
-      }
-
-      if (mine.length > 0) {
-        void sendCabinetLinksEmail(
-          email,
-          mine.map((o: any) => ({
-            number: String(o.id).split("-")[0].toUpperCase(),
-            createdAt: o.createdAt,
-            url: cabinetUrl(o.accessToken),
-          })),
-        );
-      }
+      if (count > 0) void sendLoginCodeEmail(email, createLoginCode(email));
     } catch (error) {
-      console.error("❌ request-link:", error);
+      console.error("❌ login/request:", error);
     }
   }
 
   res.json({ success: true });
+});
+
+/** Login step 2: e-mail + code → 90-day session token. */
+router.post("/login/verify", (req, res) => {
+  const email = normEmail(req.body?.email);
+  const code = String(req.body?.code ?? "");
+  const ip = req.ip ?? "unknown";
+  const FIFTEEN_MIN = 15 * 60 * 1000;
+
+  if (
+    !EMAIL_RE.test(email) ||
+    limited(`ver:e:${email}`, 8, FIFTEEN_MIN) ||
+    limited(`ver:i:${ip}`, 40, FIFTEEN_MIN)
+  ) {
+    res.status(429).json({ success: false });
+    return;
+  }
+
+  if (!verifyLoginCode(email, code)) {
+    res.status(401).json({ success: false });
+    return;
+  }
+
+  res.json({ success: true, token: createSessionToken(email) });
+});
+
+/** The signed-in client's orders (no Notion calls: status is shown inside an order). */
+router.get("/session/orders", async (req, res) => {
+  const email = verifySessionToken(
+    String(req.headers.authorization ?? "").replace(/^Bearer\s+/i, ""),
+  );
+  if (!email) {
+    res.status(401).json({ success: false });
+    return;
+  }
+
+  try {
+    const orders: any[] = await findCustomOrders(email);
+
+    // Orders made before the cabinet existed have no link yet → issue one now
+    for (const o of orders) {
+      if (!o.accessToken) {
+        o.accessToken = generateAccessToken();
+        await o.update({ accessToken: o.accessToken });
+      }
+    }
+
+    res.set("Cache-Control", "no-store");
+    res.json({
+      success: true,
+      data: orders.map((o) => ({
+        token: o.accessToken,
+        number: String(o.id).split("-")[0].toUpperCase(),
+        createdAt: o.createdAt,
+        garments: (Array.isArray(o.estimate?.types) ? o.estimate.types : []).map(
+          (type: string) => ({ type, program: o.estimate?.programs?.[type] ?? "ST" }),
+        ),
+        start: o.estimate?.startDate ?? null,
+        readyTo: o.estimate?.readyTo ?? null,
+      })),
+    });
+  } catch (error) {
+    console.error("❌ session/orders:", error);
+    res.status(500).json({ success: false });
+  }
 });
 
 /** Order status for the client, by the secret token from the e-mail link. */
