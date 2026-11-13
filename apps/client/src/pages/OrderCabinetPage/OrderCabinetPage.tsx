@@ -79,6 +79,12 @@ export const OrderCabinetPage = () => {
           <p className="text-base font-medium leading-relaxed text-stone-500">
             {t(`cabinet.stageDesc.${order.stage}`)}
           </p>
+          <Link
+            to="/my-orders"
+            className="mt-5 inline-block text-xs font-semibold text-stone-500 underline underline-offset-4 hover:text-stone-900"
+          >
+            {t("cabinet.allOrders")}
+          </Link>
         </div>
 
         {order.measurements.needed && (

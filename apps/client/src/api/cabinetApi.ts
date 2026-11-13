@@ -38,6 +38,38 @@ export const submitCabinetMeasurements = async (
   return data.data;
 };
 
-export const requestCabinetLink = async (email: string): Promise<void> => {
-  await axios.post(`${API_URL}/my-order/request-link`, { email });
+export interface CabinetOrderSummary {
+  token: string;
+  number: string;
+  createdAt: string;
+  garments: Array<{ type: string; program: string }>;
+  start: string | null;
+  readyTo: string | null;
+}
+
+/** Login step 1: send a 6-digit code to the e-mail (always "succeeds"). */
+export const requestLoginCode = async (email: string): Promise<void> => {
+  await axios.post(`${API_URL}/my-order/login/request`, { email });
+};
+
+/** Login step 2: exchange e-mail + code for a 90-day session token. */
+export const verifyLoginCode = async (
+  email: string,
+  code: string,
+): Promise<string> => {
+  const { data } = await axios.post<{ success: boolean; token: string }>(
+    `${API_URL}/my-order/login/verify`,
+    { email, code },
+  );
+  return data.token;
+};
+
+export const getMyOrders = async (
+  sessionToken: string,
+): Promise<CabinetOrderSummary[]> => {
+  const { data } = await axios.get<{ data: CabinetOrderSummary[] }>(
+    `${API_URL}/my-order/session/orders`,
+    { headers: { Authorization: `Bearer ${sessionToken}` } },
+  );
+  return data.data;
 };

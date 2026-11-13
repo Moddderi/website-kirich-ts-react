@@ -6,7 +6,7 @@ import { notifyMeasurementsRequested } from "../utils/measurementsReminder.js";
 
 /**
  * Daily job: website bookings whose «Дата зняття мірок» (start − 30 days) has
- * come and that are still «Заброньовано» →
+ * come and that are still «В черзі на пошиття» →
  *   1. Notion status becomes «Планове зняття мірок»,
  *   2. the studio gets a Telegram message, the client an e-mail,
  *   3. the cabinet opens the measurements form (it reads the same status).
@@ -34,10 +34,10 @@ export const runMeasurementsJob = async (): Promise<{
   }
 
   const options = statusProp.status?.options ?? [];
-  const booked = options.find((o) => /заброньов|бронь/i.test(o.name));
+  const booked = options.find((o) => /в черзі|заброньов|бронь/i.test(o.name));
   const measuring = options.find((o) => /зняття мірок/i.test(o.name));
   if (!booked || !measuring) {
-    console.warn("⚠️ Задача мірок: немає статусів «Заброньовано» / «Планове зняття мірок».");
+    console.warn("⚠️ Задача мірок: немає статусів «В черзі на пошиття» / «Планове зняття мірок».");
     return { found: 0, moved: 0 };
   }
 

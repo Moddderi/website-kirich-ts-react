@@ -11,7 +11,7 @@ export const generateAccessToken = (): string =>
 export const mapNotionStatus = (name: string | null | undefined): CabinetStage => {
   const s = (name ?? "").toLowerCase();
   if (/передпл|предоплат/.test(s)) return "awaiting_prepayment";
-  if (/заброньов|бронь/.test(s)) return "booked";
+  if (/в черзі|черзі на пошит|заброньов|бронь/.test(s)) return "booked";
   // "примірки" (fitting) contains "мірки" → check it before measurements
   if (/примірк/.test(s)) return "fitting";
   if (/зняття мірок|мірк/.test(s)) return "measurements";
