@@ -8,7 +8,6 @@ export const CABINET_STAGES = [
   "booked", // Заброньовано — чекаємо дати
   "measurements", // Планове зняття мірок
   "in_progress", // В роботі
-  "fitting", // Чекає примірки
   "awaiting_payment", // Очікує розрахунку
   "ready", // Готове до відправлення / видачі
   "done", // Відправлено / видано

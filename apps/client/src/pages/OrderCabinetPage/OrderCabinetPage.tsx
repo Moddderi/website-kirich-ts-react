@@ -80,7 +80,7 @@ export const OrderCabinetPage = () => {
             {t(`cabinet.stageDesc.${order.stage}`)}
           </p>
           <Link
-            to="/my-orders"
+            to="/my-orders?list=1"
             className="mt-5 inline-block text-xs font-semibold text-stone-500 underline underline-offset-4 hover:text-stone-900"
           >
             {t("cabinet.allOrders")}

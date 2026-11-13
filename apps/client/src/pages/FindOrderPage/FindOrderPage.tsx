@@ -1,5 +1,5 @@
 import { useEffect, useState, type FormEvent } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import axios from "axios";
 import {
@@ -29,6 +29,9 @@ const labelClass =
 export const FindOrderPage = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  // ?list=1 → always show the list (the "all my orders" link), even with one order
+  const [searchParams] = useSearchParams();
+  const listMode = searchParams.get("list") === "1";
   const formatDate = useFormatDate();
 
   const [step, setStep] = useState<Step>(() => (getSession() ? "loading" : "email"));
@@ -42,7 +45,7 @@ export const FindOrderPage = () => {
     try {
       const list = await getMyOrders(sessionToken);
       // A single order opens right away
-      if (list.length === 1) {
+      if (list.length === 1 && !listMode) {
         saveCabinetToken(list[0].token);
         navigate(`/my-order/${list[0].token}`, { replace: true });
         return true;
@@ -64,7 +67,7 @@ export const FindOrderPage = () => {
     getMyOrders(session.token)
       .then((list) => {
         if (cancelled) return;
-        if (list.length === 1) {
+        if (list.length === 1 && !listMode) {
           saveCabinetToken(list[0].token);
           navigate(`/my-order/${list[0].token}`, { replace: true });
           return;
@@ -79,7 +82,7 @@ export const FindOrderPage = () => {
     return () => {
       cancelled = true;
     };
-  }, [navigate]);
+  }, [navigate, listMode]);
 
   const onEmail = async (event: FormEvent) => {
     event.preventDefault();

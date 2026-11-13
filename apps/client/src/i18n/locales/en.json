@@ -557,7 +557,6 @@
       "booked": "In the tailoring queue",
       "measurements": "Taking measurements",
       "in_progress": "Tailoring",
-      "fitting": "Fitting",
       "awaiting_payment": "Final payment",
       "ready": "Ready for pickup / shipping",
       "done": "Shipped / handed over"
@@ -568,7 +567,6 @@
       "booked": "Prepayment received — your order is in the tailoring queue. If the start is a while away, we will remind you to take measurements a month before.",
       "measurements": "Time to take measurements so tailoring can start on time.",
       "in_progress": "Your order is in production.",
-      "fitting": "The garment is ready for a fitting. The manager will arrange a convenient time.",
       "awaiting_payment": "Only the final payment is left.",
       "ready": "Your order is ready — the manager will arrange pickup or shipping.",
       "done": "Your order has been shipped or handed over. Thank you for choosing K.I.RICH!"
