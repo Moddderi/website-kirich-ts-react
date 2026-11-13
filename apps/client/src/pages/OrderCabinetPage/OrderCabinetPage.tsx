@@ -56,7 +56,7 @@ export const OrderCabinetPage = () => {
         </p>
         <Link
           to="/my-orders"
-          className="rounded-2xl bg-stone-900 px-6 py-3 text-xs font-semibold uppercase tracking-widest text-white transition-all hover:bg-stone-700 active:scale-95"
+            className="btn-ember rounded-2xl px-6 py-3 text-xs font-semibold uppercase tracking-widest active:scale-95"
         >
           {t("cabinet.findOrder")}
         </Link>
@@ -70,7 +70,7 @@ export const OrderCabinetPage = () => {
     <main className="grow pt-12 pb-28">
       <div className="mx-auto max-w-6xl px-6 lg:px-8 animate-reveal-up">
         <div className="mx-auto mb-12 max-w-2xl text-center">
-          <span className="mb-6 inline-block rounded-full border border-stone-800 bg-stone-900 px-3 py-1 text-[10px] font-semibold uppercase tracking-widest text-white shadow-sm">
+          <span className="mb-6 inline-block rounded-full border border-accent/40 bg-accent/10 px-3 py-1 text-[10px] font-semibold uppercase tracking-widest text-accent">
             {t("cabinet.label", { number: order.number })}
           </span>
           <h1 className="mb-4 text-4xl font-semibold tracking-tighter text-stone-900 sm:text-5xl">
@@ -137,16 +137,16 @@ export const OrderCabinetPage = () => {
                       <span
                         aria-hidden="true"
                         className={`absolute left-[15px] top-8 h-[calc(100%-2rem)] w-px ${
-                          done ? "bg-stone-900" : "bg-stone-200"
+                          done ? "bg-accent" : "bg-stone-200"
                         }`}
                       />
                     )}
                     <span
                       className={`relative z-10 flex h-8 w-8 shrink-0 items-center justify-center rounded-full border text-xs font-semibold ${
                         done
-                          ? "border-stone-900 bg-stone-900 text-white"
+                          ? "border-accent bg-accent text-[#fff]"
                           : active
-                            ? "border-stone-900 bg-white text-stone-900 ring-4 ring-stone-900/10"
+                            ? "border-accent bg-white text-accent ring-4 ring-accent/20"
                             : "border-stone-200 bg-white text-stone-300"
                       }`}
                     >

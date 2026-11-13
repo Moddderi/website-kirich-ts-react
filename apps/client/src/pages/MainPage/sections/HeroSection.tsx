@@ -13,7 +13,6 @@ import {
 import { HOME_IMAGES } from "../../../constants/homeImages";
 import { CATALOG_ENABLED } from "../../../constants/features";
 import { optimizeCloudinaryUrl } from "../../../utils/cloudinary";
-import { Tilt } from "../../../components/fx/Tilt";
 import { LivingBg } from "../../../components/fx/LivingBg";
 
 const Photo = ({
@@ -47,13 +46,6 @@ const Photo = ({
     {children}
   </div>
 );
-
-/** Measuring marks drawn over the main photo (percent positions of the shirt). */
-const SCAN_POINTS = [
-  { key: "scanNeck", x: 50, y: 15, side: "right" },
-  { key: "scanChest", x: 50, y: 37, side: "left" },
-  { key: "scanWaist", x: 50, y: 70, side: "right" },
-] as const;
 
 const Word = ({
   children,
@@ -110,10 +102,7 @@ export const HeroSection = () => {
         <div className="text-center lg:text-left">
           <p className="animate-reveal-up mb-6 flex items-center justify-center gap-3 text-[11px] font-semibold uppercase tracking-[0.3em] text-stone-500 lg:justify-start">
             <span className="hidden h-px w-8 bg-current opacity-60 lg:block" />
-            <span className="relative flex h-2 w-2">
-              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-accent opacity-70" />
-              <span className="relative inline-flex h-2 w-2 rounded-full bg-accent" />
-            </span>
+            <span className="h-1.5 w-1.5 rounded-full bg-accent" />
             {t("main.vanguardCollection")}
           </p>
 
@@ -185,76 +174,38 @@ export const HeroSection = () => {
           </ul>
         </div>
 
-        {/* Photo collage with 3D tilt + measuring scan */}
-        <Tilt className="animate-reveal-up delay-300 relative mx-auto w-full max-w-md sm:max-w-lg lg:max-w-none">
-          {/* decorative orbit */}
-          <svg
-            aria-hidden
-            viewBox="0 0 200 200"
-            className="spin-slower pointer-events-none absolute left-1/2 top-1/2 -z-0 h-[120%] w-[120%] -translate-x-1/2 -translate-y-1/2 text-stone-900/15"
-          >
-            <circle cx="100" cy="100" r="98" fill="none" stroke="currentColor" strokeWidth="0.4" strokeDasharray="2 5" />
-            <circle cx="100" cy="100" r="78" fill="none" stroke="currentColor" strokeWidth="0.3" />
-          </svg>
-
-          <div className="relative grid grid-cols-2 gap-3 sm:gap-5">
-            <div className="relative pt-10 sm:pt-14">
-              <div className="absolute inset-x-0 bottom-0 top-10 translate-x-2 translate-y-2 rounded-3xl border border-stone-900/25 sm:top-14 sm:translate-x-3 sm:translate-y-3" />
-              <Photo
-                src={HOME_IMAGES.heroLeft}
-                alt="K.I.RICH ballroom shirt"
-                width={640}
-                priority
-                className="relative h-full"
-              >
-                <div className="palette-original pointer-events-none absolute inset-0">
-                  <div className="scan-line" />
-                  {SCAN_POINTS.map((p) => (
-                    <span
-                      key={p.key}
-                      className="absolute h-0 w-0"
-                      style={{ left: `${p.x}%`, top: `${p.y}%` }}
-                    >
-                      <span className="ping-dot absolute -left-[5px] -top-[5px] h-[10px] w-[10px] rounded-full bg-accent shadow-[0_0_12px_3px_rgba(255,59,87,0.7)] ring-2 ring-white" />
-                      <span
-                        className={`absolute top-0 flex -translate-y-1/2 items-center gap-1 whitespace-nowrap ${
-                          p.side === "right" ? "left-[10px]" : "right-[10px] flex-row-reverse"
-                        }`}
-                      >
-                        <span className="h-px w-4 bg-white/60 sm:w-8" />
-                        <span className="rounded-full border border-white/25 bg-black/70 px-2 py-0.5 text-[9px] font-semibold uppercase tracking-widest text-white backdrop-blur-sm">
-                          {t(`main.${p.key}`)}
-                        </span>
-                      </span>
-                    </span>
-                  ))}
-                </div>
-              </Photo>
-            </div>
-            <div className="flex flex-col gap-3 sm:gap-5">
-              <Photo
-                src={HOME_IMAGES.heroTopRight}
-                alt="K.I.RICH ballroom shirt, red"
-                width={520}
-                priority
-                className="aspect-[4/5]"
-              />
-              <Photo
-                src={HOME_IMAGES.heroBottomRight}
-                alt="K.I.RICH ballroom shirt, brown"
-                width={520}
-                className="aspect-[4/4.6]"
-              />
-            </div>
+        {/* Photo collage: one tall hero shot + two stacked, flush grid */}
+        <div className="animate-reveal-up delay-300 relative mx-auto w-full max-w-md sm:max-w-lg lg:max-w-none">
+          <div className="grid aspect-[5/6] grid-cols-[1.15fr_1fr] grid-rows-2 gap-3 sm:gap-4">
+            <Photo
+              src={HOME_IMAGES.heroLeft}
+              alt="K.I.RICH ballroom shirt"
+              width={720}
+              priority
+              className="row-span-2 h-full"
+            />
+            <Photo
+              src={HOME_IMAGES.heroTopRight}
+              alt="K.I.RICH ballroom shirt, red"
+              width={520}
+              priority
+              className="h-full"
+            />
+            <Photo
+              src={HOME_IMAGES.heroBottomRight}
+              alt="K.I.RICH ballroom shirt, brown"
+              width={520}
+              className="h-full"
+            />
           </div>
 
-          <div className="float-y absolute -left-1 bottom-6 z-10 flex items-center gap-3 rounded-2xl border border-stone-900/15 bg-beige-50/80 px-4 py-3 backdrop-blur-xl sm:-left-6">
-            <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-stone-900 text-beige-50">
+          <div className="absolute -bottom-5 left-4 z-10 flex items-center gap-3 rounded-2xl border border-stone-900/15 bg-beige-50/85 px-4 py-3 shadow-xl shadow-black/40 backdrop-blur-xl sm:left-6">
+            <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-accent text-[#fff]">
               <LuCrown size={18} strokeWidth={1.6} />
             </span>
             <div>
               <p className="flex items-center gap-1 text-xs font-bold text-stone-900">
-                <LuMapPin size={12} strokeWidth={2} className="text-stone-500" />
+                <LuMapPin size={12} strokeWidth={2} className="text-accent" />
                 Poltava, Ukraine
               </p>
               <p className="text-[11px] font-medium text-stone-500">
@@ -262,15 +213,7 @@ export const HeroSection = () => {
               </p>
             </div>
           </div>
-
-          <div
-            className="float-y absolute -right-1 top-3 z-10 flex items-center gap-2 rounded-full border border-stone-900/15 bg-beige-50/80 px-3.5 py-2 text-[11px] font-semibold text-stone-900 backdrop-blur-xl sm:-right-4"
-            style={{ animationDelay: "-3s" }}
-          >
-            <LuRuler size={14} strokeWidth={1.8} />
-            {t("main.chipPrecision")}
-          </div>
-        </Tilt>
+        </div>
       </div>
     </section>
   );

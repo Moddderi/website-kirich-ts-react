@@ -13,9 +13,9 @@ export const Kicker = ({
       center ? "justify-center" : ""
     }`}
   >
-    <span className="h-px w-8 bg-current opacity-60" />
+    <span className="h-px w-8 bg-accent" />
     {children}
-    {center && <span className="h-px w-8 bg-current opacity-60" />}
+    {center && <span className="h-px w-8 bg-accent" />}
   </p>
 );
 

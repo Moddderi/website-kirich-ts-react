@@ -84,7 +84,7 @@ export const MeasurementsForm = ({
                   onClick={() => onUnitChange(unit)}
                   className={`rounded-full px-5 py-2 text-xs font-semibold uppercase tracking-widest transition-all ${
                     measurementUnit === unit
-                      ? "bg-stone-900 text-white shadow-sm"
+                      ? "bg-accent text-[#fff] shadow-sm"
                       : "text-stone-500 hover:text-stone-900"
                   }`}
                 >
@@ -145,7 +145,7 @@ export const MeasurementsForm = ({
                         placeholder="0"
                         className={`block w-full rounded-xl border-0 bg-stone-50 py-3 pl-4 pr-12 text-sm font-semibold text-stone-900 shadow-inner ring-1 ring-inset ${
                           fieldError ? "ring-red-500" : "ring-stone-200"
-                        } focus:ring-2 focus:ring-stone-900 transition-all`}
+                        } focus:ring-2 focus:ring-accent/70 transition-all`}
                       />
                       <span className="absolute inset-y-0 right-4 flex items-center text-xs font-semibold text-stone-400 pointer-events-none">
                         {unitLabel}
@@ -192,7 +192,7 @@ export const MeasurementsForm = ({
                     errors[FINAL_MEASUREMENT_FIELD]
                       ? "ring-red-500"
                       : "ring-stone-200"
-                  } focus:ring-2 focus:ring-stone-900 transition-all placeholder:text-stone-400`}
+                  } focus:ring-2 focus:ring-accent/70 transition-all placeholder:text-stone-400`}
                 />
                 {errors[FINAL_MEASUREMENT_FIELD] && (
                   <p className="mt-1.5 text-xs font-medium text-red-500 text-center">
@@ -203,7 +203,7 @@ export const MeasurementsForm = ({
               <button
                 type="submit"
                 disabled={submitting}
-                className="w-full mt-2 disabled:opacity-60 flex items-center justify-center gap-2 rounded-2xl bg-stone-900 py-4 px-8 text-sm font-semibold text-white hover:bg-stone-800 transition-all active:scale-[0.98] shadow-lg shadow-black/40 group"
+                  className="w-full mt-2 disabled:opacity-60 flex items-center justify-center gap-2 btn-ember rounded-2xl py-4 px-8 text-sm font-semibold active:scale-[0.98] group"
               >
                 {submitLabel}
               </button>

@@ -235,7 +235,7 @@ export const CheckoutPage = () => {
                 : t("checkout.titleReady")}
             </h1>
             {orderType === "custom" && (
-              <span className="self-start rounded-full bg-stone-900 px-3 py-1 text-[10px] font-semibold uppercase tracking-widest text-white shadow-sm border border-stone-800 shrink-0">
+              <span className="self-start rounded-full border border-accent/40 bg-accent/10 px-3 py-1 text-[10px] font-semibold uppercase tracking-widest text-accent shrink-0">
                 {t("checkout.customBadge")}
               </span>
             )}
@@ -258,7 +258,7 @@ export const CheckoutPage = () => {
                     className={`block w-full rounded-xl border-0 bg-white py-3.5 px-4 text-sm font-medium text-stone-900 shadow-sm ring-1 ring-inset transition-all placeholder:text-stone-400 focus:ring-2 ${
                       errors.firstName
                         ? "ring-red-500 focus:ring-red-500"
-                        : "ring-stone-200 focus:ring-stone-900"
+                        : "ring-stone-200 focus:ring-accent/70"
                     }`}
                     placeholder={t("checkout.firstNamePlaceholder")}
                   />
@@ -279,7 +279,7 @@ export const CheckoutPage = () => {
                     className={`block w-full rounded-xl border-0 bg-white py-3.5 px-4 text-sm font-medium text-stone-900 shadow-sm ring-1 ring-inset transition-all placeholder:text-stone-400 focus:ring-2 ${
                       errors.lastName
                         ? "ring-red-500 focus:ring-red-500"
-                        : "ring-stone-200 focus:ring-stone-900"
+                        : "ring-stone-200 focus:ring-accent/70"
                     }`}
                     placeholder={t("checkout.lastNamePlaceholder")}
                   />
@@ -300,7 +300,7 @@ export const CheckoutPage = () => {
                     className={`block w-full rounded-xl border-0 bg-white py-3.5 px-4 text-sm font-medium text-stone-900 shadow-sm ring-1 ring-inset transition-all placeholder:text-stone-400 focus:ring-2 ${
                       errors.phone
                         ? "ring-red-500 focus:ring-red-500"
-                        : "ring-stone-200 focus:ring-stone-900"
+                        : "ring-stone-200 focus:ring-accent/70"
                     }`}
                     placeholder="+380000000000"
                   />
@@ -321,7 +321,7 @@ export const CheckoutPage = () => {
                     className={`block w-full rounded-xl border-0 bg-white py-3.5 px-4 text-sm font-medium text-stone-900 shadow-sm ring-1 ring-inset transition-all placeholder:text-stone-400 focus:ring-2 ${
                       errors.email
                         ? "ring-red-500 focus:ring-red-500"
-                        : "ring-stone-200 focus:ring-stone-900"
+                        : "ring-stone-200 focus:ring-accent/70"
                     }`}
                     placeholder="your@email.com"
                   />
@@ -346,7 +346,7 @@ export const CheckoutPage = () => {
                   <label
                     className={`flex items-center gap-3 p-3.5 rounded-xl border-2 cursor-pointer transition-all ${
                       communicationMethod === "telegram"
-                        ? "border-stone-900 bg-stone-50"
+                        ? "border-accent bg-accent/10"
                         : "border-stone-200 bg-white"
                     }`}
                   >
@@ -365,7 +365,7 @@ export const CheckoutPage = () => {
                   <label
                     className={`flex items-center gap-3 p-3.5 rounded-xl border-2 cursor-pointer transition-all ${
                       communicationMethod === "instagram"
-                        ? "border-stone-900 bg-stone-50"
+                        ? "border-accent bg-accent/10"
                         : "border-stone-200 bg-white"
                     }`}
                   >
@@ -384,7 +384,7 @@ export const CheckoutPage = () => {
                   <label
                     className={`flex items-center gap-3 p-3.5 rounded-xl border-2 cursor-pointer transition-all ${
                       communicationMethod === "whatsapp"
-                        ? "border-stone-900 bg-stone-50"
+                        ? "border-accent bg-accent/10"
                         : "border-stone-200 bg-white"
                     }`}
                   >
@@ -425,7 +425,7 @@ export const CheckoutPage = () => {
                       } ${
                         errors.socialUsername
                           ? "ring-red-500 focus:ring-red-500"
-                          : "ring-stone-200 focus:ring-stone-900"
+                          : "ring-stone-200 focus:ring-accent/70"
                       }`}
                       placeholder={
                         communicationMethod === "whatsapp"
@@ -452,7 +452,7 @@ export const CheckoutPage = () => {
                 <label
                   className={`flex items-center gap-3 p-4 rounded-xl border-2 cursor-pointer transition-all ${
                     deliveryMethod === "nova_poshta"
-                      ? "border-stone-900 bg-stone-50"
+                      ? "border-accent bg-accent/10"
                       : "border-stone-200 bg-white"
                   }`}
                 >
@@ -470,7 +470,7 @@ export const CheckoutPage = () => {
                 <label
                   className={`flex items-center gap-3 p-4 rounded-xl border-2 cursor-pointer transition-all ${
                     deliveryMethod === "ukrposhta"
-                      ? "border-stone-900 bg-stone-50"
+                      ? "border-accent bg-accent/10"
                       : "border-stone-200 bg-white"
                   }`}
                 >
@@ -488,7 +488,7 @@ export const CheckoutPage = () => {
                 <label
                   className={`flex items-center gap-3 p-4 rounded-xl border-2 cursor-pointer transition-all ${
                     deliveryMethod === "pickup"
-                      ? "border-stone-900 bg-stone-50"
+                      ? "border-accent bg-accent/10"
                       : "border-stone-200 bg-white"
                   }`}
                 >
@@ -517,7 +517,7 @@ export const CheckoutPage = () => {
                       className={`block w-full rounded-xl border-0 bg-white py-3.5 px-4 text-sm font-medium text-stone-900 shadow-sm ring-1 ring-inset transition-all placeholder:text-stone-400 focus:ring-2 ${
                         errors.city
                           ? "ring-red-500 focus:ring-red-500"
-                          : "ring-stone-200 focus:ring-stone-900"
+                          : "ring-stone-200 focus:ring-accent/70"
                       }`}
                       placeholder={t("checkout.cityPlaceholder")}
                     />
@@ -537,7 +537,7 @@ export const CheckoutPage = () => {
                       className={`block w-full rounded-xl border-0 bg-white py-3.5 px-4 text-sm font-medium text-stone-900 shadow-sm ring-1 ring-inset transition-all placeholder:text-stone-400 focus:ring-2 ${
                         errors.warehouse
                           ? "ring-red-500 focus:ring-red-500"
-                          : "ring-stone-200 focus:ring-stone-900"
+                          : "ring-stone-200 focus:ring-accent/70"
                       }`}
                       placeholder={t("checkout.warehousePlaceholder")}
                     />
@@ -567,7 +567,7 @@ export const CheckoutPage = () => {
                   className={`block w-full resize-y rounded-xl border-0 bg-white py-3.5 px-4 text-sm font-medium text-stone-900 shadow-sm ring-1 ring-inset transition-all placeholder:text-stone-400 focus:ring-2 ${
                     errors.comment
                       ? "ring-red-500 focus:ring-red-500"
-                      : "ring-stone-200 focus:ring-stone-900"
+                      : "ring-stone-200 focus:ring-accent/70"
                   }`}
                 />
                 {errors.comment && (
@@ -723,7 +723,7 @@ export const CheckoutPage = () => {
                   (orderType === "ready-made" && cartItems.length === 0) ||
                   isSubmitting
                 }
-                className="w-full rounded-2xl bg-stone-900 px-8 py-4 text-sm font-semibold uppercase tracking-widest text-white hover:bg-stone-800 transition-all duration-300 active:scale-95 flex items-center justify-center gap-2 group disabled:opacity-50 disabled:pointer-events-none"
+                  className="w-full btn-ember rounded-2xl px-8 py-4 text-sm font-semibold uppercase tracking-widest duration-300 active:scale-95 flex items-center justify-center gap-2 group disabled:opacity-50 disabled:pointer-events-none"
               >
                 {isSubmitting ? t("checkout.processing") : t("checkout.confirmOrder")}
                 {!isSubmitting && (

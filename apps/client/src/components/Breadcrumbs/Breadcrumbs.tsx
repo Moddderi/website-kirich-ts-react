@@ -65,7 +65,7 @@ export const Breadcrumbs: React.FC = () => {
   return (
     <nav className="flex items-center gap-2 mb-10 text-xs font-medium text-stone-500 select-none flex-wrap">
       <Link to="/" className="flex items-center gap-1 hover:text-stone-900">
-        <LuHouse size={14} className="text-stone-900" />
+        <LuHouse size={14} className="text-accent" />
         {t("breadcrumbs.home")}
       </Link>
 

@@ -180,7 +180,7 @@ export const StudioCalendar = ({
                 onClick={() => setCursor(m)}
                 className={`flex shrink-0 items-center gap-2 rounded-full border px-4 py-2 text-xs font-semibold transition-all ${
                   active
-                    ? "border-stone-900 bg-stone-900 text-white"
+                    ? "border-accent bg-accent text-[#fff]"
                     : "border-stone-200 bg-white text-stone-700 hover:border-stone-400"
                 }`}
               >
@@ -261,9 +261,9 @@ export const StudioCalendar = ({
                     : STATUS_STYLES[status]
             } ${
               selectable
-                ? "cursor-pointer hover:ring-2 hover:ring-stone-900/40 focus-visible:ring-2 focus-visible:ring-stone-900"
+                ? "cursor-pointer hover:ring-2 hover:ring-stone-900/40 focus-visible:ring-2 focus-visible:ring-accent"
                 : ""
-            } ${isSelected ? "ring-2 ring-stone-900 ring-offset-2 ring-offset-white" : ""}`;
+            } ${isSelected ? "ring-2 ring-accent ring-offset-2 ring-offset-white" : ""}`;
             const title = isWeekend
               ? t("availability.legendWeekend")
               : inOrder

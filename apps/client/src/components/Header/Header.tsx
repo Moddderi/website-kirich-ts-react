@@ -59,12 +59,14 @@ export const Header = () => {
 
   const desktopLink = ({ isActive }: { isActive: boolean }) =>
     `relative text-[13px] font-semibold uppercase tracking-[0.18em] transition-colors magnetic-link ${
-      isActive ? "text-stone-900" : "text-stone-500 hover:text-stone-900"
+      isActive
+        ? "text-stone-900 after:absolute after:-bottom-1.5 after:left-0 after:h-px after:w-full after:bg-accent"
+        : "text-stone-500 hover:text-stone-900"
     }`;
 
   const mobileLink = ({ isActive }: { isActive: boolean }) =>
     `block border-b border-white/10 py-5 font-display text-4xl font-medium tracking-tight transition-colors ${
-      isActive ? "text-beige-300" : "text-stone-300 hover:text-white"
+      isActive ? "text-accent" : "text-stone-300 hover:text-white"
     }`;
 
   return (
@@ -83,7 +85,7 @@ export const Header = () => {
                   className="flex items-center text-[10px] font-semibold uppercase tracking-[0.28em] text-white/80 sm:text-[11px]"
                 >
                   <span className="px-6 sm:px-10">{t(`header.${key}`)}</span>
-                  <span className="h-1.5 w-1.5 rotate-45 bg-accent shadow-[0_0_10px_2px_rgba(255,59,87,0.7)]" />
+                  <span className="h-1.5 w-1.5 rotate-45 bg-accent shadow-[0_0_10px_2px_rgba(196,65,77,0.7)]" />
                 </span>
               ))}
             </div>

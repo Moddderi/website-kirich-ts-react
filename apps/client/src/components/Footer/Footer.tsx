@@ -26,6 +26,7 @@ export function Footer() {
 
   return (
     <footer className="palette-original relative overflow-hidden border-t border-white/5 bg-stone-950 text-white">
+      <span aria-hidden className="shine-line absolute inset-x-0 top-0" />
       <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-beige-500/60 to-transparent" />
 
       <div className="mx-auto max-w-7xl px-5 py-16 sm:px-6 lg:px-8 lg:py-20">
@@ -56,7 +57,7 @@ export function Footer() {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={name}
-                  className="flex h-11 w-11 items-center justify-center rounded-full border border-white/15 text-stone-300 transition-all duration-300 hover:border-beige-400 hover:bg-beige-400 hover:text-stone-950"
+                  className="flex h-11 w-11 items-center justify-center rounded-full border border-white/15 text-stone-300 transition-all duration-300 hover:border-accent hover:bg-accent hover:text-[#fff]"
                 >
                   <Icon size={18} strokeWidth={1.6} />
                 </a>
@@ -105,7 +106,7 @@ export function Footer() {
             </h3>
             <ul role="list" className="mt-6 space-y-5">
               <li className="flex items-start gap-3">
-                <LuPhone size={16} strokeWidth={1.6} className="mt-0.5 shrink-0 text-beige-500" />
+                <LuPhone size={16} strokeWidth={1.6} className="mt-0.5 shrink-0 text-accent" />
                 <div>
                   <a href="tel:+380508344955" className={linkClass}>
                     {t("footer.phone")}
@@ -116,13 +117,13 @@ export function Footer() {
                 </div>
               </li>
               <li className="flex items-start gap-3">
-                <LuMapPin size={16} strokeWidth={1.6} className="mt-0.5 shrink-0 text-beige-500" />
+                <LuMapPin size={16} strokeWidth={1.6} className="mt-0.5 shrink-0 text-accent" />
                 <p className="text-sm font-medium text-stone-400">
                   {t("footer.address")}
                 </p>
               </li>
               <li className="flex items-start gap-3">
-                <LuMail size={16} strokeWidth={1.6} className="mt-0.5 shrink-0 text-beige-500" />
+                <LuMail size={16} strokeWidth={1.6} className="mt-0.5 shrink-0 text-accent" />
                 <a
                   href="mailto:kirich.sewing.studio@gmail.com"
                   className={`${linkClass} break-all`}

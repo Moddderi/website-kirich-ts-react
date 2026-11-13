@@ -90,7 +90,7 @@ export const OrderSuccessPage = () => {
         <div className="flex flex-col items-center justify-center text-center py-10 lg:py-20 relative min-h-[50vh]">
           <div className="relative mb-10">
             <div className="absolute inset-0 animate-pulse-glow rounded-full bg-stone-200/50 blur-xl"></div>
-            <div className="flex h-24 w-24 items-center justify-center rounded-full bg-stone-900 text-white relative z-10 shadow-xl">
+            <div className="flex h-24 w-24 items-center justify-center rounded-full bg-accent text-[#fff] relative z-10 shadow-xl shadow-accent/30">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
@@ -119,7 +119,7 @@ export const OrderSuccessPage = () => {
           {accessToken && (
             <Link
               to={`/my-order/${accessToken}`}
-              className="mt-2 rounded-2xl bg-stone-900 px-8 py-4 text-sm font-semibold uppercase tracking-widest text-white shadow-lg transition-all duration-300 hover:bg-stone-700 active:scale-95"
+                className="mt-2 btn-ember rounded-2xl px-8 py-4 text-sm font-semibold uppercase tracking-widest duration-300 active:scale-95"
             >
               {t("orderSuccess.openCabinet")}
             </Link>
@@ -153,7 +153,7 @@ export const OrderSuccessPage = () => {
         <div className="lg:col-span-7 flex flex-col items-center justify-center text-center py-10 lg:py-20 relative">
           <div className="relative mb-10">
             <div className="absolute inset-0 animate-pulse-glow rounded-full bg-stone-200/50 blur-xl"></div>
-            <div className="flex h-24 w-24 items-center justify-center rounded-full bg-stone-900 text-white relative z-10 shadow-xl">
+            <div className="flex h-24 w-24 items-center justify-center rounded-full bg-accent text-[#fff] relative z-10 shadow-xl shadow-accent/30">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"

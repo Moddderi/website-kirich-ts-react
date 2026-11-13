@@ -149,7 +149,7 @@ export const CatalogFilters = ({
             placeholder={t("catalogFilters.search")}
             value={filters.search ?? ""}
             onChange={(e) => updateFilter({ search: e.target.value })}
-            className="px-3 py-1.5 rounded-xl bg-white border border-stone-200 text-stone-900 text-xs font-medium focus:border-stone-900 focus:outline-none transition-all w-40"
+            className="px-3 py-1.5 rounded-xl bg-white border border-stone-200 text-stone-900 text-xs font-medium focus:border-accent focus:outline-none transition-all w-40"
           />
           <button
             onClick={resetFilters}

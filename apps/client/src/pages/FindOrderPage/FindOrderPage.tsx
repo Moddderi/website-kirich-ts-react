@@ -19,9 +19,9 @@ import {
 type Step = "loading" | "email" | "code" | "orders";
 
 const inputClass =
-  "w-full rounded-2xl border border-stone-200 bg-stone-50 px-4 py-3 text-sm font-medium text-stone-900 outline-none transition focus:border-stone-900 focus:bg-white";
+  "w-full rounded-2xl border border-stone-200 bg-stone-50 px-4 py-3 text-sm font-medium text-stone-900 outline-none transition focus:border-accent focus:bg-white";
 const buttonClass =
-  "mt-5 w-full rounded-2xl bg-stone-900 px-6 py-3.5 text-xs font-semibold uppercase tracking-widest text-white transition-all hover:bg-stone-700 active:scale-95 disabled:opacity-60";
+  "btn-ember mt-5 w-full rounded-2xl px-6 py-3.5 text-xs font-semibold uppercase tracking-widest active:scale-95 disabled:opacity-60";
 const labelClass =
   "mb-2 block text-[10px] font-semibold uppercase tracking-widest text-stone-400";
 

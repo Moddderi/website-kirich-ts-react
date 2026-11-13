@@ -32,7 +32,7 @@ export const LivingBg = ({ stitches = true }: { stitches?: boolean }) => (
         <path
           className="stitch"
           d="M-20 720 C 360 610, 650 830, 990 690 S 1290 570, 1460 630"
-          stroke="rgba(255,70,95,0.6)"
+          stroke="rgba(196,65,77,0.45)"
           strokeWidth="1.6"
           vectorEffect="non-scaling-stroke"
           style={{ animationDuration: "2.2s" }}

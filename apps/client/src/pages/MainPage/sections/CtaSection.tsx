@@ -19,7 +19,7 @@ export const CtaSection = () => {
       className="mx-auto max-w-7xl px-5 pb-24 sm:px-6 lg:px-8 lg:pb-36"
     >
       <Reveal>
-        <div className="border-beam relative overflow-hidden rounded-4xl border border-stone-900/10 bg-stone-900/[0.02] px-6 py-16 text-center sm:px-12 sm:py-24">
+        <div className="relative overflow-hidden rounded-4xl border border-stone-900/10 bg-stone-900/[0.02] px-6 py-16 text-center sm:px-12 sm:py-24">
           <LivingBg />
 
           <div className="relative">

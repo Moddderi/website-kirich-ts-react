@@ -33,7 +33,7 @@ export const WhySection = () => {
           <Reveal key={n} delay={i * 70} className={className}>
             <Spot className="group h-full rounded-4xl">
               <div className="relative h-full overflow-hidden rounded-4xl border border-stone-900/10 bg-stone-900/[0.025] p-6 sm:p-8">
-                <span className="flex h-12 w-12 items-center justify-center rounded-full border border-stone-900/20 text-stone-900 transition-all duration-500 group-hover:border-transparent group-hover:bg-accent group-hover:text-white group-hover:shadow-[0_0_28px_-2px_rgba(255,59,87,0.8)]">
+                <span className="flex h-12 w-12 items-center justify-center rounded-full border border-stone-900/20 text-stone-900 transition-all duration-500 group-hover:border-transparent group-hover:bg-accent group-hover:text-white group-hover:shadow-[0_0_28px_-2px_rgba(196,65,77,0.8)]">
                   <Icon size={21} strokeWidth={1.5} />
                 </span>
                 <h3

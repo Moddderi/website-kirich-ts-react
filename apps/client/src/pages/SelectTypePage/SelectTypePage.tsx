@@ -47,7 +47,7 @@ export const SelectTypePage = () => {
     <section className="grow pb-40 animate-reveal-up">
       <div className="mx-auto max-w-7xl px-6">
         <div className="mb-16 text-center max-w-2xl mx-auto animate-reveal-up [animation-delay:200ms] opacity-0 [animation-fill-mode:forwards]">
-          <span className="rounded-full bg-stone-900 px-3 py-1 text-[10px] font-semibold uppercase tracking-widest text-white shadow-sm border border-stone-800 mb-6 inline-block">
+          <span className="rounded-full border border-accent/40 bg-accent/10 px-3 py-1 text-[10px] font-semibold uppercase tracking-widest text-accent mb-6 inline-block">
             {t("selectType.stepLabel")}
           </span>
           <h1 className="text-4xl sm:text-5xl font-semibold tracking-tighter text-stone-900 mb-6">
@@ -80,7 +80,7 @@ export const SelectTypePage = () => {
                       ? "palette-original bg-stone-900 border border-beige-500/40 hover:border-beige-400"
                       : "bg-white border border-stone-200/60 hover:border-stone-400"
                   }
-                  ${isSelected ? "ring-2 ring-offset-2 ring-offset-beige-50 ring-stone-900" : ""}`}
+                  ${isSelected ? "ring-2 ring-offset-2 ring-offset-beige-50 ring-accent" : ""}`}
                 style={{ animationDelay: `${400 + index * 100}ms` }}
               >
                 {!opt.dark && (
@@ -162,7 +162,7 @@ export const SelectTypePage = () => {
                       isSelected
                         ? opt.dark
                           ? "border-white bg-white text-stone-900"
-                          : "border-stone-900 bg-stone-900 text-white"
+                          : "border-accent bg-accent text-[#fff]"
                         : opt.dark
                           ? "border-stone-700 bg-stone-800 text-white group-hover:border-white group-hover:bg-white group-hover:text-stone-900"
                           : "border-stone-200 bg-white text-stone-900 group-hover:border-stone-900 group-hover:bg-stone-900 group-hover:text-white"
@@ -191,7 +191,7 @@ export const SelectTypePage = () => {
                       }
                       className={`rounded-full px-2 py-2.5 text-[11px] font-semibold transition-all duration-300 ${
                         active
-                          ? "bg-stone-900 text-white shadow-md"
+                          ? "bg-accent text-[#fff] shadow-md"
                           : "text-stone-500 hover:bg-stone-100"
                       }`}
                     >
@@ -239,7 +239,7 @@ export const SelectTypePage = () => {
             type="button"
             disabled={!hasSelection}
             onClick={() => navigate("/individual-tailoring/step-2")}
-            className="rounded-2xl bg-stone-900 px-8 py-4 text-sm font-semibold text-white shadow-lg shadow-black/40 transition-all hover:bg-stone-800 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40"
+              className="btn-ember rounded-2xl px-8 py-4 text-sm font-semibold active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40"
           >
             {t("selectType.continue")}
           </button>

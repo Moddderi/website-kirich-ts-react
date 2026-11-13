@@ -18,7 +18,7 @@ export const TailoringLayout = () => {
 
   return (
     <div
-      className={`w-full flex flex-col items-stretch min-h-screen ${
+      className={`relative w-full flex flex-col items-stretch min-h-screen ${
         isWidePage ? "" : "p-4 sm:p-6"
       }`}
     >

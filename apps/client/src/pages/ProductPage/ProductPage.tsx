@@ -222,7 +222,7 @@ export const ProductPage: React.FC = () => {
           <div className="sticky top-32">
             <div className="mb-8">
               <div className="flex items-center gap-3 mb-6">
-                <span className="rounded-full bg-stone-900 px-3 py-1 text-[10px] font-semibold uppercase tracking-widest text-white shadow-sm border border-stone-800">
+                <span className="rounded-full border border-accent/40 bg-accent/10 px-3 py-1 text-[10px] font-semibold uppercase tracking-widest text-accent">
                   {SUBTYPE_LABELS[product.sub_type] || product.sub_type}
                 </span>
                 <span className="text-xs font-semibold text-stone-400 flex items-center gap-1.5 uppercase tracking-widest">
@@ -371,7 +371,7 @@ export const ProductPage: React.FC = () => {
               <button
                 type="button"
                 onClick={handleAddToCart}
-                className="flex-1 rounded-2xl bg-stone-900 px-8 py-4 text-sm font-semibold uppercase tracking-widest text-white shadow-[0_8px_30px_rgba(28,25,23,0.12)] hover:bg-stone-800 hover:shadow-[0_8px_30px_rgba(28,25,23,0.2)] transition-all duration-300 active:scale-95 flex items-center justify-center gap-2"
+                  className="flex-1 btn-ember rounded-2xl px-8 py-4 text-sm font-semibold uppercase tracking-widest duration-300 active:scale-95 flex items-center justify-center gap-2"
               >
                 <LuShoppingBag size={18} /> {t("productPage.addToCart")}
               </button>

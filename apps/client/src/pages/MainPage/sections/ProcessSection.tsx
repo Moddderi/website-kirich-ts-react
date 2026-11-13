@@ -82,7 +82,7 @@ export const ProcessSection = () => {
           {/* track + fill: both 2px wide, centred on x = 14px (the dots' centre line) */}
           <span className="absolute bottom-6 left-[13px] top-6 w-[2px] rounded-full bg-stone-900/10" />
           <span
-            className="absolute bottom-6 left-[13px] top-6 w-[2px] origin-top rounded-full bg-gradient-to-b from-accent via-accent to-accent-2 shadow-[0_0_14px_rgba(255,59,87,0.8)] will-change-transform"
+            className="absolute bottom-6 left-[13px] top-6 w-[2px] origin-top rounded-full bg-gradient-to-b from-accent via-accent to-accent-2 shadow-[0_0_14px_rgba(196,65,77,0.8)] will-change-transform"
             style={{ transform: "scaleY(var(--p))" }}
           />
 
@@ -94,7 +94,7 @@ export const ProcessSection = () => {
                 <span
                   className={`absolute -left-12 top-7 grid h-7 w-7 place-items-center rounded-full border-2 transition-all duration-500 sm:-left-16 ${
                     on
-                      ? "border-accent bg-accent shadow-[0_0_26px_rgba(255,59,87,0.75)]"
+                      ? "border-accent bg-accent shadow-[0_0_26px_rgba(196,65,77,0.75)]"
                       : "border-stone-900/20 bg-beige-50"
                   }`}
                 >

@@ -201,7 +201,7 @@ export const CartPage: React.FC = () => {
               <button
                 onClick={handleCheckout}
                 disabled={cartItems.length === 0}
-                className="w-full rounded-2xl bg-stone-900 px-8 py-4 text-sm font-semibold uppercase tracking-widest text-white hover:bg-stone-800 transition-all duration-300 active:scale-95 flex items-center justify-center gap-2 group disabled:opacity-50 disabled:pointer-events-none"
+                  className="w-full btn-ember rounded-2xl px-8 py-4 text-sm font-semibold uppercase tracking-widest duration-300 active:scale-95 flex items-center justify-center gap-2 group disabled:opacity-50 disabled:pointer-events-none"
               >
                 {t("cart.checkout")}
                 <LuArrowRight

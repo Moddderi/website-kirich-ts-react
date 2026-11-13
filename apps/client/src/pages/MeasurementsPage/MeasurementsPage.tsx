@@ -39,7 +39,7 @@ export const MeasurementsPage = () => {
     <main className="grow pb-32">
       <div className="mx-auto max-w-7xl px-6 lg:px-8 animate-reveal-up">
         <div className="mb-16 text-center max-w-2xl mx-auto">
-          <span className="rounded-full bg-stone-900 px-3 py-1 text-[10px] font-semibold uppercase tracking-widest text-white shadow-sm border border-stone-800 mb-6 inline-block">
+          <span className="rounded-full border border-accent/40 bg-accent/10 px-3 py-1 text-[10px] font-semibold uppercase tracking-widest text-accent mb-6 inline-block">
             {t("measurements.stepLabel")}
           </span>
           <h1 className="text-4xl sm:text-5xl font-semibold tracking-tighter text-stone-900 mb-6">
