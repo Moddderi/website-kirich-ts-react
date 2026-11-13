@@ -110,7 +110,7 @@ export const WaysSection = () => {
                     {t("main.comingSoon")}
                   </span>
                 ) : (
-                  <span className="mt-8 inline-flex items-center gap-3 rounded-full bg-white px-7 py-3.5 text-sm font-bold text-black transition-all duration-300 group-hover:shadow-[0_0_40px_-6px_rgba(255,255,255,0.7)]">
+                  <span className="btn-ember mt-8 inline-flex items-center gap-3 rounded-full px-7 py-3.5 text-sm font-bold">
                     {t("main.tailoring")}
                     <LuArrowRight
                       size={18}

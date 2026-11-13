@@ -24,11 +24,10 @@ export const StatsStrip = () => {
               i === 2 ? "lg:border-l lg:border-stone-900/10" : ""
             }`}
           >
-            <CountUp
-              to={s.to}
-              suffix={s.suffix}
-              className="font-display text-5xl font-medium tracking-tight text-stone-900 sm:text-7xl"
-            />
+            <div className="font-display text-5xl font-medium tracking-tight text-stone-900 sm:text-7xl">
+              <CountUp to={s.to} />
+              {s.suffix && <span className="text-ember">{s.suffix}</span>}
+            </div>
             <p className="mt-3 max-w-[16rem] text-xs leading-relaxed text-stone-500 sm:text-sm">
               {t(`main.${s.key}`)}
             </p>

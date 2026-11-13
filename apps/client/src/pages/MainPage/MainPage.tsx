@@ -7,6 +7,7 @@ import { WhySection } from "./sections/WhySection";
 import { ProcessSection } from "./sections/ProcessSection";
 import { AboutSection } from "./sections/AboutSection";
 import { CtaSection } from "./sections/CtaSection";
+import { StickyCta } from "./sections/StickyCta";
 
 const FeaturedProducts = lazy(() => import("./FeaturedProducts"));
 
@@ -43,7 +44,7 @@ export const MainPage = () => (
                 >
                   {word}
                 </span>
-                <span className="h-2 w-2 rotate-45 bg-stone-900/50" />
+                <span className="h-2 w-2 rotate-45 bg-accent" />
               </span>
             ))}
           </div>
@@ -64,5 +65,6 @@ export const MainPage = () => (
 
     <AboutSection />
     <CtaSection />
+    <StickyCta />
   </main>
 );

@@ -12,6 +12,8 @@ import { getCabinetToken, getSession } from "../../utils/cabinetStorage";
 import { CATALOG_ENABLED } from "../../constants/features";
 import logoLight from "../../assets/logo-mini.png";
 
+const TICKER_KEYS = ["topBar", "topBar2", "topBar3", "topBar4"] as const;
+
 const ICON_CLASS =
   "relative flex h-10 w-10 items-center justify-center rounded-full text-stone-600 transition-colors duration-300 hover:bg-stone-900/5 hover:text-stone-900";
 
@@ -67,11 +69,28 @@ export const Header = () => {
 
   return (
     <>
-      <div className="palette-original border-b border-white/5 bg-stone-900 px-4 py-2 text-center">
-        <p className="text-[10px] font-medium uppercase tracking-[0.32em] text-beige-300/90 sm:text-[11px]">
-          {t("header.topBar")}
-        </p>
-      </div>
+      <Link
+        to="/individual-tailoring"
+        className="ticker palette-original relative block overflow-hidden bg-stone-900 py-2"
+        aria-label={t("header.topBar")}
+      >
+        <div className="ticker-track flex items-center" aria-hidden="true">
+          {[0, 1].map((dup) => (
+            <div key={dup} className="flex shrink-0 items-center">
+              {TICKER_KEYS.map((key) => (
+                <span
+                  key={`${dup}-${key}`}
+                  className="flex items-center text-[10px] font-semibold uppercase tracking-[0.28em] text-white/80 sm:text-[11px]"
+                >
+                  <span className="px-6 sm:px-10">{t(`header.${key}`)}</span>
+                  <span className="h-1.5 w-1.5 rotate-45 bg-accent shadow-[0_0_10px_2px_rgba(255,59,87,0.7)]" />
+                </span>
+              ))}
+            </div>
+          ))}
+        </div>
+        <span className="shine-line absolute inset-x-0 bottom-0" />
+      </Link>
 
       <nav className="sticky top-0 z-50 border-b border-stone-900/10 bg-beige-50/85 backdrop-blur-md">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -103,6 +122,12 @@ export const Header = () => {
             </div>
 
             <div className="flex items-center gap-0.5 sm:gap-1.5">
+              <Link
+                to="/individual-tailoring/step-1"
+                className="btn-ember mr-2 hidden items-center rounded-full px-5 py-2 text-xs font-bold uppercase tracking-widest lg:inline-flex"
+              >
+                {t("header.startCta")}
+              </Link>
               <button
                 type="button"
                 onClick={toggleLang}
@@ -202,6 +227,13 @@ export const Header = () => {
               </div>
 
               <div className="pt-10">
+                <Link
+                  to="/individual-tailoring/step-1"
+                  onClick={closeMenu}
+                  className="btn-ember mb-8 flex items-center justify-center rounded-full px-6 py-4 text-sm font-bold uppercase tracking-widest"
+                >
+                  {t("header.startCta")}
+                </Link>
                 <div className="flex flex-col gap-4">
                   <NavLink
                     to="/delivery-and-payment"

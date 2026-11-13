@@ -1,6 +1,10 @@
 {
   "header": {
     "topBar": "Global Shipping. Made in Ukraine.",
+    "topBar2": "Only 30% prepayment — the rest when it's ready",
+    "topBar3": "Studio calendar online — book your start date",
+    "topBar4": "Measured for every garment",
+    "startCta": "Start tailoring",
     "catalog": "Catalog",
     "tailoring": "Custom Tailoring",
     "navigation": "Navigation",
@@ -325,6 +329,10 @@
     "heroDescription": "Men's ballroom wear without compromise. Every detail crafted for your confidence on the dance floor.",
     "goToCollection": "Browse Catalog",
     "brandPhilosophy": "Brand Philosophy",
+    "ctaNote": "A manager contacts you after the request · Only 30% prepayment",
+    "ctaChip1": "Choose pieces",
+    "ctaChip2": "Start date",
+    "ctaChip3": "Measurements online",
     "comingSoon": "Coming soon",
     "comingSoonDesc": "Ready-to-wear is returning soon. For now we sew exclusively to measure — made just for you.",
     "scanNeck": "Neck",

@@ -64,7 +64,7 @@ export const ProcessSection = () => {
           </h2>
           <Link
             to="/individual-tailoring/step-1"
-            className="group mt-10 inline-flex items-center gap-2 rounded-full bg-stone-900 px-7 py-3.5 text-sm font-semibold text-beige-50 shadow-[0_0_40px_-10px_rgba(255,255,255,0.5)] transition-all duration-300 hover:shadow-[0_0_60px_-8px_rgba(255,255,255,0.7)]"
+            className="btn-ember group mt-10 inline-flex items-center gap-2 rounded-full px-7 py-3.5 text-sm font-semibold"
           >
             {t("main.processCta")}
             <LuArrowRight
@@ -77,12 +77,12 @@ export const ProcessSection = () => {
 
         <ol
           ref={listRef}
-          className="relative space-y-6 pl-10 [--p:0] sm:pl-14"
+          className="relative space-y-5 pl-12 [--p:0] sm:pl-16"
         >
-          {/* track + fill */}
-          <span className="absolute bottom-3 left-[11px] top-3 w-px bg-stone-900/15 sm:left-[15px]" />
+          {/* track + fill: both 2px wide, centred on x = 14px (the dots' centre line) */}
+          <span className="absolute bottom-6 left-[13px] top-6 w-[2px] rounded-full bg-stone-900/10" />
           <span
-            className="absolute bottom-3 left-[11px] top-3 w-px origin-top bg-gradient-to-b from-white via-white to-white/30 shadow-[0_0_12px_rgba(255,255,255,0.8)] will-change-transform sm:left-[15px]"
+            className="absolute bottom-6 left-[13px] top-6 w-[2px] origin-top rounded-full bg-gradient-to-b from-accent via-accent to-accent-2 shadow-[0_0_14px_rgba(255,59,87,0.8)] will-change-transform"
             style={{ transform: "scaleY(var(--p))" }}
           />
 
@@ -90,16 +90,17 @@ export const ProcessSection = () => {
             const on = i < active;
             return (
               <li key={n} className="relative">
+                {/* dot: 28px box, left edge at -48px/-64px → centre exactly at x = 14px */}
                 <span
-                  className={`absolute -left-10 top-6 flex h-6 w-6 items-center justify-center rounded-full border transition-all duration-500 sm:-left-14 sm:h-8 sm:w-8 ${
+                  className={`absolute -left-12 top-7 grid h-7 w-7 place-items-center rounded-full border-2 transition-all duration-500 sm:-left-16 ${
                     on
-                      ? "border-white bg-white shadow-[0_0_24px_rgba(255,255,255,0.7)]"
-                      : "border-stone-900/25 bg-beige-50"
+                      ? "border-accent bg-accent shadow-[0_0_26px_rgba(255,59,87,0.75)]"
+                      : "border-stone-900/20 bg-beige-50"
                   }`}
                 >
                   <span
-                    className={`h-1.5 w-1.5 rounded-full transition-colors duration-500 ${
-                      on ? "bg-black" : "bg-stone-900/40"
+                    className={`block h-2 w-2 rounded-full transition-colors duration-500 ${
+                      on ? "bg-white" : "bg-stone-900/30"
                     }`}
                   />
                 </span>
@@ -107,8 +108,8 @@ export const ProcessSection = () => {
                 <div
                   className={`rounded-3xl border p-6 transition-all duration-500 sm:p-8 ${
                     on
-                      ? "border-stone-900/25 bg-stone-900/[0.04]"
-                      : "border-stone-900/10 bg-transparent opacity-60"
+                      ? "border-accent/40 bg-stone-900/[0.04]"
+                      : "border-stone-900/10 bg-transparent opacity-55"
                   }`}
                 >
                   <div className="flex items-start justify-between gap-6">
@@ -122,7 +123,7 @@ export const ProcessSection = () => {
                     </div>
                     <span
                       className={`font-display text-6xl font-medium leading-none transition-colors duration-500 sm:text-7xl ${
-                        on ? "text-stone-900" : "text-outline"
+                        on ? "text-ember" : "text-outline"
                       }`}
                     >
                       {String(n).padStart(2, "0")}

@@ -14,6 +14,7 @@ import { HOME_IMAGES } from "../../../constants/homeImages";
 import { CATALOG_ENABLED } from "../../../constants/features";
 import { optimizeCloudinaryUrl } from "../../../utils/cloudinary";
 import { Tilt } from "../../../components/fx/Tilt";
+import { LivingBg } from "../../../components/fx/LivingBg";
 
 const Photo = ({
   src,
@@ -102,10 +103,7 @@ export const HeroSection = () => {
       onPointerMove={onPointerMove}
       className="fx-cursor-host relative overflow-hidden"
     >
-      <div className="fx-grid-wrap">
-        <div className="fx-grid" />
-      </div>
-      <div className="fx-beam" />
+      <LivingBg />
       <div className="fx-cursor-glow" />
 
       <div className="relative mx-auto grid max-w-7xl items-center gap-14 px-5 pb-20 pt-10 sm:px-6 lg:grid-cols-[1.05fr_0.95fr] lg:gap-10 lg:px-8 lg:pb-32 lg:pt-20">
@@ -113,8 +111,8 @@ export const HeroSection = () => {
           <p className="animate-reveal-up mb-6 flex items-center justify-center gap-3 text-[11px] font-semibold uppercase tracking-[0.3em] text-stone-500 lg:justify-start">
             <span className="hidden h-px w-8 bg-current opacity-60 lg:block" />
             <span className="relative flex h-2 w-2">
-              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-stone-900 opacity-60" />
-              <span className="relative inline-flex h-2 w-2 rounded-full bg-stone-900" />
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-accent opacity-70" />
+              <span className="relative inline-flex h-2 w-2 rounded-full bg-accent" />
             </span>
             {t("main.vanguardCollection")}
           </p>
@@ -147,8 +145,7 @@ export const HeroSection = () => {
           <div className="animate-reveal-up delay-700 mt-10 flex flex-col items-stretch gap-3 sm:flex-row sm:items-center sm:justify-center lg:justify-start">
             <Link
               to="/individual-tailoring"
-              className="group relative inline-flex items-center justify-center gap-3 overflow-hidden rounded-full bg-stone-900 px-8 py-4 text-sm font-semibold text-beige-50 shadow-[0_0_40px_-8px_rgba(255,255,255,0.45)] transition-all duration-300 hover:shadow-[0_0_60px_-6px_rgba(255,255,255,0.65)] active:scale-[0.98]"
-            >
+              className="btn-ember group inline-flex items-center justify-center gap-3 rounded-full px-8 py-4 text-sm font-semibold">
               {t("main.tailoring")}
               <LuArrowRight
                 size={18}
@@ -210,26 +207,28 @@ export const HeroSection = () => {
                 priority
                 className="relative h-full"
               >
-                <div className="scan-line" />
-                {SCAN_POINTS.map((p) => (
-                  <span
-                    key={p.key}
-                    className="absolute flex items-center"
-                    style={{ left: `${p.x}%`, top: `${p.y}%` }}
-                  >
-                    <span className="ping-dot -ml-1 h-2 w-2 shrink-0 rounded-full bg-white shadow-[0_0_10px_2px_rgba(255,255,255,0.8)]" />
+                <div className="palette-original pointer-events-none absolute inset-0">
+                  <div className="scan-line" />
+                  {SCAN_POINTS.map((p) => (
                     <span
-                      className={`absolute flex items-center gap-1 whitespace-nowrap ${
-                        p.side === "right" ? "left-2" : "right-3 flex-row-reverse"
-                      }`}
+                      key={p.key}
+                      className="absolute h-0 w-0"
+                      style={{ left: `${p.x}%`, top: `${p.y}%` }}
                     >
-                      <span className="h-px w-4 bg-white/70 sm:w-8" />
-                      <span className="rounded-full border border-white/30 bg-black/60 px-2 py-0.5 text-[9px] font-semibold uppercase tracking-widest text-white backdrop-blur-sm">
-                        {t(`main.${p.key}`)}
+                      <span className="ping-dot absolute -left-[5px] -top-[5px] h-[10px] w-[10px] rounded-full bg-accent shadow-[0_0_12px_3px_rgba(255,59,87,0.7)] ring-2 ring-white" />
+                      <span
+                        className={`absolute top-0 flex -translate-y-1/2 items-center gap-1 whitespace-nowrap ${
+                          p.side === "right" ? "left-[10px]" : "right-[10px] flex-row-reverse"
+                        }`}
+                      >
+                        <span className="h-px w-4 bg-white/60 sm:w-8" />
+                        <span className="rounded-full border border-white/25 bg-black/70 px-2 py-0.5 text-[9px] font-semibold uppercase tracking-widest text-white backdrop-blur-sm">
+                          {t(`main.${p.key}`)}
+                        </span>
                       </span>
                     </span>
-                  </span>
-                ))}
+                  ))}
+                </div>
               </Photo>
             </div>
             <div className="flex flex-col gap-3 sm:gap-5">
