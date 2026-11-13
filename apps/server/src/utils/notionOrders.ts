@@ -5,12 +5,14 @@ import {
   type MeasurementType,
   type MeasurementUnit,
   type TailoringProgram,
+  type WorkDaysTable,
 } from "@project/shared";
 import {
   isNotionConfigured,
   normalizeNotionId,
 } from "./notionAvailability.js";
 import { invalidateAvailabilityCache } from "./availability.js";
+import { cabinetUrl } from "./links.js";
 import {
   TAILORING_TYPE_META,
   buildCustomOrderSummary,
@@ -72,7 +74,7 @@ const SITE_SOURCE_LABEL = "З сайту";
 
 /* ------------------------------ Notion client ----------------------------- */
 
-const notion = async <T>(
+export const notionRequest = async <T>(
   path: string,
   init: { method?: "GET" | "POST" | "PATCH"; body?: unknown } = {},
 ): Promise<T> => {
@@ -80,6 +82,14 @@ const notion = async <T>(
   if (process.env.NOTION_DRY_RUN === "1" && init.method !== "GET" && path === "/pages") {
     console.log("🧪 [dry-run] POST /pages", JSON.stringify(init.body, null, 2));
     return { id: "dry-run-page-id", url: null } as T;
+  }
+  if (
+    process.env.NOTION_DRY_RUN === "1" &&
+    init.method === "PATCH" &&
+    (path.startsWith("/pages/") || path.startsWith("/blocks/"))
+  ) {
+    console.log(`🧪 [dry-run] PATCH ${path}`, JSON.stringify(init.body, null, 2));
+    return {} as T;
   }
 
   const controller = new AbortController();
@@ -108,7 +118,7 @@ const notion = async <T>(
   }
 };
 
-interface SchemaProperty {
+export interface SchemaProperty {
   id: string;
   name: string;
   type: string;
@@ -124,11 +134,11 @@ interface DbSchema {
 
 const schemaCache = new Map<string, { schema: DbSchema; at: number }>();
 
-const getSchema = async (databaseId: string): Promise<DbSchema> => {
+export const getSchema = async (databaseId: string): Promise<DbSchema> => {
   const hit = schemaCache.get(databaseId);
   if (hit && Date.now() - hit.at < SCHEMA_TTL_MS) return hit.schema;
 
-  const raw = await notion<{ id: string; properties: Record<string, SchemaProperty> }>(
+  const raw = await notionRequest<{ id: string; properties: Record<string, SchemaProperty> }>(
     `/databases/${databaseId}`,
   );
   const schema: DbSchema = { id: raw.id, properties: raw.properties };
@@ -137,7 +147,7 @@ const getSchema = async (databaseId: string): Promise<DbSchema> => {
 };
 
 /** First property of one of the given types whose name matches (or any, if no pattern). */
-const findProp = (
+export const findProp = (
   schema: DbSchema,
   types: string[],
   pattern?: RegExp,
@@ -152,7 +162,7 @@ const richText = (content: string) => [
   { type: "text", text: { content: content.slice(0, 1900) } },
 ];
 
-const pageTitle = (page: any): string => {
+export const pageTitle = (page: any): string => {
   for (const prop of Object.values<any>(page.properties ?? {})) {
     if (prop.type === "title") {
       return (prop.title ?? []).map((t: any) => t.plain_text).join("");
@@ -183,7 +193,7 @@ const findOrCreateClient = async (
   const fullName = `${order.lastName} ${order.firstName}`.trim();
   const prefix = normalizeName(fullName);
 
-  const search = await notion<{ results: any[] }>(
+  const search = await notionRequest<{ results: any[] }>(
     `/databases/${clientsDbId}/query`,
     {
       body: {
@@ -225,7 +235,7 @@ const findOrCreateClient = async (
     properties[statusProp.name] = { select: { name: newStatus.name } };
   }
 
-  const created = await notion<{ id: string }>("/pages", {
+  const created = await notionRequest<{ id: string }>("/pages", {
     body: { parent: { database_id: clientsDbId }, properties },
   });
   return created.id;
@@ -245,7 +255,7 @@ const findPriceItems = async (
 
   const result: Array<{ id: string; name: string }> = [];
   for (const name of names) {
-    const search = await notion<{ results: any[] }>(
+    const search = await notionRequest<{ results: any[] }>(
       `/databases/${priceDbId}/query`,
       {
         body: {
@@ -275,7 +285,7 @@ const nextOrderNumber = async (
   ordersDbId: string,
   numberProp: SchemaProperty,
 ): Promise<number | null> => {
-  const res = await notion<{ results: any[] }>(
+  const res = await notionRequest<{ results: any[] }>(
     `/databases/${ordersDbId}/query`,
     {
       body: {
@@ -341,14 +351,70 @@ const PAYMENT_LABEL: Record<string, string> = {
   cod: "Накладений платіж",
 };
 
+/** "Мірки (см)" heading + one bullet per measurement (or a placeholder text). */
+export const buildMeasurementBlocks = (
+  data: unknown,
+  emptyText: string,
+  title?: string,
+) => {
+  const { unit, values } = parseMeasurements(data);
+  const blocks: unknown[] = [
+    heading(title ?? `Мірки (${MEASUREMENT_UNIT_LABELS[unit]})`),
+  ];
+  const entries = Object.entries(values);
+  if (entries.length === 0) {
+    blocks.push(paragraph(emptyText));
+  } else {
+    for (const [key, value] of entries) {
+      const label =
+        MEASUREMENT_LABELS_UK[key as keyof typeof MEASUREMENT_LABELS_UK] ?? key;
+      blocks.push(bullet(`${label}: ${value}`));
+    }
+  }
+  return blocks;
+};
+
+/** Adds blocks to the end of an existing order page. */
+export const appendNotionBlocks = async (pageId: string, children: unknown[]) => {
+  await notionRequest(`/blocks/${pageId}/children`, {
+    method: "PATCH",
+    body: { children: children.slice(0, 95) },
+  });
+};
+
 const buildBody = (order: any, unlinkedItems: string[]) => {
   const summary = buildCustomOrderSummary({ ...order, displayCurrency: "UAH" });
-  const { unit, values } = parseMeasurements(order.items?.[0]?.measurements);
-  const unitLabel = MEASUREMENT_UNIT_LABELS[unit];
   const shortId = String(order.id ?? "").split("-")[0].toUpperCase();
 
   const blocks: unknown[] = [
     paragraph(`🌐 Замовлення з сайту (індивідуальний пошив) · №${shortId}`),
+    ...(order.accessToken
+      ? [
+          {
+            object: "block",
+            type: "paragraph",
+            paragraph: {
+              rich_text: [
+                { type: "text", text: { content: "🔗 Кабінет клієнта (передайте посилання клієнту): " } },
+                {
+                  type: "text",
+                  text: {
+                    content: cabinetUrl(order.accessToken),
+                    link: { url: cabinetUrl(order.accessToken) },
+                  },
+                },
+              ],
+            },
+          },
+        ]
+      : []),
+    ...(order.estimate?.measurementsPending
+      ? [
+          paragraph(
+            "📆 Замовлення на майбутню дату: після передоплати змініть статус на «Заброньовано» — за 30 днів до початку сайт сам поставить «Планове зняття мірок» і відкриє клієнту бланк мірок.",
+          ),
+        ]
+      : []),
     heading("Вироби"),
     ...summary.lines.map((line) =>
       bullet(`${line.label} — ${line.priceRange}, ${line.leadDays}`),
@@ -388,17 +454,14 @@ const buildBody = (order: any, unlinkedItems: string[]) => {
     blocks.push(heading("Коментар клієнта"), paragraph(summary.comment));
   }
 
-  blocks.push(heading(`Мірки (${unitLabel})`));
-  const entries = Object.entries(values);
-  if (entries.length === 0) {
-    blocks.push(paragraph("Мірки будуть уточнені менеджером особисто."));
-  } else {
-    for (const [key, value] of entries) {
-      const label =
-        MEASUREMENT_LABELS_UK[key as keyof typeof MEASUREMENT_LABELS_UK] ?? key;
-      blocks.push(bullet(`${label}: ${value}`));
-    }
-  }
+  blocks.push(
+    ...buildMeasurementBlocks(
+      order.items?.[0]?.measurements,
+      order.estimate?.measurementsPending
+        ? "Мірки будуть зняті пізніше: клієнт передасть їх через кабінет за 30 днів до початку (статус у Notion зміниться автоматично)."
+        : "Мірки будуть уточнені менеджером особисто.",
+    ),
+  );
 
   return blocks.slice(0, 95); // Notion allows 100 blocks per request
 };
@@ -458,10 +521,98 @@ const createPositions = async (
     };
     if (qtyProp) properties[qtyProp.name] = { number: item.qty };
 
-    await notion("/pages", {
+    await notionRequest("/pages", {
       body: { parent: { database_id: positionsDbId }, properties },
     });
   }
+};
+
+/* ------------------------- Production time (work days) --------------------- */
+
+const WORK_DAYS_TTL_MS = 60 * 60 * 1000; // the price list is edited rarely
+let workDaysCache: { table: WorkDaysTable; at: number } | null = null;
+
+/** "0,25" / "0.5" / 2 → number of working days. */
+const parseDays = (value: unknown): number | null => {
+  const n =
+    typeof value === "number"
+      ? value
+      : parseFloat(String(value ?? "").replace(",", ".").trim());
+  return Number.isFinite(n) && n >= 0 ? n : null;
+};
+
+const readTermCell = (page: any, termName: string): number | null => {
+  const prop = page.properties?.[termName];
+  if (!prop) return null;
+  if (prop.type === "number") return parseDays(prop.number);
+  if (prop.type === "formula") return parseDays(prop.formula?.number ?? prop.formula?.string);
+  if (prop.type === "rich_text") {
+    return parseDays((prop.rich_text ?? []).map((t: any) => t.plain_text).join(""));
+  }
+  return null;
+};
+
+/**
+ * Production time in working days per garment and program, summed over the
+ * base price items the site maps garments to (BASE_PRICE_ITEMS). Read from the
+ * «Термін виготовлення» column of [DB] Прайс. null = not available.
+ */
+export const getWorkDaysTable = async (): Promise<WorkDaysTable | null> => {
+  if (!isNotionConfigured()) return null;
+  if (workDaysCache && Date.now() - workDaysCache.at < WORK_DAYS_TTL_MS) {
+    return workDaysCache.table;
+  }
+
+  const ordersDbId = normalizeNotionId(process.env.NOTION_DATABASE_ID);
+  if (!ordersDbId) return null;
+
+  const ordersSchema = await getSchema(ordersDbId);
+  const positionsProp = findProp(ordersSchema, ["relation"], /позиц/i);
+  if (!positionsProp?.relation) return null;
+
+  const priceDbId = await resolvePriceDbId(positionsProp.relation.database_id, ordersDbId);
+  const priceSchema = await getSchema(priceDbId);
+  const titleProp = findProp(priceSchema, ["title"]);
+  const termProp = findProp(
+    priceSchema,
+    ["rich_text", "number", "formula"],
+    /термін|срок|term|lead/i,
+  );
+  if (!titleProp || !termProp) return null;
+
+  const days = new Map<string, number>();
+  let cursor: string | undefined;
+  do {
+    const res: { results: any[]; has_more: boolean; next_cursor: string | null } =
+      await notionRequest(`/databases/${priceDbId}/query`, {
+        body: { page_size: 100, ...(cursor ? { start_cursor: cursor } : {}) },
+      });
+    for (const page of res.results) {
+      const name = pageTitle(page);
+      const value = readTermCell(page, termProp.name);
+      if (!name || value === null) continue;
+      const isActive = Object.values<any>(page.properties ?? {}).some(
+        (prop) => prop.type === "select" && /^активн/i.test(prop.select?.name ?? ""),
+      );
+      // The "Активний" duplicate wins over archived ones
+      if (!days.has(name) || isActive) days.set(name, value);
+    }
+    cursor = res.has_more && res.next_cursor ? res.next_cursor : undefined;
+  } while (cursor);
+
+  const table: WorkDaysTable = { ST: {}, LAT: {} };
+  for (const program of Object.keys(BASE_PRICE_ITEMS) as TailoringProgram[]) {
+    for (const type of Object.keys(BASE_PRICE_ITEMS[program]) as MeasurementType[]) {
+      const names = BASE_PRICE_ITEMS[program][type];
+      if (names.length === 0) continue;
+      const values = names.map((name) => days.get(name));
+      if (values.some((v) => v === undefined)) continue;
+      table[program][type] = Math.round((values as number[]).reduce((a, b) => a + b, 0) * 100) / 100;
+    }
+  }
+
+  workDaysCache = { table, at: Date.now() };
+  return table;
 };
 
 /* --------------------------------- Public ---------------------------------- */
@@ -472,7 +623,7 @@ const createPositions = async (
  */
 export const createNotionOrder = async (
   order: any,
-): Promise<{ url: string | null } | null> => {
+): Promise<{ url: string | null; id: string } | null> => {
   if (!isNotionConfigured() || order.orderType !== "custom") return null;
 
   const ordersDbId = normalizeNotionId(process.env.NOTION_DATABASE_ID);
@@ -534,9 +685,13 @@ export const createNotionOrder = async (
     props[numberProp.name] = { number: orderNumber };
   }
 
-  const newStatus = statusProp?.status?.options.find((o) =>
-    /нове замовлення|new order/i.test(o.name),
-  );
+  // A booking far in the future waits for the prepayment; others are simply new.
+  const wantsPrepayment = Boolean(order.estimate?.measurementsPending);
+  const newStatus =
+    (wantsPrepayment
+      ? statusProp?.status?.options.find((o) => /передпл|предоплат/i.test(o.name))
+      : undefined) ??
+    statusProp?.status?.options.find((o) => /нове замовлення|new order/i.test(o.name));
   if (statusProp && newStatus) {
     props[statusProp.name] = { status: { name: newStatus.name } };
   }
@@ -613,7 +768,7 @@ export const createNotionOrder = async (
     );
   }
 
-  const page = await notion<{ id: string; url?: string }>("/pages", {
+  const page = await notionRequest<{ id: string; url?: string }>("/pages", {
     body: {
       parent: { database_id: ordersDbId },
       properties: props,
@@ -643,5 +798,5 @@ export const createNotionOrder = async (
   console.log(
     `✅ Notion: створено замовлення ${orderNumber ?? ""} (${formatDateUk(startDate)} → ${formatDateUk(readyTo)})`,
   );
-  return { url: page.url ?? null };
+  return { url: page.url ?? null, id: page.id };
 };

@@ -12,6 +12,7 @@ import {
   type MeasurementUnit,
 } from "@project/shared";
 import { buildCustomOrderSummary } from "./tailoringSummary.js";
+import { cabinetUrl } from "./links.js";
 
 type MeasurementsPayload =
   | Record<string, string>
@@ -130,6 +131,15 @@ export const sendTelegramNotification = async (order: any) => {
       `⏳ *Орієнтовна готовність:* ${summary.readyRange}\n` +
       `💰 *Орієнтовна вартість:* ${summary.priceRange}\n` +
       `💳 *Передоплата ${summary.prepaymentPercent}%:* ${summary.prepaymentRange}\n`;
+
+    if (order.estimate?.measurementsPending) {
+      itemsList +=
+        `\n📆 *Замовлення на майбутню дату* — мірки клієнт передасть через кабінет за 30 днів до початку. ` +
+        `Після передоплати змініть статус у Notion на «Заброньовано».\n`;
+    }
+    if (order.accessToken) {
+      itemsList += `\n🔗 [Кабінет клієнта — перешліть йому посилання](${cabinetUrl(order.accessToken)})\n`;
+    }
 
     if (summary.comment) {
       itemsList += `\n💬 *Коментар клієнта:*\n${escapeMd(summary.comment)}\n`;

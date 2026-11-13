@@ -75,6 +75,11 @@ export const customOrderSchema = checkoutFieldsSchema.extend({
   /** Garments the client selected; the server recomputes price range / dates from them */
   /** Per garment: e.g. { pants: "LAT", body: "ST" } */
   tailoringPrograms: z.record(z.string(), z.enum(["ST", "LAT"])).optional(),
+  /** Start date picked by the client in the calendar (YYYY-MM-DD); validated on the server */
+  preferredStartDate: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/)
+    .optional(),
   tailoringTypes: z
     .array(z.enum(["body", "jacket", "pants", "suit"]))
     .min(1, "Оберіть хоча б один виріб"),

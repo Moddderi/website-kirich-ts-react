@@ -9,7 +9,10 @@ import {
   type MeasurementType,
   type TailoringProgram,
 } from "@project/shared";
-import { useTailoringEstimate } from "../../hooks/useTailoringEstimate";
+import {
+  useScheduleFormat,
+  useTailoringEstimate,
+} from "../../hooks/useTailoringEstimate";
 import { IoShirtOutline, IoCheckmark } from "react-icons/io5";
 import { ImScissors } from "react-icons/im";
 import { GiClothes, GiSuitcase } from "react-icons/gi";
@@ -29,7 +32,8 @@ export const SelectTypePage = () => {
   const selected = useAppSelector((state) => state.tailoring.types);
   const programs = useAppSelector((state) => state.tailoring.programs);
   const currency = useAppSelector((state) => state.currency.code);
-  const { estimate, formatRange } = useTailoringEstimate();
+  const { estimate, formatRange, workDaysTable } = useTailoringEstimate();
+  const schedule = useScheduleFormat();
 
   const cardPrice = (type: MeasurementType) => {
     const info = TAILORING_GARMENTS[type];
@@ -142,10 +146,14 @@ export const SelectTypePage = () => {
                       className={`mt-1 text-[11px] font-medium ${opt.dark ? "text-stone-400" : "text-stone-500"}`}
                     >
                       {t("selectType.leadTime", {
-                        days: t("selectType.days", {
-                          min: info.leadDaysMin,
-                          max: info.leadDaysMax,
-                        }),
+                        days: (() => {
+                          // Real production time (working days) from the price list
+                          const real =
+                            workDaysTable?.[programs[opt.type] ?? "ST"]?.[opt.type];
+                          return typeof real === "number"
+                            ? schedule.days(real, real)
+                            : schedule.days(info.leadDaysMin, info.leadDaysMax);
+                        })(),
                       })}
                     </p>
                   </div>

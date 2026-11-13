@@ -14,6 +14,11 @@ interface StudioCalendarProps {
   /** Earliest / latest estimated ready date of the client's order */
   readyFrom?: string | null;
   readyTo?: string | null;
+  /** Currently selected start day (client's pick or the nearest one) */
+  selectedStart?: string | null;
+  /** Can an order start on this day? Enables picking it. */
+  canSelect?: (iso: string) => boolean;
+  onSelect?: (iso: string) => void;
 }
 
 const MONTHS_AHEAD = 18;
@@ -48,6 +53,9 @@ export const StudioCalendar = ({
   nearestStart,
   readyFrom = null,
   readyTo = null,
+  selectedStart = null,
+  canSelect,
+  onSelect,
 }: StudioCalendarProps) => {
   const { t, i18n } = useTranslation();
   const locale = i18n.language === "en" ? "en-GB" : "uk-UA";
@@ -141,7 +149,8 @@ export const StudioCalendar = ({
   /** Is the day inside the client's own order (approximate production period)? */
   const isInOrder = (iso: string) => {
     const end = readyTo ?? readyFrom;
-    return Boolean(nearestStart && end && iso >= nearestStart && iso <= end);
+    const start = selectedStart ?? nearestStart;
+    return Boolean(start && end && iso >= start && iso <= end);
   };
 
   // "Few slots" only matters when the owner actually uses it (Google Sheet rows)
@@ -239,30 +248,49 @@ export const StudioCalendar = ({
             const isWeekend = index % 7 >= 5;
             const inOrder = !isPast && !isWeekend && isInOrder(iso);
 
-            return (
-              <div
+            const selectable =
+              !isPast && !isWeekend && Boolean(onSelect && canSelect?.(iso));
+            const isSelected = selectedStart === iso;
+            const className = `relative flex aspect-square items-center justify-center rounded-xl border text-xs font-semibold transition-colors sm:text-sm ${
+              isPast
+                ? "border-transparent bg-transparent text-stone-300"
+                : isWeekend
+                  ? WEEKEND_STYLE
+                  : inOrder
+                    ? WORK_STYLE
+                    : STATUS_STYLES[status]
+            } ${
+              selectable
+                ? "cursor-pointer hover:ring-2 hover:ring-stone-900/40 focus-visible:ring-2 focus-visible:ring-stone-900"
+                : ""
+            } ${isSelected ? "ring-2 ring-stone-900 ring-offset-2" : ""}`;
+            const title = isWeekend
+              ? t("availability.legendWeekend")
+              : inOrder
+                ? t("availability.legendWork")
+                : status !== "busy" && !isPast && onSelect && !selectable
+                  ? t("availability.notEnoughRoom")
+                  : note || statusLabel[status];
+            const style =
+              !isPast && isWeekend ? { backgroundImage: CROSS_BG } : undefined;
+            const content = (
+              <span className="relative rounded-sm bg-inherit px-0.5">{day}</span>
+            );
+
+            return selectable ? (
+              <button
                 key={iso}
-                title={
-                  isWeekend
-                    ? t("availability.legendWeekend")
-                    : inOrder
-                      ? t("availability.legendWork")
-                      : note || statusLabel[status]
-                }
-                className={`relative flex aspect-square items-center justify-center rounded-xl border text-xs font-semibold transition-colors sm:text-sm ${
-                  isPast
-                    ? "border-transparent bg-transparent text-stone-300"
-                    : isWeekend
-                      ? WEEKEND_STYLE
-                      : inOrder
-                        ? WORK_STYLE
-                        : STATUS_STYLES[status]
-                }`}
-                style={
-                  !isPast && isWeekend ? { backgroundImage: CROSS_BG } : undefined
-                }
+                type="button"
+                title={t("availability.pickDay")}
+                aria-pressed={isSelected}
+                onClick={() => onSelect?.(iso)}
+                className={className}
               >
-                <span className="relative rounded-sm bg-inherit px-0.5">{day}</span>
+                {content}
+              </button>
+            ) : (
+              <div key={iso} title={title} className={className} style={style}>
+                {content}
               </div>
             );
           })}
@@ -287,6 +315,11 @@ export const StudioCalendar = ({
             />
             {t("availability.legendWeekend")}
           </span>
+          {onSelect && (
+            <span className="flex w-full items-center gap-2 text-stone-600">
+              {t("availability.pickHint")}
+            </span>
+          )}
           {nearestStart && (readyTo ?? readyFrom) && (
             <span className="flex items-center gap-2">
               <span className={`h-3 w-3 rounded-md border ${WORK_STYLE}`} />

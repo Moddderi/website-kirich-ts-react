@@ -91,6 +91,58 @@ export const isWeekendISO = (iso: string): boolean => {
   return day === 0 || day === 6;
 };
 
+/** Working days of production per garment (from the studio price list in Notion). */
+export type WorkDaysByType = Partial<Record<MeasurementType, number>>;
+export type WorkDaysTable = Record<TailoringProgram, WorkDaysByType>;
+
+/** `n` working days after `iso` (Sat/Sun skipped). */
+export const addWorkDaysISO = (iso: string, n: number): string => {
+  let day = iso;
+  let left = Math.max(0, Math.floor(n));
+  while (left > 0) {
+    day = addDaysISO(day, 1);
+    if (!isWeekendISO(day)) left--;
+  }
+  return day;
+};
+
+const roundDays = (value: number) => Math.round(value * 100) / 100;
+
+/**
+ * Work days of the chosen garments (each with its own program), or null when
+ * any of them is unknown → callers fall back to the static estimate.
+ */
+export const pickWorkDays = (
+  table: WorkDaysTable | null | undefined,
+  types: MeasurementType[],
+  programs: Partial<Record<MeasurementType, TailoringProgram>>,
+): WorkDaysByType | null => {
+  if (!table || types.length === 0) return null;
+  const result: WorkDaysByType = {};
+  for (const type of types) {
+    const days = table[programs[type] ?? "ST"]?.[type];
+    if (typeof days !== "number" || !Number.isFinite(days)) return null;
+    result[type] = days;
+  }
+  return result;
+};
+
+export const sumWorkDays = (workDays: WorkDaysByType | null | undefined): number | null => {
+  if (!workDays) return null;
+  const values = Object.values(workDays).filter(
+    (v): v is number => typeof v === "number",
+  );
+  return values.length ? roundDays(values.reduce((a, b) => a + b, 0)) : null;
+};
+
+/** Orders starting later than this are bookings: measurements are taken closer to the start. */
+export const FAR_ORDER_DAYS = 45;
+/** How many days before the start the client is asked for fresh measurements. */
+export const MEASUREMENTS_REMINDER_DAYS = 30;
+
+export const daysBetweenISO = (fromISO: string, toISO: string): number =>
+  Math.round((isoToUtc(toISO) - isoToUtc(fromISO)) / DAY_MS);
+
 export const todayISO = (): string => new Date().toISOString().slice(0, 10);
 
 /* -------------------------------------------------------------------------- */
@@ -135,28 +187,42 @@ export const getStatusForDate = (
  * start + windowDays must be free. Single free days squeezed between other
  * orders are therefore skipped — the start moves to the end of the queue.
  */
+/**
+ * Can an order of `windowDays` calendar days / `workDays` working days start on `day`?
+ * The start day must be a free working day and so must every working day of the order.
+ */
+export const canStartOn = (
+  ranges: AvailabilityRange[],
+  day: string,
+  windowDays = 1,
+  workDays: number | null = null,
+): boolean => {
+  const isBusy = (iso: string) => getStatusForDate(ranges, iso).status === "busy";
+  if (isWeekendISO(day) || isBusy(day)) return false;
+
+  // With known work days the order occupies exactly that many working days
+  // (the start day is day 1); otherwise a calendar window is used.
+  const end =
+    workDays !== null
+      ? addWorkDaysISO(day, Math.max(1, Math.ceil(roundDays(workDays))) - 1)
+      : addDaysISO(day, Math.max(0, Math.floor(windowDays)));
+
+  for (let d = addDaysISO(day, 1); d <= end; d = addDaysISO(d, 1)) {
+    if (!isWeekendISO(d) && isBusy(d)) return false;
+  }
+  return true;
+};
+
 export const findNearestStart = (
   ranges: AvailabilityRange[],
   fromISO: string = todayISO(),
   horizonDays = 1100,
   windowDays = 1,
+  workDays: number | null = null,
 ): string | null => {
-  const isBusy = (iso: string) => getStatusForDate(ranges, iso).status === "busy";
-  const window = Math.max(0, Math.floor(windowDays));
-
   for (let i = 0; i <= horizonDays; i++) {
     const day = addDaysISO(fromISO, i);
-    if (isWeekendISO(day) || isBusy(day)) continue;
-
-    let fits = true;
-    for (let j = 1; j <= window; j++) {
-      const next = addDaysISO(day, j);
-      if (!isWeekendISO(next) && isBusy(next)) {
-        fits = false;
-        break;
-      }
-    }
-    if (fits) return day;
+    if (canStartOn(ranges, day, windowDays, workDays)) return day;
   }
   return null;
 };
@@ -197,15 +263,22 @@ export const calcTailoringEstimate = (
   types: MeasurementType[],
   currency: Currency,
   startDate: string | null,
+  workDays?: WorkDaysByType | null,
 ): TailoringEstimate => {
+  // Real production time (working days, from the price list) when known for every garment
+  const useWorkDays =
+    !!workDays &&
+    types.length > 0 &&
+    types.every((type) => typeof workDays[type] === "number");
+
   const items: TailoringEstimateItem[] = types.map((type) => {
     const info = TAILORING_GARMENTS[type];
     return {
       type,
       priceFrom: convertFromUah(info.priceFromUah, currency),
       priceTo: convertFromUah(info.priceToUah, currency),
-      leadDaysMin: info.leadDaysMin,
-      leadDaysMax: info.leadDaysMax,
+      leadDaysMin: useWorkDays ? (workDays![type] as number) : info.leadDaysMin,
+      leadDaysMax: useWorkDays ? (workDays![type] as number) : info.leadDaysMax,
     };
   });
 
@@ -214,8 +287,12 @@ export const calcTailoringEstimate = (
 
   const priceFrom = sum((i) => i.priceFrom);
   const priceTo = sum((i) => i.priceTo);
-  const leadDaysMin = sum((i) => i.leadDaysMin);
-  const leadDaysMax = sum((i) => i.leadDaysMax);
+  const leadDaysMin = roundDays(sum((i) => i.leadDaysMin));
+  const leadDaysMax = roundDays(sum((i) => i.leadDaysMax));
+  const readyWork =
+    useWorkDays && startDate
+      ? addWorkDaysISO(startDate, Math.max(1, Math.ceil(leadDaysMax)) - 1)
+      : null;
 
   return {
     currency,
@@ -227,7 +304,13 @@ export const calcTailoringEstimate = (
     leadDaysMin,
     leadDaysMax,
     startDate,
-    readyFrom: startDate ? addDaysISO(startDate, leadDaysMin) : null,
-    readyTo: startDate ? addDaysISO(startDate, leadDaysMax) : null,
+    readyFrom: readyWork ?? (startDate ? addDaysISO(startDate, leadDaysMin) : null),
+    readyTo: readyWork ?? (startDate ? addDaysISO(startDate, leadDaysMax) : null),
   };
 };
+
+/** A booking far in the future: measurements are taken (and re-taken) later. */
+export const isFarOrder = (
+  startISO: string | null | undefined,
+  fromISO: string = todayISO(),
+): boolean => !!startISO && daysBetweenISO(fromISO, startISO) > FAR_ORDER_DAYS;

@@ -5,7 +5,8 @@
     "tailoring": "Custom Tailoring",
     "navigation": "Navigation",
     "deliveryAndPayment": "Delivery & Payment",
-    "privacyPolicy": "Privacy Policy"
+    "privacyPolicy": "Privacy Policy",
+    "cabinet": "My orders"
   },
   "footer": {
     "brandDescription": "Absolute ballroom aesthetics. A brand born in Ukraine to set global standards for dancewear.",
@@ -25,7 +26,8 @@
     "deliveryAndPayment": "Delivery & Payment",
     "privacyPolicy": "Privacy Policy",
     "madeInUkraine": "Made in Ukraine",
-    "copyright": "© {{year}} K.I.RICH POLTAVA. Global Excellence."
+    "copyright": "© {{year}} K.I.RICH POLTAVA. Global Excellence.",
+    "myOrders": "My orders"
   },
   "breadcrumbs": {
     "home": "Home",
@@ -232,7 +234,8 @@
     "prepaymentLine": "{{percent}}% prepayment",
     "startLabel": "Work starts",
     "readyLabel": "Estimated ready date",
-    "pending": "To be confirmed by a manager"
+    "pending": "To be confirmed by a manager",
+    "measurementsLater": "You will send measurements later — 30 days before work starts, in your personal cabinet."
   },
   "orderSuccess": {
     "loading": "Loading order details...",
@@ -250,7 +253,8 @@
     "delivery": "Delivery",
     "selfPickup": "Studio Pickup",
     "byNPTariffs": "Postal rates",
-    "total": "Total"
+    "total": "Total",
+    "openCabinet": "Open order cabinet"
   },
   "individualTailoring": {
     "howItWorks": "How It Works",
@@ -288,6 +292,7 @@
     "priceRange": "Approx. {{range}}",
     "leadTime": "Lead time: {{days}}",
     "days": "{{min}}–{{max}} days",
+    "daysExact": "{{count}} day(s)",
     "approxNote": "Prices and lead times are approximate. A manager will confirm the exact figures after contacting you.",
     "suitNote": "A suit already includes the jacket and trousers, so they cannot be combined.",
     "summaryTitle": "Your selection",
@@ -481,7 +486,7 @@
   "availability": {
     "stepLabel": "Step 2 of 4",
     "title": "When is the studio free?",
-    "description": "See when we can start your order. The start date is reserved for the nearest free day.",
+    "description": "Pick the start date that suits you — the nearest one or any free day later, even months ahead. For distant dates we take measurements closer to the start.",
     "loading": "Loading calendar…",
     "nearestTitle": "Nearest start",
     "nearestUnknown": "A manager will confirm the start date",
@@ -501,7 +506,15 @@
     "goSelect": "Choose items",
     "back": "Back",
     "continue": "Next: measurements",
-    "startsFrom": "Starts from {{date}}"
+    "startsFrom": "Starts from {{date}}",
+    "continueFar": "Next: checkout",
+    "farTitle": "Start is a while away",
+    "farText": "No need to take measurements now: we will remind you 30 days before the start, and a measurements form will appear in your personal cabinet.",
+    "pickHint": "Click a free day to choose your start date.",
+    "pickDay": "Choose this day as the start",
+    "notEnoughRoom": "Not enough free days after this one for the whole order",
+    "chosenTitle": "Your start date",
+    "resetToNearest": "Back to the nearest ({{date}})"
   },
   "prepayment": {
     "stepLabel": "Step 4 of 4",
@@ -517,6 +530,61 @@
     "importantTitle": "Important",
     "importantText": "All amounts and dates are approximate. After you submit the request, a manager will contact you with the exact price, the prepayment amount and the final sum due.",
     "continue": "Proceed to checkout",
-    "back": "Back to measurements"
+    "back": "Back to measurements",
+    "farTitle": "Measurements — later",
+    "farText": "Your order is booked for a future date, so measurements are not needed yet. We will remind you 30 days before work starts, and a form will appear in your personal cabinet.",
+    "backFar": "Back to the calendar"
+  },
+  "cabinet": {
+    "loading": "Loading your order...",
+    "notFoundTitle": "Order not found",
+    "notFoundText": "The link is invalid or has expired. Enter the email from your order and we will send you a new cabinet link.",
+    "findOrder": "Find my order",
+    "label": "Order № {{number}}",
+    "title": "{{name}}, your order",
+    "progress": "Order status",
+    "startLabel": "Work starts",
+    "readyLabel": "Estimated ready date",
+    "measurementsDueLabel": "Take measurements by",
+    "pending": "To be confirmed by the manager",
+    "garments": "Your garments",
+    "contactNote": "The status updates automatically when the studio changes it in its system. Questions? Just message your manager.",
+    "measurementsTitle": "Time to take measurements",
+    "measurementsText": "Your tailoring start date is getting close. To begin on time we need up-to-date measurements — fill in the form below following the photo guides.",
+    "stage": {
+      "new": "Request received",
+      "awaiting_prepayment": "Waiting for prepayment",
+      "booked": "Slot booked, waiting for the date",
+      "measurements": "Taking measurements",
+      "in_progress": "Tailoring",
+      "fitting": "Fitting",
+      "awaiting_payment": "Final payment",
+      "ready": "Ready for pickup / shipping",
+      "done": "Shipped / handed over"
+    },
+    "stageDesc": {
+      "new": "We have received your request. The manager will contact you to confirm details and price.",
+      "awaiting_prepayment": "A prepayment secures your place in the schedule. The manager will send the details.",
+      "booked": "Your slot is reserved. We will remind you to take measurements a month before the start.",
+      "measurements": "Time to take measurements so tailoring can start on time.",
+      "in_progress": "Your order is in production.",
+      "fitting": "The garment is ready for a fitting. The manager will arrange a convenient time.",
+      "awaiting_payment": "Only the final payment is left.",
+      "ready": "Your order is ready — the manager will arrange pickup or shipping.",
+      "done": "Your order has been shipped or handed over. Thank you for choosing K.I.RICH!"
+    },
+    "sendMeasurements": "Send measurements",
+    "sendError": "Could not send the measurements. Check the values and try again.",
+    "measurementsSent": "Thank you! We have received your measurements."
+  },
+  "findOrder": {
+    "title": "My orders",
+    "description": "Enter the email you used for the order — we will send you a link to the cabinet with the status.",
+    "emailLabel": "Email",
+    "submit": "Send link",
+    "sending": "Sending...",
+    "error": "Could not send. Please try again.",
+    "sentTitle": "Check your inbox",
+    "sentText": "If there is a tailoring order for this email, we sent a cabinet link. No email? Check your spam folder."
   }
 }

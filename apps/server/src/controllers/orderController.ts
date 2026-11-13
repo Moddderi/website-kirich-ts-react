@@ -24,6 +24,8 @@ export const createOrderController = async (
       success: true,
       message: "Замовлення успішно створено",
       orderId: newOrder.id,
+      // personal cabinet link token (individual tailoring only)
+      accessToken: newOrder.accessToken ?? undefined,
     });
   } catch (error: any) {
     console.error("Помилка при створенні замовлення на бекенді:", error);

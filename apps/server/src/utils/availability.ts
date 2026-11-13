@@ -26,7 +26,8 @@ import { fetchNotionRanges, isNotionConfigured } from "./notionAvailability.js";
  * If rows overlap, the lower row wins.
  */
 
-const CACHE_TTL_MS = 5 * 60 * 1000;
+// The calendar changes rarely and is refreshed right after a site order → 10 min
+const CACHE_TTL_MS = 10 * 60 * 1000;
 const FETCH_TIMEOUT_MS = 6000;
 
 let cache: { data: AvailabilityResponse; fetchedAt: number } | null = null;
@@ -156,15 +157,22 @@ export const parseAvailabilityCsv = (csv: string): AvailabilityRange[] => {
   return ranges;
 };
 
+export interface StartOptions {
+  /** calendar days the order needs (fallback when work days are unknown) */
+  windowDays?: number;
+  /** working days of production (preferred) */
+  workDays?: number | null;
+}
+
 const buildResponse = (
   ranges: AvailabilityRange[],
   source: AvailabilityResponse["source"],
-  windowDays = 1,
+  opts: StartOptions = {},
 ): AvailabilityResponse => ({
   ranges,
   nearestStart:
     source !== "unavailable"
-      ? findNearestStart(ranges, todayISO(), 1100, windowDays)
+      ? findNearestStart(ranges, todayISO(), 1100, opts.windowDays ?? 1, opts.workDays ?? null)
       : null,
   updatedAt: new Date().toISOString(),
   source,
@@ -173,12 +181,18 @@ const buildResponse = (
 /** nearestStart depends on "today" and on the order length → computed per call. */
 const withStart = (
   data: AvailabilityResponse,
-  windowDays: number,
+  opts: StartOptions,
 ): AvailabilityResponse => ({
   ...data,
   nearestStart:
     data.source !== "unavailable"
-      ? findNearestStart(data.ranges, todayISO(), 1100, windowDays)
+      ? findNearestStart(
+          data.ranges,
+          todayISO(),
+          1100,
+          opts.windowDays ?? 1,
+          opts.workDays ?? null,
+        )
       : null,
 });
 
@@ -201,10 +215,10 @@ const fetchSheetRanges = async (url: string): Promise<AvailabilityRange[]> => {
  * Sheet rows are applied on top of Notion (later ranges win).
  */
 export const getAvailability = async (
-  windowDays = 1,
+  opts: StartOptions = {},
 ): Promise<AvailabilityResponse> => {
   if (cache && Date.now() - cache.fetchedAt < CACHE_TTL_MS) {
-    return withStart(cache.data, windowDays);
+    return withStart(cache.data, opts);
   }
 
   const sheetUrl = process.env.AVAILABILITY_SHEET_CSV_URL;
@@ -229,7 +243,7 @@ export const getAvailability = async (
 
   if (!notionOk && !sheetOk) {
     // Prefer stale data over showing nothing
-    if (cache) return withStart(cache.data, windowDays);
+    if (cache) return withStart(cache.data, opts);
     return buildResponse([], "unavailable");
   }
 
@@ -240,5 +254,5 @@ export const getAvailability = async (
 
   const data = buildResponse(ranges, notionOk ? "notion" : "sheet");
   cache = { data, fetchedAt: Date.now() };
-  return withStart(data, windowDays);
+  return withStart(data, opts);
 };

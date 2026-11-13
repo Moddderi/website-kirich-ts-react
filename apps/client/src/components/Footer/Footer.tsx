@@ -108,6 +108,14 @@ export function Footer() {
                   {t("footer.womenLine")}
                 </Link>
               </li>
+              <li>
+                <Link
+                  to="/my-orders"
+                  className="text-sm font-medium text-stone-400 hover:text-white transition-colors magnetic-link relative inline-block"
+                >
+                  {t("footer.myOrders")}
+                </Link>
+              </li>
             </ul>
           </div>
 

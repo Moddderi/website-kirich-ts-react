@@ -1,8 +1,10 @@
 import { Link, Navigate, useNavigate } from "react-router-dom";
+import { isFarOrder } from "@project/shared";
 import { useTranslation } from "react-i18next";
 import { PREPAYMENT_RATE } from "@project/shared";
 import {
   useFormatDate,
+  useScheduleFormat,
   useTailoringEstimate,
 } from "../../hooks/useTailoringEstimate";
 import { useAppSelector } from "../../store/store";
@@ -11,6 +13,7 @@ export const PrepaymentPage = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const formatDate = useFormatDate();
+  const schedule = useScheduleFormat();
   const programs = useAppSelector((state) => state.tailoring.programs);
   const { estimate, formatRange, types } = useTailoringEstimate();
   const hasMeasurements = useAppSelector(
@@ -20,7 +23,8 @@ export const PrepaymentPage = () => {
   if (types.length === 0) {
     return <Navigate to="/individual-tailoring/step-1" replace />;
   }
-  if (!hasMeasurements) {
+  const far = isFarOrder(estimate.startDate);
+  if (!hasMeasurements && !far) {
     return <Navigate to="/individual-tailoring/step-3" replace />;
   }
 
@@ -59,10 +63,7 @@ export const PrepaymentPage = () => {
                       {t(`selectType.${item.type}`)} · {programs[item.type] ?? "ST"}
                     </p>
                     <p className="text-xs font-medium text-stone-500">
-                      {t("selectType.days", {
-                        min: item.leadDaysMin,
-                        max: item.leadDaysMax,
-                      })}
+                      {schedule.days(item.leadDaysMin, item.leadDaysMax)}
                     </p>
                   </div>
                   <p className="whitespace-nowrap text-sm font-semibold text-stone-900">
@@ -109,7 +110,7 @@ export const PrepaymentPage = () => {
                 </p>
                 <p className="mt-1 text-sm font-semibold">
                   {estimate.readyFrom && estimate.readyTo
-                    ? `${formatDate(estimate.readyFrom, false)} – ${formatDate(estimate.readyTo)}`
+                    ? schedule.ready(estimate.readyFrom, estimate.readyTo)
                     : pending}
                 </p>
               </div>
@@ -126,12 +127,23 @@ export const PrepaymentPage = () => {
             </p>
           </section>
 
+          {far && (
+            <section className="rounded-4xl border border-stone-200/60 bg-white p-7 shadow-sm sm:p-9">
+              <p className="mb-2 text-xs font-semibold uppercase tracking-widest text-stone-500">
+                {t("prepayment.farTitle")}
+              </p>
+              <p className="text-sm font-medium leading-relaxed text-stone-600">
+                {t("prepayment.farText")}
+              </p>
+            </section>
+          )}
+
           <div className="flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-between">
             <Link
-              to="/individual-tailoring/step-3"
+              to={far ? "/individual-tailoring/step-2" : "/individual-tailoring/step-3"}
               className="text-center text-xs font-semibold text-stone-500 underline underline-offset-4 hover:text-stone-900"
             >
-              {t("prepayment.back")}
+              {far ? t("prepayment.backFar") : t("prepayment.back")}
             </Link>
             <button
               type="button"

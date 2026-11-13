@@ -14,10 +14,12 @@ import { createOrder } from "../../api/orderApi";
 import { useCartMoney } from "../../hooks/useFormattedPrice";
 import {
   useFormatDate,
+  useScheduleFormat,
   useTailoringEstimate,
 } from "../../hooks/useTailoringEstimate";
 
-import { PREPAYMENT_RATE, checkoutSchema } from "@project/shared";
+import { saveCabinetToken } from "../../utils/cabinetStorage";
+import { PREPAYMENT_RATE, checkoutSchema, isFarOrder } from "@project/shared";
 import type { CheckoutFormValues, OrderPayload } from "@project/shared";
 import {
   NovaPoshtaIcon,
@@ -43,6 +45,7 @@ export const CheckoutPage = () => {
     measurementUnit,
   } = useAppSelector((state) => state.tailoring);
   const formatDate = useFormatDate();
+  const schedule = useScheduleFormat();
   const { estimate, formatRange } = useTailoringEstimate();
 
   // Cart checkout is /checkout; custom flow is /individual-tailoring/checkout.
@@ -146,6 +149,7 @@ export const CheckoutPage = () => {
         orderType: "custom",
         displayCurrency,
         tailoringTypes,
+        preferredStartDate: estimate.startDate ?? undefined,
         tailoringPrograms: Object.fromEntries(
           tailoringTypes.map((type) => [type, tailoringPrograms[type] ?? "ST"]),
         ),
@@ -176,7 +180,10 @@ export const CheckoutPage = () => {
             orderType === "custom"
               ? "/individual-tailoring/order-success"
               : `/order-success/${orderUuid}`;
-          navigate(successPath);
+          saveCabinetToken(result.accessToken);
+        navigate(successPath, {
+            state: { accessToken: result.accessToken ?? null },
+          });
         } else {
           navigate("/");
         }
@@ -209,7 +216,7 @@ export const CheckoutPage = () => {
     if (tailoringTypes.length === 0) {
       return <Navigate to="/individual-tailoring/step-1" replace />;
     }
-    if (Object.keys(measurements).length === 0) {
+    if (Object.keys(measurements).length === 0 && !isFarOrder(estimate.startDate)) {
       return <Navigate to="/individual-tailoring/step-3" replace />;
     }
   }
@@ -618,12 +625,18 @@ export const CheckoutPage = () => {
                       </span>
                     </div>
                   ))}
-                  <div className="flex flex-col gap-1 sm:flex-row sm:justify-between sm:gap-4 text-sm font-medium text-stone-500">
-                    <span>{t("checkout.measurementUnits")}:</span>
-                    <span className="text-stone-900 font-semibold sm:text-right">
-                      {t(`measurementUnits.${measurementUnit}`)}
-                    </span>
-                  </div>
+                  {Object.keys(measurements).length > 0 ? (
+                    <div className="flex flex-col gap-1 sm:flex-row sm:justify-between sm:gap-4 text-sm font-medium text-stone-500">
+                      <span>{t("checkout.measurementUnits")}:</span>
+                      <span className="text-stone-900 font-semibold sm:text-right">
+                        {t(`measurementUnits.${measurementUnit}`)}
+                      </span>
+                    </div>
+                  ) : (
+                    <p className="text-xs font-medium leading-relaxed text-stone-500">
+                      {t("checkout.measurementsLater")}
+                    </p>
+                  )}
                   {Object.entries(measurements)
                     .filter(([key]) => key !== "waist_definition")
                     .map(([key, value]) => (
@@ -695,7 +708,7 @@ export const CheckoutPage = () => {
                     <span>{t("checkout.readyLabel")}</span>
                     <span className="text-stone-900 text-right">
                       {estimate.readyFrom && estimate.readyTo
-                        ? `${formatDate(estimate.readyFrom, false)} – ${formatDate(estimate.readyTo)}`
+                        ? schedule.ready(estimate.readyFrom, estimate.readyTo)
                         : t("checkout.pending")}
                     </span>
                   </div>
