@@ -45,3 +45,17 @@ export const useWorkDaysTable = () =>
     staleTime: 1000 * 60 * 10,
     retry: 1,
   });
+
+/** Working days per catalog line — synced once from Notion into StudioSettings. */
+export const useCatalogLeadDays = () =>
+  useQuery({
+    queryKey: ["catalog-lead-days"],
+    queryFn: async (): Promise<Record<string, number>> => {
+      const { data } = await axios.get<{
+        byProductId: Record<string, number>;
+      }>(`${API_URL}/tailoring/catalog-lead-days`);
+      return data.byProductId ?? {};
+    },
+    staleTime: 1000 * 60 * 5,
+    retry: 1,
+  });

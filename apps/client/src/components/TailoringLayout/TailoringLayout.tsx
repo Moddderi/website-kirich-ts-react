@@ -14,16 +14,23 @@ export const TailoringLayout = () => {
     "/individual-tailoring/order-success",
   );
   const isWidePage = isCheckoutPage || isSuccessPage;
+  const isSelectTypeStep = location.pathname.includes(
+    "/individual-tailoring/step-1",
+  );
   const showBreadcrumbs = !isWidePage;
 
   return (
     <div
-      className={`relative w-full flex flex-col items-stretch min-h-screen ${
+      className={`relative flex w-full flex-col items-stretch ${
         isWidePage ? "" : "p-4 sm:p-6"
       }`}
     >
       {showBreadcrumbs && (
-        <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 mb-4 pt-6">
+        <div
+          className={`mx-auto w-full max-w-7xl px-0 sm:px-6 mb-4 pt-6 ${
+            isSelectTypeStep ? "max-sm:mb-2 max-sm:pt-2" : ""
+          }`}
+        >
           <Breadcrumbs />
         </div>
       )}
@@ -31,8 +38,8 @@ export const TailoringLayout = () => {
       <Outlet />
 
       {!isWidePage && (
-        <footer className="mx-auto w-full max-w-2xl mt-12 mb-6 text-center">
-          <div className="border-t border-stone-200 pt-6">
+        <footer className="mx-auto mb-2 mt-8 w-full max-w-2xl text-center max-sm:mt-6">
+          <div className="border-t border-stone-200 pt-6 max-sm:pt-4">
             <p className="text-[10px] sm:text-xs text-stone-400 font-medium leading-relaxed px-4">
               {t("tailoringLayout.disclaimer")}
             </p>

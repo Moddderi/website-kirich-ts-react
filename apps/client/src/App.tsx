@@ -1,5 +1,5 @@
 import { Suspense } from "react";
-import { Outlet } from "react-router-dom";
+import { Outlet, useLocation } from "react-router-dom";
 import { Header } from "./components/Header/Header";
 import "./main.css";
 import { Footer } from "./components/Footer/Footer";
@@ -13,9 +13,16 @@ const PageFallback = () => (
 );
 
 export function App() {
+  const { pathname } = useLocation();
+  const clearStickyBar = pathname.includes("/individual-tailoring/step-1");
+
   return (
     <div
-      className="notranslate bg-beige-50 text-stone-900 font-sans antialiased flex flex-col min-h-screen relative overflow-x-hidden"
+      className={`notranslate bg-beige-50 text-stone-900 font-sans antialiased flex flex-col min-h-screen relative overflow-x-hidden ${
+        clearStickyBar
+          ? "pb-[calc(11rem+env(safe-area-inset-bottom,0px))] sm:pb-28"
+          : ""
+      }`}
       translate="no"
     >
       <Header />

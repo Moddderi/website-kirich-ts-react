@@ -2,12 +2,16 @@ import {
   PREPAYMENT_RATE,
   TAILORING_GARMENTS,
   calcTailoringEstimate,
+  calcTailoringLinesEstimate,
   clampGarmentQty,
+  clampLineQty,
   expandTailoringTypes,
-  formatConvertedPrice,
+  formatDisplayPriceFrom,
+  formatSiteCatalogLineLabelUk,
   isCurrency,
   type Currency,
   type MeasurementType,
+  type TailoringLine,
 } from "@project/shared";
 
 export const TAILORING_TYPE_META: Record<
@@ -22,6 +26,12 @@ export const TAILORING_TYPE_META: Record<
 
 const isTailoringType = (value: unknown): value is MeasurementType =>
   typeof value === "string" && value in TAILORING_GARMENTS;
+
+const isCatalogLine = (value: unknown): value is TailoringLine =>
+  typeof value === "object" &&
+  value !== null &&
+  typeof (value as TailoringLine).productId === "string" &&
+  typeof (value as TailoringLine).quantity === "number";
 
 /** "2027-03-22" → "22.03.2027" */
 export const formatDateUk = (iso?: string | null): string => {
@@ -49,12 +59,9 @@ export interface CustomOrderSummary {
   comment: string;
 }
 
-const range = (from: number, to: number, currency: Currency) =>
-  from === to
-    ? formatConvertedPrice(from, currency)
-    : `${formatConvertedPrice(from, currency)} – ${formatConvertedPrice(to, currency)}`;
+const range = (from: number, _to: number, currency: Currency) =>
+  formatDisplayPriceFrom(from, currency, "uk");
 
-// Production time can be fractional (0.25 day) → show whole days
 const daysRange = (min: number, max: number) => {
   const a = Math.ceil(min);
   const b = Math.ceil(max);
@@ -67,12 +74,66 @@ export const buildCustomOrderSummary = (order: any): CustomOrderSummary => {
     ? order.displayCurrency
     : "UAH";
 
-  // Preferred source: what we stored at creation time.
+  const startDate: string | null = order.estimate?.startDate ?? null;
+  const catalogLines = Array.isArray(order.estimate?.lines)
+    ? order.estimate.lines.filter(isCatalogLine)
+    : [];
+
+  if (catalogLines.length > 0) {
+    const leadDaysByProduct = order.estimate?.catalogLeadDays as
+      | Record<string, number>
+      | undefined;
+    const estimate = calcTailoringLinesEstimate(
+      catalogLines,
+      currency,
+      startDate,
+      leadDaysByProduct ?? null,
+    );
+
+    const types = [
+      ...new Set(estimate.items.map((item) => item.type)),
+    ] as MeasurementType[];
+
+    return {
+      currency,
+      types,
+      lines: catalogLines.map((line: TailoringLine) => {
+        const qty = clampLineQty(line.quantity);
+        const items = estimate.items.filter(
+          (item) => item.productId === line.productId,
+        );
+        const priceFrom = items.reduce((acc, item) => acc + item.priceFrom, 0);
+        const leadMin = items.reduce((acc, item) => acc + item.leadDaysMin, 0);
+        const leadMax = items.reduce((acc, item) => acc + item.leadDaysMax, 0);
+        const type = items[0]?.type ?? "body";
+        return {
+          type,
+          label: formatSiteCatalogLineLabelUk(line.productId, qty),
+          category: "Сайт",
+          priceRange: range(priceFrom, priceFrom, currency),
+          leadDays: daysRange(leadMin, leadMax),
+        };
+      }),
+      priceRange: range(estimate.priceFrom, estimate.priceTo, currency),
+      prepaymentRange: range(
+        estimate.prepaymentFrom,
+        estimate.prepaymentTo,
+        currency,
+      ),
+      prepaymentPercent: Math.round(PREPAYMENT_RATE * 100),
+      leadDays: daysRange(estimate.leadDaysMin, estimate.leadDaysMax),
+      startDate: startDate ? formatDateUk(startDate) : "уточнюється менеджером",
+      readyRange: estimate.readyFrom
+        ? `${formatDateUk(estimate.readyFrom)} – ${formatDateUk(estimate.readyTo)}`
+        : "уточнюється менеджером",
+      comment: typeof order.comment === "string" ? order.comment.trim() : "",
+    };
+  }
+
   let types: MeasurementType[] = Array.isArray(order.estimate?.types)
     ? order.estimate.types.filter(isTailoringType)
     : [];
 
-  // Fallback for old orders: "Індивідуальний пошив: jacket" item names.
   if (types.length === 0) {
     types = (order.items ?? [])
       .map((item: { name?: string }) =>
@@ -85,7 +146,6 @@ export const buildCustomOrderSummary = (order: any): CustomOrderSummary => {
     Record<MeasurementType, number>
   >;
   const expanded = expandTailoringTypes(types, quantities);
-  const startDate: string | null = order.estimate?.startDate ?? null;
   const estimate = calcTailoringEstimate(
     expanded,
     currency,

@@ -39,6 +39,9 @@ export const CheckoutPage = () => {
   const displayCurrency = useAppSelector((state) => state.currency.code);
   const {
     types: tailoringTypes,
+    lines: tailoringLines,
+    browseCategory: tailoringBrowseCategory,
+    browseProgram: tailoringBrowseProgram,
     quantities: tailoringQuantities,
     programs: tailoringPrograms,
     measurements,
@@ -156,6 +159,9 @@ export const CheckoutPage = () => {
         tailoringPrograms: Object.fromEntries(
           tailoringTypes.map((type) => [type, tailoringPrograms[type] ?? "ST"]),
         ),
+        tailoringCategory: tailoringBrowseCategory ?? undefined,
+        tailoringOrderProgram: tailoringBrowseProgram ?? undefined,
+        tailoringLines: tailoringLines.length > 0 ? tailoringLines : undefined,
         // 🟢 Виносимо мірки на рівень об'єкта замовлення, як того вимагає схема з packages/shared/src/order.schema.ts
         measurements: {
           unit: measurementUnit,

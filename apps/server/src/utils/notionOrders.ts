@@ -382,9 +382,11 @@ export const appendNotionBlocks = async (pageId: string, children: unknown[]) =>
   });
 };
 
-const buildBody = (order: any, unlinkedItems: string[]) => {
+const buildBody = (order: any) => {
   const summary = buildCustomOrderSummary({ ...order, displayCurrency: "UAH" });
   const shortId = String(order.id ?? "").split("-")[0].toUpperCase();
+  const hasCatalogLines =
+    Array.isArray(order.estimate?.lines) && order.estimate.lines.length > 0;
 
   const blocks: unknown[] = [
     paragraph(`🌐 Замовлення з сайту (індивідуальний пошив) · №${shortId}`),
@@ -415,19 +417,18 @@ const buildBody = (order: any, unlinkedItems: string[]) => {
           ),
         ]
       : []),
-    heading("Вироби"),
+    heading(hasCatalogLines ? "Вибір клієнта на сайті" : "Вироби"),
     ...summary.lines.map((line) =>
       bullet(`${line.label} — ${line.priceRange}, ${line.leadDays}`),
     ),
+    ...(hasCatalogLines
+      ? [
+          paragraph(
+            "Детальні рядки з [DB] Прайс додайте вручну у зв'язку «Позиції замовлення» — на сайті клієнт обрав лише загальні позиції прайсу.",
+          ),
+        ]
+      : []),
   ];
-
-  if (unlinkedItems.length > 0) {
-    blocks.push(
-      paragraph(
-        `⚠️ Не знайдено в прайсі, додайте вручну: ${unlinkedItems.join(", ")}`,
-      ),
-    );
-  }
 
   blocks.push(
     heading("Орієнтовно (на момент замовлення на сайті)"),
@@ -552,16 +553,12 @@ const readTermCell = (page: any, termName: string): number | null => {
   return null;
 };
 
-/**
- * Production time in working days per garment and program, summed over the
- * base price items the site maps garments to (BASE_PRICE_ITEMS). Read from the
- * «Термін виготовлення» column of [DB] Прайс. null = not available.
- */
-export const getWorkDaysTable = async (): Promise<WorkDaysTable | null> => {
+/** All items from [DB] Прайс: «Назва виробу» → working days («Термін виготовлення»). */
+export const fetchNotionPriceDaysByName = async (): Promise<Record<
+  string,
+  number
+> | null> => {
   if (!isNotionConfigured()) return null;
-  if (workDaysCache && Date.now() - workDaysCache.at < WORK_DAYS_TTL_MS) {
-    return workDaysCache.table;
-  }
 
   const ordersDbId = normalizeNotionId(process.env.NOTION_DATABASE_ID);
   if (!ordersDbId) return null;
@@ -594,11 +591,28 @@ export const getWorkDaysTable = async (): Promise<WorkDaysTable | null> => {
       const isActive = Object.values<any>(page.properties ?? {}).some(
         (prop) => prop.type === "select" && /^активн/i.test(prop.select?.name ?? ""),
       );
-      // The "Активний" duplicate wins over archived ones
       if (!days.has(name) || isActive) days.set(name, value);
     }
     cursor = res.has_more && res.next_cursor ? res.next_cursor : undefined;
   } while (cursor);
+
+  return Object.fromEntries(days);
+};
+
+/**
+ * Production time in working days per garment and program, summed over the
+ * base price items the site maps garments to (BASE_PRICE_ITEMS). Read from the
+ * «Термін виготовлення» column of [DB] Прайс. null = not available.
+ */
+export const getWorkDaysTable = async (): Promise<WorkDaysTable | null> => {
+  if (!isNotionConfigured()) return null;
+  if (workDaysCache && Date.now() - workDaysCache.at < WORK_DAYS_TTL_MS) {
+    return workDaysCache.table;
+  }
+
+  const byName = await fetchNotionPriceDaysByName();
+  if (!byName) return null;
+  const days = new Map(Object.entries(byName));
 
   const table: WorkDaysTable = { ST: {}, LAT: {} };
   for (const program of Object.keys(BASE_PRICE_ITEMS) as TailoringProgram[]) {
@@ -733,65 +747,19 @@ export const createNotionOrder = async (
     props[clientProp.name] = { relation: [{ id: clientId }] };
   }
 
-  // Garments → base items of [DB] Прайс (each garment has its own ST/LAT program).
-  const unlinkedItems: string[] = [];
-  const positionItems: Array<{ id: string; qty: number }> = [];
-  if (positionsProp?.relation) {
-    const programs: Partial<Record<MeasurementType, TailoringProgram>> =
-      order.estimate?.programs ?? {};
-    const types: MeasurementType[] = Array.isArray(order.estimate?.types)
-      ? order.estimate.types
-      : [];
-
-    const quantities = new Map<string, number>();
-    for (const type of types) {
-      const program = programs[type] ?? "ST";
-      const names = BASE_PRICE_ITEMS[program][type] ?? [];
-      if (names.length === 0) {
-        unlinkedItems.push(`${TAILORING_TYPE_META[type]?.label ?? type} ${program}`);
-      }
-      for (const name of names) quantities.set(name, (quantities.get(name) ?? 0) + 1);
-    }
-
-    const priceDbId = await resolvePriceDbId(
-      positionsProp.relation.database_id,
-      ordersDbId,
-    );
-    const found = await findPriceItems(priceDbId, [...quantities.keys()]);
-    for (const item of found) {
-      positionItems.push({ id: item.id, qty: quantities.get(item.name) ?? 1 });
-    }
-    unlinkedItems.push(
-      ...[...quantities.keys()].filter((name) => !found.some((f) => f.name === name)),
-    );
-  }
+  // Coarse catalog choice is in the page body — manager links detailed [DB] Прайс rows manually.
+  void positionsProp;
 
   const page = await notionRequest<{ id: string; url?: string }>("/pages", {
     body: {
       parent: { database_id: ordersDbId },
       properties: props,
-      children: buildBody(order, unlinkedItems),
+      children: buildBody(order),
     },
   });
 
   // The calendar reads these same orders → refresh it immediately.
   invalidateAvailabilityCache();
-
-  if (positionsProp?.relation && positionItems.length > 0) {
-    try {
-      await createPositions(
-        positionsProp.relation.database_id,
-        ordersDbId,
-        page.id,
-        positionItems,
-      );
-    } catch (error) {
-      // The order itself exists — only the positions need to be added by hand.
-      throw new Error(
-        `Замовлення створено, але позиції не додано (${(error as Error).message})`,
-      );
-    }
-  }
 
   console.log(
     `✅ Notion: створено замовлення ${orderNumber ?? ""} (${formatDateUk(startDate)} → ${formatDateUk(readyTo)})`,

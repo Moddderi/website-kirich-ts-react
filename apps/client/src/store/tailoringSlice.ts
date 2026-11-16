@@ -1,27 +1,36 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 import {
   clampGarmentQty,
+  clampLineQty,
+  deriveLegacyTailoringState,
+  getTailoringProduct,
+  toggleTailoringLine,
   toggleTailoringType,
   type MeasurementType,
   type MeasurementUnit,
+  type TailoringCategory,
+  type TailoringLine,
   type TailoringProgram,
 } from "@project/shared";
 
 interface TailoringState {
-  /** Garments the client wants to order (suit excludes jacket/pants) */
+  /** UI filter only — does not limit items already in the cart. */
+  browseCategory: TailoringCategory | null;
+  browseProgram: TailoringProgram | null;
+  lines: TailoringLine[];
   types: MeasurementType[];
-  /** Units per garment type (defaults to 1 when missing) */
   quantities: Partial<Record<MeasurementType, number>>;
-  /** Standard (ST) or Latin (LAT) chosen per garment (pants may be LAT, body ST) */
   programs: Partial<Record<MeasurementType, TailoringProgram>>;
   measurementUnit: MeasurementUnit;
   measurements: Record<string, string>;
   comment: string;
-  /** Start date picked in the calendar; null → nearest free start */
   startDate: string | null;
 }
 
 const initialState: TailoringState = {
+  browseCategory: null,
+  browseProgram: null,
+  lines: [],
   types: [],
   quantities: {},
   programs: {},
@@ -31,10 +40,54 @@ const initialState: TailoringState = {
   startDate: null,
 };
 
+const syncLegacy = (state: TailoringState) => {
+  if (state.lines.length > 0) {
+    const legacy = deriveLegacyTailoringState(state.lines);
+    state.types = legacy.types;
+    state.quantities = legacy.quantities;
+    state.programs = legacy.programs;
+  } else {
+    state.types = [];
+    state.quantities = {};
+    state.programs = {};
+  }
+};
+
+const clearMeasurements = (state: TailoringState) => {
+  state.measurements = {};
+  state.measurementUnit = "cm";
+};
+
 const tailoringSlice = createSlice({
   name: "tailoring",
   initialState,
   reducers: {
+    setTailoringCategory: (
+      state,
+      action: PayloadAction<TailoringCategory>,
+    ) => {
+      state.browseCategory = action.payload;
+    },
+    setOrderProgram: (state, action: PayloadAction<TailoringProgram>) => {
+      state.browseProgram = action.payload;
+    },
+    toggleCatalogLine: (state, action: PayloadAction<string>) => {
+      state.lines = toggleTailoringLine(state.lines, action.payload);
+      syncLegacy(state);
+      clearMeasurements(state);
+    },
+    setCatalogLineQuantity: (
+      state,
+      action: PayloadAction<{ productId: string; quantity: number }>,
+    ) => {
+      const { productId, quantity } = action.payload;
+      const idx = state.lines.findIndex((l) => l.productId === productId);
+      if (idx < 0) return;
+      const catalogProduct = getTailoringProduct(productId);
+      state.lines[idx].quantity =
+        catalogProduct?.isKit ? 1 : clampLineQty(quantity);
+      syncLegacy(state);
+    },
     toggleType: (state, action: PayloadAction<MeasurementType>) => {
       const type = action.payload;
       const wasSelected = state.types.includes(type);
@@ -44,16 +97,13 @@ const tailoringSlice = createSlice({
       } else {
         state.quantities[type] = 1;
       }
-      // Keep programs in sync with the selection (new garments default to ST).
       const next: TailoringState["programs"] = {};
       for (const t of state.types) next[t] = state.programs[t] ?? "ST";
       state.programs = next;
       const nextQty: TailoringState["quantities"] = {};
       for (const t of state.types) nextQty[t] = state.quantities[t] ?? 1;
       state.quantities = nextQty;
-      // The set of required measurements changed → old values may not fit.
-      state.measurements = {};
-      state.measurementUnit = "cm";
+      clearMeasurements(state);
     },
     setGarmentQuantity: (
       state,
@@ -69,11 +119,9 @@ const tailoringSlice = createSlice({
     ) => {
       const { type, program } = action.payload;
       if (!state.types.includes(type)) {
-        // Picking ST/LAT on a card also selects that garment.
         state.types = toggleTailoringType(state.types, type);
         state.quantities[type] = 1;
-        state.measurements = {};
-        state.measurementUnit = "cm";
+        clearMeasurements(state);
         const next: TailoringState["programs"] = {};
         for (const t of state.types) next[t] = state.programs[t] ?? "ST";
         state.programs = next;
@@ -101,6 +149,10 @@ const tailoringSlice = createSlice({
 });
 
 export const {
+  setTailoringCategory,
+  setOrderProgram,
+  toggleCatalogLine,
+  setCatalogLineQuantity,
   toggleType,
   setGarmentQuantity,
   setGarmentProgram,

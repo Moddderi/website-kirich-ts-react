@@ -1,5 +1,5 @@
 import { Link, Navigate, useNavigate } from "react-router-dom";
-import { isFarOrder } from "@project/shared";
+import { getTailoringProduct, isFarOrder } from "@project/shared";
 import { useTranslation } from "react-i18next";
 import { PREPAYMENT_RATE } from "@project/shared";
 import {
@@ -53,14 +53,25 @@ export const PrepaymentPage = () => {
               {t("prepayment.itemsTitle")}
             </p>
             <ul className="divide-y divide-stone-100">
-              {estimate.items.map((item) => (
+              {estimate.items.map((item, index) => (
                 <li
-                  key={item.type}
+                  key={item.productId ?? `${item.type}-${index}`}
                   className="flex items-baseline justify-between gap-4 py-3"
                 >
                   <div>
                     <p className="text-sm font-semibold text-stone-900">
-                      {t(`selectType.${item.type}`)} · {programs[item.type] ?? "ST"}
+                      {item.productId
+                        ? t(`selectType.catalog.${item.productId}`, {
+                            defaultValue: item.productId,
+                          })
+                        : t(`selectType.${item.type}`)}
+                      {` · ${
+                        item.productId
+                          ? getTailoringProduct(item.productId)?.program ??
+                            programs[item.type] ??
+                            "ST"
+                          : programs[item.type] ?? "ST"
+                      }`}
                     </p>
                     <p className="text-xs font-medium text-stone-500">
                       {schedule.days(item.leadDaysMin, item.leadDaysMax)}

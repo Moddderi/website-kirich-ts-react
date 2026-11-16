@@ -54,6 +54,23 @@ export const formatPrice = (amountUah: number, currency: Currency): string => {
   return formatConvertedPrice(convertFromUah(amountUah, currency), currency);
 };
 
+/** Display «from» price (already in target currency). */
+export const formatDisplayPriceFrom = (
+  amount: number,
+  currency: Currency,
+  locale: "uk" | "en" = "uk",
+): string => {
+  const prefix = locale === "en" ? "from" : "від";
+  return `${prefix} ${formatConvertedPrice(amount, currency)}`;
+};
+
+export const formatPriceFromUah = (
+  amountUah: number,
+  currency: Currency,
+  locale: "uk" | "en" = "uk",
+): string =>
+  formatDisplayPriceFrom(convertFromUah(amountUah, currency), currency, locale);
+
 /**
  * Cart/checkout line: convert unit price once, then multiply by quantity.
  * Avoids double-rounding drift vs converting (price * qty) as one sum.
