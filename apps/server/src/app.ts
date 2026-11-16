@@ -6,7 +6,9 @@ import orderRoutes from "./routes/orderRoutes.js";
 import availabilityRoutes from "./routes/availabilityRoutes.js";
 import cabinetRoutes from "./routes/cabinetRoutes.js";
 import jobRoutes from "./routes/jobRoutes.js";
+import tailoringRoutes from "./routes/tailoringRoutes.js";
 import { startScheduler } from "./jobs/scheduler.js";
+import { ensureCatalogLeadDaysSynced } from "./utils/catalogLeadDaysStore.js";
 
 dotenv.config();
 
@@ -21,9 +23,13 @@ app.use("/api/orders", orderRoutes);
 app.use("/api/availability", availabilityRoutes);
 app.use("/api/my-order", cabinetRoutes);
 app.use("/api/jobs", jobRoutes);
+app.use("/api/tailoring", tailoringRoutes);
 
 const PORT = process.env.PORT || 5005;
 app.listen(PORT, () => {
   console.log(`🚀 Server is running on http://localhost:${PORT}`);
   startScheduler();
+  void ensureCatalogLeadDaysSynced().catch((error) => {
+    console.error("⚠️ Catalog lead days initial sync:", error);
+  });
 });

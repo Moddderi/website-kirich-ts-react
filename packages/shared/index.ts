@@ -3,4 +3,6 @@ export * from "./src/order.schema.js";
 export * from "./src/measurements.schema.js";
 export * from "./src/currency.js";
 export * from "./src/tailoring.js";
+export * from "./src/tailoringCatalog.js";
+export * from "./src/tailoringNotionMap.js";
 export * from "./src/cabinet.js";

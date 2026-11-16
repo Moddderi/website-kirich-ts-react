@@ -2,16 +2,22 @@ import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import {
   calcTailoringEstimate,
+  calcTailoringLinesEstimate,
   canStartOn,
   expandTailoringTypes,
   formatConvertedPrice,
+  linesToMeasurementTypes,
   pickWorkDays,
   sumWorkDaysForSelection,
   todayISO,
   type MeasurementType,
 } from "@project/shared";
 import { useAppSelector } from "../store/store";
-import { useAvailability, useWorkDaysTable } from "../api/availabilityApi";
+import {
+  useAvailability,
+  useCatalogLeadDays,
+  useWorkDaysTable,
+} from "../api/availabilityApi";
 
 /** "2027-03-22" → localized "22 березня 2027" */
 export const useFormatDate = () => {
@@ -33,10 +39,6 @@ export const useFormatDate = () => {
   );
 };
 
-/**
- * Price range / prepayment / ready dates for the garments in the tailoring flow.
- * Lines are converted per garment and summed, so everything adds up on screen.
- */
 /** "2" / "2–3" days and a single-date-or-range label, shared by all tailoring pages. */
 export const useScheduleFormat = () => {
   const { t } = useTranslation();
@@ -65,49 +67,73 @@ export const useScheduleFormat = () => {
 
 /**
  * Price range / prepayment / ready dates for the garments in the tailoring flow.
- * Lines are converted per garment and summed, so everything adds up on screen.
- * Production time comes from the studio price list (working days) when known.
+ * Uses the fixed catalog when `lines` are set; otherwise legacy garment cards.
  */
 export const useTailoringEstimate = (typesOverride?: MeasurementType[]) => {
   const storeTypes = useAppSelector((state) => state.tailoring.types);
+  const lines = useAppSelector((state) => state.tailoring.lines);
   const quantities = useAppSelector((state) => state.tailoring.quantities);
   const programs = useAppSelector((state) => state.tailoring.programs);
   const currency = useAppSelector((state) => state.currency.code);
   const chosenStart = useAppSelector((state) => state.tailoring.startDate);
 
   const types = typesOverride ?? storeTypes;
+  const useCatalog = lines.length > 0;
+
   const expandedTypes = useMemo(
-    () => expandTailoringTypes(types, quantities),
-    [types, quantities],
+    () =>
+      useCatalog
+        ? linesToMeasurementTypes(lines)
+        : expandTailoringTypes(types, quantities),
+    [useCatalog, lines, types, quantities],
   );
+
+  const catalogLeadDaysQuery = useCatalogLeadDays();
+  const catalogLeadDays = catalogLeadDaysQuery.data ?? null;
 
   const workDaysQuery = useWorkDaysTable();
   const workDays = useMemo(
-    () => pickWorkDays(workDaysQuery.data, types, programs),
-    [workDaysQuery.data, types, programs],
-  );
-  const totalWorkDays = sumWorkDaysForSelection(
-    workDaysQuery.data,
-    types,
-    programs,
-    quantities,
+    () =>
+      useCatalog
+        ? null
+        : pickWorkDays(workDaysQuery.data, types, programs),
+    [useCatalog, workDaysQuery.data, types, programs],
   );
 
-  // The start date must leave room for the whole order
-  const windowDays = useMemo(
+  const catalogPreview = useMemo(
+    () =>
+      useCatalog
+        ? calcTailoringLinesEstimate(lines, "UAH", null, catalogLeadDays)
+        : null,
+    [useCatalog, lines, catalogLeadDays],
+  );
+
+  const totalWorkDays = useCatalog
+    ? catalogPreview?.leadDaysMin ?? null
+    : sumWorkDaysForSelection(
+        workDaysQuery.data,
+        types,
+        programs,
+        quantities,
+      );
+
+  const legacyWindow = useMemo(
     () => Math.ceil(calcTailoringEstimate(expandedTypes, "UAH", null).leadDaysMin),
     [expandedTypes],
   );
+  const windowDays = useCatalog
+    ? Math.ceil(catalogPreview?.leadDaysMin ?? legacyWindow)
+    : legacyWindow;
+
   const availability = useAvailability(
     { days: windowDays, workDays: totalWorkDays },
-    !workDaysQuery.isLoading,
+    !workDaysQuery.isLoading && !catalogLeadDaysQuery.isLoading,
   );
 
   const nearestStart = availability.data?.nearestStart ?? null;
   const ranges = availability.data?.ranges;
   const hasCalendar = Boolean(ranges) && availability.data?.source !== "unavailable";
 
-  /** Can the order (whole production window) start on this day? */
   const canSelectStart = useMemo(
     () => (iso: string) =>
       Boolean(ranges) &&
@@ -117,22 +143,35 @@ export const useTailoringEstimate = (typesOverride?: MeasurementType[]) => {
     [ranges, hasCalendar, windowDays, totalWorkDays],
   );
 
-  // The client's own pick wins while it is still valid; otherwise the nearest start
   const chosenValid = Boolean(chosenStart) && canSelectStart(chosenStart as string);
   const startDate = chosenValid ? (chosenStart as string) : nearestStart;
   const isCustomStart = chosenValid && chosenStart !== nearestStart;
 
   const estimate = useMemo(
-    () => calcTailoringEstimate(expandedTypes, currency, startDate, workDays),
-    [expandedTypes, currency, startDate, workDays],
+    () =>
+      useCatalog
+        ? calcTailoringLinesEstimate(
+            lines,
+            currency,
+            startDate,
+            catalogLeadDays,
+          )
+        : calcTailoringEstimate(expandedTypes, currency, startDate, workDays),
+    [useCatalog, lines, expandedTypes, currency, startDate, workDays, catalogLeadDays],
   );
 
+  const { t } = useTranslation();
+
+  /** Show only the lower bound, with «від» / «from». */
   const formatRange = useMemo(
-    () => (from: number, to: number) =>
-      from === to
-        ? formatConvertedPrice(from, currency)
-        : `${formatConvertedPrice(from, currency)} – ${formatConvertedPrice(to, currency)}`,
-    [currency],
+    () => (_from: number, to?: number) => {
+      const from = _from;
+      void to;
+      return t("pricing.from", {
+        price: formatConvertedPrice(from, currency),
+      });
+    },
+    [currency, t],
   );
 
   return {
@@ -140,9 +179,12 @@ export const useTailoringEstimate = (typesOverride?: MeasurementType[]) => {
     formatRange,
     availability,
     types,
+    lines,
+    useCatalog,
     nearestStart,
     canSelectStart,
     isCustomStart,
     workDaysTable: workDaysQuery.data ?? null,
+    catalogLeadDays: catalogLeadDays ?? {},
   };
 };

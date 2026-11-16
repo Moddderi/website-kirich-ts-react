@@ -1,6 +1,6 @@
 import { Link, Navigate, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { isFarOrder } from "@project/shared";
+import { getTailoringProduct, isFarOrder } from "@project/shared";
 import { useAppDispatch, useAppSelector } from "../../store/store";
 import { setStartDate } from "../../store/tailoringSlice";
 import { StudioCalendar } from "../../components/StudioCalendar/StudioCalendar";
@@ -119,13 +119,23 @@ export const AvailabilityPage = () => {
                   {t("availability.yourItems")}
                 </p>
                 <ul className="space-y-3">
-                  {estimate.items.map((item) => (
+                  {estimate.items.map((item, index) => (
                     <li
-                      key={item.type}
+                      key={item.productId ?? `${item.type}-${index}`}
                       className="flex items-baseline justify-between gap-4 text-sm"
                     >
                       <span className="font-semibold text-stone-900">
-                        {t(`selectType.${item.type}`)} · {programs[item.type] ?? "ST"}
+                        {item.productId
+                          ? t(`selectType.catalog.${item.productId}`, {
+                              defaultValue: item.productId,
+                            })
+                          : t(`selectType.${item.type}`)}{" "}
+                        ·{" "}
+                        {item.productId
+                          ? (getTailoringProduct(item.productId)?.program ??
+                            programs[item.type] ??
+                            "ST")
+                          : programs[item.type] ?? "ST"}
                       </span>
                       <span className="whitespace-nowrap text-xs font-medium text-stone-500">
                         {schedule.days(item.leadDaysMin, item.leadDaysMax)}

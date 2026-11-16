@@ -267,6 +267,8 @@ export const findNearestStart = (
 
 export interface TailoringEstimateItem {
   type: MeasurementType;
+  /** When the line comes from TAILORING_CATALOG */
+  productId?: string;
   priceFrom: number;
   priceTo: number;
   leadDaysMin: number;

@@ -2,17 +2,22 @@ import {
   TAILORING_GARMENTS,
   addDaysISO,
   calcTailoringEstimate,
+  calcTailoringLinesEstimate,
   canStartOn,
   clampGarmentQty,
+  clampLineQty,
   expandTailoringTypes,
+  getTailoringProduct,
   isFarOrder,
   pickWorkDays,
   sumWorkDaysForSelection,
   todayISO,
   type MeasurementType,
   type OrderPayload,
+  type TailoringLine,
   type TailoringProgram,
 } from "@project/shared";
+import { loadCatalogLeadDays } from "../utils/catalogLeadDaysStore.js";
 import db from "../models/index.js";
 import { getAvailability } from "../utils/availability.js";
 import {
@@ -46,14 +51,90 @@ export const createOrder = async (payload: OrderPayload) => {
     }> | null = null;
 
     if (payload.orderType === "custom") {
+      const catalogLines: TailoringLine[] =
+        Array.isArray(payload.tailoringLines) && payload.tailoringLines.length > 0
+          ? payload.tailoringLines.flatMap((line) => {
+              const productId = line.productId;
+              if (!productId || !getTailoringProduct(productId)) return [];
+              return [
+                {
+                  productId,
+                  quantity: clampLineQty(line.quantity ?? 1),
+                },
+              ];
+            })
+          : [];
+
       const tailoringTypes = payload.tailoringTypes;
       const validTypes =
         Array.isArray(tailoringTypes) &&
         tailoringTypes.length > 0 &&
         tailoringTypes.every((type) => type in TAILORING_GARMENTS);
-      if (!validTypes || !tailoringTypes) {
+      if ((!validTypes || !tailoringTypes) && catalogLines.length === 0) {
         throw new Error("Для індивідуального пошиву потрібно обрати вироби.");
       }
+
+      const catalogLeadDays = (await loadCatalogLeadDays())?.byProductId ?? null;
+
+      if (catalogLines.length > 0) {
+        const baseEstimate = calcTailoringLinesEstimate(
+          catalogLines,
+          "UAH",
+          null,
+          catalogLeadDays,
+        );
+        const totalWorkDays = baseEstimate.leadDaysMin;
+        const availability = await getAvailability({
+          windowDays: Math.ceil(baseEstimate.leadDaysMin),
+          workDays: totalWorkDays,
+        });
+        const preferred = payload.preferredStartDate;
+        const preferredOk =
+          !!preferred &&
+          preferred >= todayISO() &&
+          preferred <= addDaysISO(todayISO(), 600) &&
+          canStartOn(
+            availability.ranges,
+            preferred,
+            Math.ceil(baseEstimate.leadDaysMin),
+            totalWorkDays,
+          );
+        const estimate = calcTailoringLinesEstimate(
+          catalogLines,
+          "UAH",
+          preferredOk ? preferred : availability.nearestStart,
+          catalogLeadDays,
+        );
+
+        customTotalFrom = estimate.priceFrom;
+        customItems = catalogLines.map((line) => {
+          const p = getTailoringProduct(line.productId)!;
+          return {
+            name: `Індивідуальний пошив: ${line.productId}`,
+            quantity: clampLineQty(line.quantity),
+            price: p.priceFromUah,
+          };
+        });
+        customEstimate = {
+          lines: catalogLines,
+          catalogLeadDays,
+          category: payload.tailoringCategory ?? null,
+          orderProgram: payload.tailoringOrderProgram ?? null,
+          types: tailoringTypes ?? [],
+          quantities: payload.tailoringQuantities ?? {},
+          programs: payload.tailoringPrograms ?? {},
+          priceFromUah: estimate.priceFrom,
+          priceToUah: estimate.priceTo,
+          prepaymentFromUah: estimate.prepaymentFrom,
+          prepaymentToUah: estimate.prepaymentTo,
+          leadDaysMin: estimate.leadDaysMin,
+          leadDaysMax: estimate.leadDaysMax,
+          startDate: estimate.startDate,
+          readyFrom: estimate.readyFrom,
+          readyTo: estimate.readyTo,
+          measurementsPending: isFarOrder(estimate.startDate),
+        };
+      } else if (tailoringTypes) {
 
       const quantities = Object.fromEntries(
         tailoringTypes.map((type) => [
@@ -143,6 +224,7 @@ export const createOrder = async (payload: OrderPayload) => {
         // before the start (cabinet form), whatever was sent now is preliminary.
         measurementsPending: isFarOrder(estimate.startDate),
       };
+      }
     }
 
     const order = await db.Order.create(
