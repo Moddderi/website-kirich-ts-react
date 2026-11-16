@@ -203,6 +203,7 @@
     "lastNamePlaceholder": "Your last name",
     "phone": "Phone",
     "email": "Email",
+    "emailNote": "Double-check spelling — confirmations, your order cabinet link and measurement reminders will be sent here.",
     "whereToWrite": "Where should we contact you?",
     "messengerNote": "A manager will contact you via the selected messenger to confirm details.",
     "whatsappPhone": "WhatsApp phone number",
@@ -281,6 +282,9 @@
   },
   "selectType": {
     "programTitle": "Program",
+    "quantity": "Quantity",
+    "quantityInc": "Increase",
+    "quantityDec": "Decrease",
     "programHint": "The program defines the cut and model of the garment",
     "programST": "Standard · ST",
     "programLAT": "Latin · LAT",
@@ -605,6 +609,7 @@
       "awaiting_prepayment": "A prepayment secures your place in the schedule. The manager will send the details.",
       "booked": "Prepayment received — your order is in the tailoring queue. If the start is a while away, we will remind you to take measurements a month before.",
       "measurements": "Time to take measurements so tailoring can start on time.",
+      "measurementsDone": "Measurements received — thank you! The studio is working with your data; tailoring is next.",
       "in_progress": "Your order is in production.",
       "awaiting_payment": "Only the final payment is left.",
       "ready": "Your order is ready — the manager will arrange pickup or shipping.",
@@ -613,6 +618,7 @@
     "sendMeasurements": "Send measurements",
     "sendError": "Could not send the measurements. Check the values and try again.",
     "measurementsSent": "Thank you! We have received your measurements.",
+    "measurementsSentAt": "Submitted on {{date}}",
     "allOrders": "All my orders"
   },
   "findOrder": {

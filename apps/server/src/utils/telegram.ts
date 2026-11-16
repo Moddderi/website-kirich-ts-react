@@ -12,7 +12,7 @@ import {
   type MeasurementUnit,
 } from "@project/shared";
 import { buildCustomOrderSummary } from "./tailoringSummary.js";
-import { cabinetUrl } from "./links.js";
+import { cabinetUrlForTelegram } from "./links.js";
 
 type MeasurementsPayload =
   | Record<string, string>
@@ -139,7 +139,8 @@ export const sendTelegramNotification = async (order: any) => {
         `статус «Планове зняття мірок» сайт поставить сам.\n`;
     }
     if (order.accessToken) {
-      itemsList += `\n🔗 [Кабінет клієнта — перешліть йому посилання](${cabinetUrl(order.accessToken)})\n`;
+      const cabinetLink = cabinetUrlForTelegram(order.accessToken);
+      itemsList += `\n🔗 *Кабінет клієнта* — перешліть клієнту:\n${cabinetLink}\n`;
     }
 
     if (summary.comment) {

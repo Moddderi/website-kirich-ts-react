@@ -1,7 +1,11 @@
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useAppDispatch, useAppSelector } from "../../store/store";
-import { setGarmentProgram, toggleType } from "../../store/tailoringSlice";
+import {
+  setGarmentProgram,
+  setGarmentQuantity,
+  toggleType,
+} from "../../store/tailoringSlice";
 import { CurrencySwitcher } from "../../components/CurrencySwitcher/CurrencySwitcher";
 import {
   TAILORING_GARMENTS,
@@ -13,7 +17,15 @@ import {
   useScheduleFormat,
   useTailoringEstimate,
 } from "../../hooks/useTailoringEstimate";
-import { LuCheck, LuCrown, LuRuler, LuScissors, LuShirt } from "react-icons/lu";
+import {
+  LuCheck,
+  LuCrown,
+  LuMinus,
+  LuPlus,
+  LuRuler,
+  LuScissors,
+  LuShirt,
+} from "react-icons/lu";
 
 const OPTIONS = [
   { type: "body" as const, icon: LuShirt, dark: false },
@@ -28,6 +40,7 @@ export const SelectTypePage = () => {
   const navigate = useNavigate();
 
   const selected = useAppSelector((state) => state.tailoring.types);
+  const quantities = useAppSelector((state) => state.tailoring.quantities);
   const programs = useAppSelector((state) => state.tailoring.programs);
   const currency = useAppSelector((state) => state.currency.code);
   const { estimate, formatRange, workDaysTable } = useTailoringEstimate();
@@ -173,6 +186,54 @@ export const SelectTypePage = () => {
                 </div>
               </button>
 
+              {isSelected && opt.type !== "suit" && (
+                <div
+                  className="flex items-center justify-between rounded-2xl border border-stone-200 bg-white px-3 py-2 shadow-sm"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <span className="text-[11px] font-semibold uppercase tracking-widest text-stone-500">
+                    {t("selectType.quantity")}
+                  </span>
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      aria-label={t("selectType.quantityDec")}
+                      disabled={(quantities[opt.type] ?? 1) <= 1}
+                      onClick={() =>
+                        dispatch(
+                          setGarmentQuantity({
+                            type: opt.type,
+                            quantity: (quantities[opt.type] ?? 1) - 1,
+                          }),
+                        )
+                      }
+                      className="flex h-8 w-8 items-center justify-center rounded-full border border-stone-200 text-stone-700 disabled:opacity-40"
+                    >
+                      <LuMinus size={14} />
+                    </button>
+                    <span className="min-w-[1.25rem] text-center text-sm font-bold text-stone-900">
+                      {quantities[opt.type] ?? 1}
+                    </span>
+                    <button
+                      type="button"
+                      aria-label={t("selectType.quantityInc")}
+                      disabled={(quantities[opt.type] ?? 1) >= 5}
+                      onClick={() =>
+                        dispatch(
+                          setGarmentQuantity({
+                            type: opt.type,
+                            quantity: (quantities[opt.type] ?? 1) + 1,
+                          }),
+                        )
+                      }
+                      className="flex h-8 w-8 items-center justify-center rounded-full border border-stone-200 text-stone-700 disabled:opacity-40"
+                    >
+                      <LuPlus size={14} />
+                    </button>
+                  </div>
+                </div>
+              )}
+
               <div
                 role="radiogroup"
                 aria-label={`${t(`selectType.${opt.type}`)} — ${t("selectType.programTitle")}`}
@@ -220,7 +281,11 @@ export const SelectTypePage = () => {
             {hasSelection ? (
               <p className="truncate text-sm font-semibold text-stone-900">
                 {selected
-                  .map((type) => `${t(`selectType.${type}`)} ${programs[type] ?? "ST"}`)
+                  .map((type) => {
+                    const qty = quantities[type] ?? 1;
+                    const name = t(`selectType.${type}`);
+                    return qty > 1 ? `${name} ×${qty} ${programs[type] ?? "ST"}` : `${name} ${programs[type] ?? "ST"}`;
+                  })
                   .join(" + ")}
                 <span className="ml-2 font-medium text-stone-500">
                   · {t("selectType.total")}{" "}

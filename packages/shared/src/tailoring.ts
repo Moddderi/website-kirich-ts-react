@@ -57,6 +57,40 @@ export const TAILORING_GARMENTS: Record<MeasurementType, TailoringGarmentInfo> =
 /** Share of the order price that is paid upfront */
 export const PREPAYMENT_RATE = 0.3;
 
+/** Max units of the same garment in one order (e.g. two pairs of pants). */
+export const MAX_GARMENT_QTY = 5;
+
+export const clampGarmentQty = (value: number | undefined): number =>
+  Math.min(MAX_GARMENT_QTY, Math.max(1, Math.floor(value ?? 1)));
+
+/** Expand selection with per-type quantities for pricing / lead time. */
+export const expandTailoringTypes = (
+  types: MeasurementType[],
+  quantities?: Partial<Record<MeasurementType, number>>,
+): MeasurementType[] =>
+  types.flatMap((type) =>
+    Array.from({ length: clampGarmentQty(quantities?.[type]) }, () => type),
+  );
+
+/** Sum working days across every garment unit (two pants → twice the pants days). */
+export const sumWorkDaysForSelection = (
+  table: WorkDaysTable | null | undefined,
+  types: MeasurementType[],
+  programs: Partial<Record<MeasurementType, TailoringProgram>>,
+  quantities?: Partial<Record<MeasurementType, number>>,
+): number | null => {
+  if (!table) return null;
+  const expanded = expandTailoringTypes(types, quantities);
+  if (expanded.length === 0) return null;
+  let sum = 0;
+  for (const type of expanded) {
+    const days = table[programs[type] ?? "ST"]?.[type];
+    if (typeof days !== "number" || !Number.isFinite(days)) return null;
+    sum += days;
+  }
+  return roundDays(sum);
+};
+
 /** Suit already contains jacket + pants, so they are mutually exclusive. */
 export const toggleTailoringType = (
   current: MeasurementType[],

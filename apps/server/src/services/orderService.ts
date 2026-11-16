@@ -3,9 +3,11 @@ import {
   addDaysISO,
   calcTailoringEstimate,
   canStartOn,
+  clampGarmentQty,
+  expandTailoringTypes,
   isFarOrder,
   pickWorkDays,
-  sumWorkDays,
+  sumWorkDaysForSelection,
   todayISO,
   type MeasurementType,
   type OrderPayload,
@@ -53,6 +55,17 @@ export const createOrder = async (payload: OrderPayload) => {
         throw new Error("Для індивідуального пошиву потрібно обрати вироби.");
       }
 
+      const quantities = Object.fromEntries(
+        tailoringTypes.map((type) => [
+          type,
+          type === "suit"
+            ? 1
+            : clampGarmentQty(payload.tailoringQuantities?.[type]),
+        ]),
+      ) as Partial<Record<MeasurementType, number>>;
+
+      const expandedTypes = expandTailoringTypes(tailoringTypes, quantities);
+
       // Dance program per garment (ST/LAT); default ST. Only for selected types.
       const programs = Object.fromEntries(
         tailoringTypes.map((type) => [
@@ -68,12 +81,17 @@ export const createOrder = async (payload: OrderPayload) => {
         tailoringTypes,
         programs as Partial<Record<MeasurementType, TailoringProgram>>,
       );
-      const baseEstimate = calcTailoringEstimate(tailoringTypes, "UAH", null, workDays);
+      const baseEstimate = calcTailoringEstimate(expandedTypes, "UAH", null, workDays);
 
       // Start = first window in the calendar that fits the whole order
       const availability = await getAvailability({
         windowDays: Math.ceil(baseEstimate.leadDaysMin),
-        workDays: sumWorkDays(workDays),
+        workDays: sumWorkDaysForSelection(
+          table,
+          tailoringTypes,
+          programs as Partial<Record<MeasurementType, TailoringProgram>>,
+          quantities,
+        ),
       });
 
       // The client may pick their own start date in the calendar — accept it
@@ -87,10 +105,15 @@ export const createOrder = async (payload: OrderPayload) => {
           availability.ranges,
           preferred,
           Math.ceil(baseEstimate.leadDaysMin),
-          sumWorkDays(workDays),
+          sumWorkDaysForSelection(
+            table,
+            tailoringTypes,
+            programs as Partial<Record<MeasurementType, TailoringProgram>>,
+            quantities,
+          ),
         );
       const estimate = calcTailoringEstimate(
-        tailoringTypes,
+        expandedTypes,
         "UAH",
         preferredOk ? preferred : availability.nearestStart,
         workDays,
@@ -99,11 +122,12 @@ export const createOrder = async (payload: OrderPayload) => {
       customTotalFrom = estimate.priceFrom;
       customItems = tailoringTypes.map((type) => ({
         name: `Індивідуальний пошив: ${type}`,
-        quantity: 1,
+        quantity: quantities[type] ?? 1,
         price: TAILORING_GARMENTS[type].priceFromUah,
       }));
       customEstimate = {
         types: tailoringTypes,
+        quantities,
         programs,
         workDays,
         priceFromUah: estimate.priceFrom,

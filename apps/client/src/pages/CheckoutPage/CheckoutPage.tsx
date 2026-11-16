@@ -39,6 +39,7 @@ export const CheckoutPage = () => {
   const displayCurrency = useAppSelector((state) => state.currency.code);
   const {
     types: tailoringTypes,
+    quantities: tailoringQuantities,
     programs: tailoringPrograms,
     measurements,
     measurementUnit,
@@ -148,6 +149,9 @@ export const CheckoutPage = () => {
         orderType: "custom",
         displayCurrency,
         tailoringTypes,
+        tailoringQuantities: Object.fromEntries(
+          tailoringTypes.map((type) => [type, tailoringQuantities[type] ?? 1]),
+        ),
         preferredStartDate: estimate.startDate ?? undefined,
         tailoringPrograms: Object.fromEntries(
           tailoringTypes.map((type) => [type, tailoringPrograms[type] ?? "ST"]),
@@ -330,6 +334,9 @@ export const CheckoutPage = () => {
                       {errors.email.message}
                     </p>
                   )}
+                  <p className="mt-2 text-xs font-medium leading-relaxed text-stone-500">
+                    {t("checkout.emailNote")}
+                  </p>
                 </div>
               </div>
 
