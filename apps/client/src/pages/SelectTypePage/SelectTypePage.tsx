@@ -1,7 +1,11 @@
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useAppDispatch, useAppSelector } from "../../store/store";
-import { setGarmentProgram, toggleType } from "../../store/tailoringSlice";
+import {
+  setGarmentProgram,
+  setGarmentQuantity,
+  toggleType,
+} from "../../store/tailoringSlice";
 import { CurrencySwitcher } from "../../components/CurrencySwitcher/CurrencySwitcher";
 import {
   TAILORING_GARMENTS,
@@ -13,15 +17,21 @@ import {
   useScheduleFormat,
   useTailoringEstimate,
 } from "../../hooks/useTailoringEstimate";
-import { IoShirtOutline, IoCheckmark } from "react-icons/io5";
-import { ImScissors } from "react-icons/im";
-import { GiClothes, GiSuitcase } from "react-icons/gi";
+import {
+  LuCheck,
+  LuCrown,
+  LuMinus,
+  LuPlus,
+  LuRuler,
+  LuScissors,
+  LuShirt,
+} from "react-icons/lu";
 
 const OPTIONS = [
-  { type: "body" as const, icon: IoShirtOutline, dark: false },
-  { type: "jacket" as const, icon: ImScissors, dark: false },
-  { type: "pants" as const, icon: GiClothes, dark: false },
-  { type: "suit" as const, icon: GiSuitcase, dark: true },
+  { type: "body" as const, icon: LuShirt, dark: false },
+  { type: "jacket" as const, icon: LuScissors, dark: false },
+  { type: "pants" as const, icon: LuRuler, dark: false },
+  { type: "suit" as const, icon: LuCrown, dark: true },
 ];
 
 export const SelectTypePage = () => {
@@ -30,6 +40,7 @@ export const SelectTypePage = () => {
   const navigate = useNavigate();
 
   const selected = useAppSelector((state) => state.tailoring.types);
+  const quantities = useAppSelector((state) => state.tailoring.quantities);
   const programs = useAppSelector((state) => state.tailoring.programs);
   const currency = useAppSelector((state) => state.currency.code);
   const { estimate, formatRange, workDaysTable } = useTailoringEstimate();
@@ -49,7 +60,7 @@ export const SelectTypePage = () => {
     <section className="grow pb-40 animate-reveal-up">
       <div className="mx-auto max-w-7xl px-6">
         <div className="mb-16 text-center max-w-2xl mx-auto animate-reveal-up [animation-delay:200ms] opacity-0 [animation-fill-mode:forwards]">
-          <span className="rounded-full bg-stone-900 px-3 py-1 text-[10px] font-semibold uppercase tracking-widest text-white shadow-sm border border-stone-800 mb-6 inline-block">
+          <span className="rounded-full border border-accent/40 bg-accent/10 px-3 py-1 text-[10px] font-semibold uppercase tracking-widest text-accent mb-6 inline-block">
             {t("selectType.stepLabel")}
           </span>
           <h1 className="text-4xl sm:text-5xl font-semibold tracking-tighter text-stone-900 mb-6">
@@ -76,13 +87,13 @@ export const SelectTypePage = () => {
                 type="button"
                 aria-pressed={isSelected}
                 onClick={() => dispatch(toggleType(opt.type))}
-                className={`group relative flex h-full min-h-[24rem] flex-col overflow-hidden rounded-[2.5rem] transition-all duration-500 hover:-translate-y-2 hover:shadow-[0_20px_40px_-15px_rgba(28,25,23,0.2)] text-left animate-reveal-up opacity-0 [animation-fill-mode:forwards]
+                className={`group relative flex h-full min-h-[24rem] flex-col overflow-hidden rounded-4xl transition-all duration-500 hover:-translate-y-2 hover:shadow-[0_20px_40px_-15px_rgba(28,25,23,0.2)] text-left animate-reveal-up opacity-0 [animation-fill-mode:forwards]
                   ${
                     opt.dark
-                      ? "bg-stone-900 border border-stone-800 hover:border-stone-600"
+                      ? "palette-original bg-stone-900 border border-beige-500/40 hover:border-beige-400"
                       : "bg-white border border-stone-200/60 hover:border-stone-400"
                   }
-                  ${isSelected ? "ring-2 ring-offset-2 ring-stone-900" : ""}`}
+                  ${isSelected ? "ring-2 ring-offset-2 ring-offset-beige-50 ring-accent" : ""}`}
                 style={{ animationDelay: `${400 + index * 100}ms` }}
               >
                 {!opt.dark && (
@@ -100,7 +111,7 @@ export const SelectTypePage = () => {
                         : "bg-stone-900 text-white"
                     }`}
                   >
-                    <IoCheckmark size={18} />
+                    <LuCheck size={18} />
                   </span>
                 )}
 
@@ -164,7 +175,7 @@ export const SelectTypePage = () => {
                       isSelected
                         ? opt.dark
                           ? "border-white bg-white text-stone-900"
-                          : "border-stone-900 bg-stone-900 text-white"
+                          : "border-accent bg-accent text-[#fff]"
                         : opt.dark
                           ? "border-stone-700 bg-stone-800 text-white group-hover:border-white group-hover:bg-white group-hover:text-stone-900"
                           : "border-stone-200 bg-white text-stone-900 group-hover:border-stone-900 group-hover:bg-stone-900 group-hover:text-white"
@@ -174,6 +185,54 @@ export const SelectTypePage = () => {
                   </span>
                 </div>
               </button>
+
+              {isSelected && opt.type !== "suit" && (
+                <div
+                  className="flex items-center justify-between rounded-2xl border border-stone-200 bg-white px-3 py-2 shadow-sm"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <span className="text-[11px] font-semibold uppercase tracking-widest text-stone-500">
+                    {t("selectType.quantity")}
+                  </span>
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      aria-label={t("selectType.quantityDec")}
+                      disabled={(quantities[opt.type] ?? 1) <= 1}
+                      onClick={() =>
+                        dispatch(
+                          setGarmentQuantity({
+                            type: opt.type,
+                            quantity: (quantities[opt.type] ?? 1) - 1,
+                          }),
+                        )
+                      }
+                      className="flex h-8 w-8 items-center justify-center rounded-full border border-stone-200 text-stone-700 disabled:opacity-40"
+                    >
+                      <LuMinus size={14} />
+                    </button>
+                    <span className="min-w-[1.25rem] text-center text-sm font-bold text-stone-900">
+                      {quantities[opt.type] ?? 1}
+                    </span>
+                    <button
+                      type="button"
+                      aria-label={t("selectType.quantityInc")}
+                      disabled={(quantities[opt.type] ?? 1) >= 5}
+                      onClick={() =>
+                        dispatch(
+                          setGarmentQuantity({
+                            type: opt.type,
+                            quantity: (quantities[opt.type] ?? 1) + 1,
+                          }),
+                        )
+                      }
+                      className="flex h-8 w-8 items-center justify-center rounded-full border border-stone-200 text-stone-700 disabled:opacity-40"
+                    >
+                      <LuPlus size={14} />
+                    </button>
+                  </div>
+                </div>
+              )}
 
               <div
                 role="radiogroup"
@@ -193,7 +252,7 @@ export const SelectTypePage = () => {
                       }
                       className={`rounded-full px-2 py-2.5 text-[11px] font-semibold transition-all duration-300 ${
                         active
-                          ? "bg-stone-900 text-white shadow-md"
+                          ? "bg-accent text-[#fff] shadow-md"
                           : "text-stone-500 hover:bg-stone-100"
                       }`}
                     >
@@ -222,7 +281,11 @@ export const SelectTypePage = () => {
             {hasSelection ? (
               <p className="truncate text-sm font-semibold text-stone-900">
                 {selected
-                  .map((type) => `${t(`selectType.${type}`)} ${programs[type] ?? "ST"}`)
+                  .map((type) => {
+                    const qty = quantities[type] ?? 1;
+                    const name = t(`selectType.${type}`);
+                    return qty > 1 ? `${name} ×${qty} ${programs[type] ?? "ST"}` : `${name} ${programs[type] ?? "ST"}`;
+                  })
                   .join(" + ")}
                 <span className="ml-2 font-medium text-stone-500">
                   · {t("selectType.total")}{" "}
@@ -241,7 +304,7 @@ export const SelectTypePage = () => {
             type="button"
             disabled={!hasSelection}
             onClick={() => navigate("/individual-tailoring/step-2")}
-            className="rounded-2xl bg-stone-900 px-8 py-4 text-sm font-semibold text-white shadow-lg shadow-stone-900/20 transition-all hover:bg-stone-800 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40"
+              className="btn-ember rounded-2xl px-8 py-4 text-sm font-semibold active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40"
           >
             {t("selectType.continue")}
           </button>

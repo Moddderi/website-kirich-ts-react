@@ -21,7 +21,7 @@ export interface CabinetOrder {
   firstName: string;
   createdAt: string;
   stage: CabinetStage;
-  garments: Array<{ type: string; program: "ST" | "LAT" }>;
+  garments: Array<{ type: string; program: "ST" | "LAT"; quantity: number }>;
   dates: {
     start: string | null;
     readyTo: string | null;
@@ -31,6 +31,7 @@ export interface CabinetOrder {
     /** the order is waiting for the client's measurements now */
     needed: boolean;
     submitted: boolean;
+    submittedAt: string | null;
   };
   /** false → status comes from the website only (Notion unavailable) */
   live: boolean;

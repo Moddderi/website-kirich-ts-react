@@ -11,6 +11,7 @@ import {
   type MeasurementUnit,
 } from "@project/shared";
 import { cabinetUrl } from "./links.js";
+import { EMAIL_COPY, emailLang, type EmailLang } from "./emailLocale.js";
 import { buildCustomOrderSummary } from "./tailoringSummary.js";
 
 type MeasurementsPayload =
@@ -72,7 +73,8 @@ const getDisplayCurrency = (order: { displayCurrency?: unknown }): Currency =>
 const getOrderIdShort = (orderId?: string) =>
   orderId ? orderId.split("-")[0].toUpperCase() : "CUSTOM";
 
-const getCommunicationLabel = (method?: string | null) => {
+const getCommunicationLabel = (method?: string | null, lang: EmailLang = "uk") => {
+  const en = lang === "en";
   switch (method) {
     case "telegram":
       return "Telegram";
@@ -81,7 +83,7 @@ const getCommunicationLabel = (method?: string | null) => {
     case "whatsapp":
       return "WhatsApp";
     default:
-      return "Не вказано";
+      return en ? "Not specified" : "Не вказано";
   }
 };
 
@@ -98,49 +100,67 @@ const getDeliveryCarrierLabel = (method: string) => {
   return null;
 };
 
-const getDeliveryHtml = (order: any) => {
+const getDeliveryHtml = (order: any, L: (typeof EMAIL_COPY)["uk"]) => {
+  const line = (label: string, value: string) =>
+    `<p style="margin:0 0 6px;font-size:14px;color:${MUTED};"><strong style="color:${INK};">${label}:</strong> ${value}</p>`;
+
   const carrier = getDeliveryCarrierLabel(order.deliveryMethod);
   if (carrier) {
     return `
-      <p style="margin:0 0 6px;"><strong>Доставка:</strong> ${carrier}</p>
-      <p style="margin:0 0 6px;"><strong>Місто:</strong> ${escapeHtml(order.city || "—")}</p>
-      <p style="margin:0;"><strong>Відділення:</strong> ${escapeHtml(order.warehouse || "—")}</p>
+      ${line(L.delivery, carrier)}
+      ${line(L.city, escapeHtml(order.city || "—"))}
+      <p style="margin:0;font-size:14px;color:${MUTED};"><strong style="color:${INK};">${L.warehouse}:</strong> ${escapeHtml(order.warehouse || "—")}</p>
     `;
   }
 
-  return `<p style="margin:0;"><strong>Доставка:</strong> Самовивіз із студії</p>`;
+  return `<p style="margin:0;font-size:14px;color:${MUTED};"><strong style="color:${INK};">${L.delivery}:</strong> ${L.pickup}</p>`;
 };
 
-const emailShell = (title: string, bodyHtml: string) => `
+/** Noir palette, matching the site: near-black surfaces, cool white type, muted ember. */
+const INK = "#f4f4f5";
+const MUTED = "#a1a1aa";
+const FAINT = "#71717a";
+const LINE = "#262626";
+const PANEL = "#141414";
+const ACCENT = "#c4414d";
+const SERIF = "Georgia,'Times New Roman',serif";
+
+const emailShell = (title: string, bodyHtml: string, lang: EmailLang = "uk") => {
+  const L = EMAIL_COPY[lang];
+  return `
 <!DOCTYPE html>
-<html lang="uk">
+<html lang="${L.htmlLang}">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="dark" />
     <title>${title}</title>
   </head>
-  <body style="margin:0;padding:0;background:#f5f1eb;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Ubuntu,sans-serif;color:#1c1917;">
-    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#f5f1eb;padding:32px 16px;">
+  <body style="margin:0;padding:0;background:#050505;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Ubuntu,sans-serif;color:${INK};">
+    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#050505;padding:32px 16px;">
       <tr>
         <td align="center">
-          <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:560px;background:#ffffff;border-radius:24px;overflow:hidden;border:1px solid #e7e5e4;">
+          <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:560px;background:#0c0c0c;border-radius:24px;overflow:hidden;border:1px solid ${LINE};">
             <tr>
-              <td style="background:#1c1917;padding:28px 32px;text-align:center;">
-                <p style="margin:0 0 8px;font-size:11px;letter-spacing:0.25em;text-transform:uppercase;color:#a8a29e;">K.I.RICH SEWING STUDIO</p>
-                <h1 style="margin:0;font-size:22px;line-height:1.3;color:#ffffff;font-weight:600;">${title}</h1>
+              <td style="height:3px;background:${ACCENT};font-size:0;line-height:0;">&nbsp;</td>
+            </tr>
+            <tr>
+              <td style="padding:32px 32px 8px;text-align:center;">
+                <p style="margin:0 0 14px;font-size:11px;letter-spacing:0.32em;text-transform:uppercase;color:${FAINT};">${L.studioTag}</p>
+                <h1 style="margin:0;font-family:${SERIF};font-size:30px;line-height:1.2;font-weight:500;color:${INK};">${title}</h1>
               </td>
             </tr>
             <tr>
-              <td style="padding:32px;">
+              <td style="padding:24px 32px 32px;">
                 ${bodyHtml}
               </td>
             </tr>
             <tr>
-              <td style="padding:20px 32px 28px;border-top:1px solid #f5f5f4;text-align:center;">
-                <p style="margin:0;font-size:12px;color:#78716c;line-height:1.5;">
-                  Якщо у вас є питання — просто дайте відповідь на цей лист<br />
-                  або напишіть на
-                  <a href="mailto:kirich.sewing.studio@gmail.com" style="color:#1c1917;">kirich.sewing.studio@gmail.com</a>
+              <td style="padding:20px 32px 28px;border-top:1px solid ${LINE};text-align:center;">
+                <p style="margin:0 0 6px;font-size:11px;letter-spacing:0.22em;text-transform:uppercase;color:${FAINT};">${L.footerCity}</p>
+                <p style="margin:0;font-size:12px;color:${FAINT};line-height:1.6;">
+                  ${L.footerHelp}
+                  <a href="mailto:kirich.sewing.studio@gmail.com" style="color:${ACCENT};text-decoration:none;">kirich.sewing.studio@gmail.com</a>
                 </p>
               </td>
             </tr>
@@ -151,8 +171,17 @@ const emailShell = (title: string, bodyHtml: string) => `
   </body>
 </html>
 `;
+};
+
+const sectionLabel = (text: string) =>
+  `<h2 style="margin:0 0 12px;font-size:11px;letter-spacing:0.26em;text-transform:uppercase;color:${FAINT};">${text}</h2>`;
+
+const ctaButton = (href: string, label: string) =>
+  `<a href="${href}" style="display:inline-block;padding:13px 30px;border-radius:999px;background:${ACCENT};color:#ffffff;font-size:13px;font-weight:600;letter-spacing:0.04em;text-decoration:none;">${label}</a>`;
 
 const buildReadyMadeEmailHtml = (order: any) => {
+  const lang = emailLang(order);
+  const L = EMAIL_COPY[lang];
   const displayCurrency = getDisplayCurrency(order);
   const orderIdShort = getOrderIdShort(order.id);
 
@@ -167,12 +196,12 @@ const buildReadyMadeEmailHtml = (order: any) => {
 
       return `
         <tr>
-          <td style="padding:12px 0;border-bottom:1px solid #f5f5f4;">
-            <p style="margin:0 0 4px;font-size:14px;font-weight:600;color:#1c1917;">
+          <td style="padding:12px 0;border-bottom:1px solid ${LINE};">
+            <p style="margin:0 0 4px;font-size:14px;font-weight:600;color:${INK};">
               ${escapeHtml(item.name || "Товар")} × ${item.quantity}
             </p>
-            ${details ? `<p style="margin:0 0 4px;font-size:12px;color:#78716c;">${details}</p>` : ""}
-            <p style="margin:0;font-size:13px;color:#1c1917;">
+            ${details ? `<p style="margin:0 0 4px;font-size:12px;color:${FAINT};">${details}</p>` : ""}
+            <p style="margin:0;font-size:13px;color:${INK};">
               ${formatConvertedPrice(
                 convertLineFromUah(
                   Number(item.price),
@@ -194,43 +223,48 @@ const buildReadyMadeEmailHtml = (order: any) => {
   );
 
   const body = `
-    <p style="margin:0 0 16px;font-size:15px;line-height:1.6;">
+    <p style="margin:0 0 16px;font-size:15px;line-height:1.6;color:${INK};">
       Вітаємо, <strong>${escapeHtml(order.firstName)} ${escapeHtml(order.lastName)}</strong>!
     </p>
-    <p style="margin:0 0 24px;font-size:14px;line-height:1.6;color:#57534e;">
-      Ваше замовлення <strong>№ ${orderIdShort}</strong> успішно прийнято.
+    <p style="margin:0 0 24px;font-size:14px;line-height:1.6;color:${MUTED};">
+      Ваше замовлення <strong style="color:${INK};">№ ${orderIdShort}</strong> успішно прийнято.
       Найближчим часом менеджер зв’яжеться з вами через
-      <strong>${getCommunicationLabel(order.communicationMethod)}</strong>
+      <strong style="color:${INK};">${getCommunicationLabel(order.communicationMethod)}</strong>
       ${order.socialUsername ? `(${escapeHtml(String(order.socialUsername))})` : ""}.
     </p>
 
-    <h2 style="margin:0 0 12px;font-size:13px;letter-spacing:0.12em;text-transform:uppercase;color:#78716c;">Деталі замовлення</h2>
+    ${sectionLabel("Деталі замовлення")}
     <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
       ${itemsHtml}
     </table>
 
-    <div style="margin-top:20px;padding:16px;border-radius:16px;background:#fafaf9;">
-      ${getDeliveryHtml(order)}
-      <p style="margin:12px 0 0;font-size:16px;">
-        <strong>Всього:</strong> ${orderTotal}
+    <div style="margin-top:20px;padding:16px 18px;border-radius:16px;background:${PANEL};border:1px solid ${LINE};">
+      ${getDeliveryHtml(order, L)}
+      <p style="margin:14px 0 0;padding-top:12px;border-top:1px solid ${LINE};font-size:16px;color:${INK};">
+        <strong>${L.total}:</strong> <span style="color:${ACCENT};">${orderTotal}</span>
       </p>
     </div>
   `;
 
-  return emailShell(`Замовлення № ${orderIdShort} підтверджено`, body);
+  return emailShell(L.readySubject(orderIdShort), body, lang);
 };
 
 const buildCustomOrderEmailHtml = (order: any) => {
+  const lang = emailLang(order);
+  const L = EMAIL_COPY[lang];
   const orderIdShort = getOrderIdShort(order.id);
   const customItem = order.items?.[0];
   const summary = buildCustomOrderSummary(order);
+  const social = order.socialUsername
+    ? ` (${escapeHtml(String(order.socialUsername))})`
+    : "";
 
   let measurementsHtml = `
-    <p style="margin:0;font-size:13px;color:#78716c;">
+    <p style="margin:0;font-size:13px;color:${FAINT};">
       ${
         order.estimate?.measurementsPending
-          ? "Мірки знімемо ближче до початку: за 30 днів ми нагадаємо, а в особистому кабінеті з’явиться бланк для актуальних мірок."
-          : "Мірки будуть уточнені менеджером особисто."
+          ? L.measurementsPending
+          : L.measurementsManager
       }
     </p>
   `;
@@ -244,8 +278,8 @@ const buildCustomOrderEmailHtml = (order: any) => {
 
     if (entries.length > 0 && !order.estimate?.measurementsPending) {
       measurementsHtml = `
-        <p style="margin:0 0 10px;font-size:13px;color:#57534e;">
-          <strong>Одиниці виміру:</strong> ${unitLabel}
+        <p style="margin:0 0 10px;font-size:13px;color:${MUTED};">
+          <strong style="color:${INK};">${L.units}:</strong> ${unitLabel}
         </p>
         <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
           ${entries
@@ -256,10 +290,10 @@ const buildCustomOrderEmailHtml = (order: any) => {
                 ] ?? key;
               return `
                 <tr>
-                  <td style="padding:8px 0;border-bottom:1px solid #f5f5f4;font-size:13px;color:#57534e;">
+                  <td style="padding:8px 0;border-bottom:1px solid ${LINE};font-size:13px;color:${MUTED};">
                     ${escapeHtml(label)}
                   </td>
-                  <td style="padding:8px 0;border-bottom:1px solid #f5f5f4;font-size:13px;color:#1c1917;text-align:right;font-weight:600;">
+                  <td style="padding:8px 0;border-bottom:1px solid ${LINE};font-size:13px;color:${INK};text-align:right;font-weight:600;">
                     ${escapeHtml(String(value))} ${unitLabel}
                   </td>
                 </tr>
@@ -277,69 +311,71 @@ const buildCustomOrderEmailHtml = (order: any) => {
     .map(
       (line) => `
       <tr>
-        <td style="padding:10px 0;border-bottom:1px solid #f0eeeb;font-size:14px;color:#1c1917;">
+        <td style="padding:10px 0;border-bottom:1px solid ${LINE};font-size:14px;color:${INK};">
           <strong>${escapeHtml(line.label)}</strong>
-          <span style="display:block;font-size:12px;color:#78716c;">${escapeHtml(line.category)} · ${escapeHtml(line.leadDays)}</span>
+          <span style="display:block;font-size:12px;color:${FAINT};">${escapeHtml(line.category)} · ${escapeHtml(line.leadDays)}</span>
         </td>
-        <td style="padding:10px 0;border-bottom:1px solid #f0eeeb;font-size:13px;color:#1c1917;text-align:right;font-weight:600;white-space:nowrap;">
+        <td style="padding:10px 0;border-bottom:1px solid ${LINE};font-size:13px;color:${ACCENT};text-align:right;font-weight:600;white-space:nowrap;">
           ${escapeHtml(line.priceRange)}
         </td>
       </tr>`,
     )
     .join("");
 
+  const summaryLine = (label: string, value: string, last = false) =>
+    `<p style="margin:0 0 ${last ? 0 : 6}px;font-size:14px;color:${MUTED};"><strong style="color:${INK};">${label}:</strong> ${value}</p>`;
+
   const body = `
-    <p style="margin:0 0 16px;font-size:15px;line-height:1.6;">
-      Вітаємо, <strong>${escapeHtml(order.firstName)} ${escapeHtml(order.lastName)}</strong>!
+    <p style="margin:0 0 16px;font-size:15px;line-height:1.6;color:${INK};">
+      ${L.greeting}, <strong>${escapeHtml(order.firstName)} ${escapeHtml(order.lastName)}</strong>!
     </p>
-    <p style="margin:0 0 24px;font-size:14px;line-height:1.6;color:#57534e;">
-      Ваш запит на індивідуальне пошиття <strong>№ ${orderIdShort}</strong> успішно прийнято.
-      Менеджер зв’яжеться з вами через
-      <strong>${getCommunicationLabel(order.communicationMethod)}</strong>
-      ${order.socialUsername ? `(${escapeHtml(String(order.socialUsername))})` : ""}
-      для уточнення деталей, точної вартості та суми передоплати.
+    <p style="margin:0 0 24px;font-size:14px;line-height:1.6;color:${MUTED};">
+      ${L.customIntro(
+        orderIdShort,
+        getCommunicationLabel(order.communicationMethod, lang),
+        social,
+      )}
     </p>
 
     ${
       order.accessToken
-        ? `<div style="margin:0 0 24px;padding:18px;border-radius:16px;background:#1c1917;text-align:center;">
-             <p style="margin:0 0 12px;font-size:13px;line-height:1.5;color:#d6d3d1;">Слідкуйте за статусом замовлення, датою старту та мірками в особистому кабінеті — реєстрація не потрібна.</p>
-             <a href="${escapeHtml(cabinetUrl(order.accessToken))}" style="display:inline-block;padding:12px 24px;border-radius:12px;background:#ffffff;color:#1c1917;font-size:13px;font-weight:600;text-decoration:none;">Відкрити кабінет замовлення</a>
+        ? `<div style="margin:0 0 24px;padding:22px;border-radius:16px;background:${PANEL};border:1px solid ${LINE};text-align:center;">
+             <p style="margin:0 0 14px;font-size:13px;line-height:1.6;color:${MUTED};">${L.cabinetBlurb}</p>
+             ${ctaButton(escapeHtml(cabinetUrl(order.accessToken)), L.cabinetBtn)}
            </div>`
         : ""
     }
 
-    <h2 style="margin:0 0 12px;font-size:13px;letter-spacing:0.12em;text-transform:uppercase;color:#78716c;">Обрані вироби</h2>
+    ${sectionLabel(L.garments)}
     <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="margin:0 0 20px;">
       ${garmentsHtml}
     </table>
 
-    <div style="margin:0 0 20px;padding:16px;border-radius:16px;background:#fafaf9;font-size:14px;line-height:1.6;">
-      <p style="margin:0 0 6px;"><strong>Орієнтовна вартість:</strong> ${escapeHtml(summary.priceRange)}</p>
-      <p style="margin:0 0 6px;"><strong>Передоплата ${summary.prepaymentPercent}%:</strong> ${escapeHtml(summary.prepaymentRange)}</p>
-      <p style="margin:0 0 6px;"><strong>Початок роботи:</strong> ${escapeHtml(summary.startDate)}</p>
-      <p style="margin:0 0 12px;"><strong>Орієнтовна готовність:</strong> ${escapeHtml(summary.readyRange)}</p>
-      ${getDeliveryHtml(order)}
-      <p style="margin:12px 0 0;font-size:12px;color:#78716c;">
-        Це орієнтовні значення. Точну вартість, суму передоплати та терміни
-        менеджер підтвердить після зв’язку з вами.
+    <div style="margin:0 0 20px;padding:16px 18px;border-radius:16px;background:${PANEL};border:1px solid ${LINE};">
+      ${summaryLine(L.estimate, escapeHtml(summary.priceRange))}
+      ${summaryLine(L.prepayment(summary.prepaymentPercent), escapeHtml(summary.prepaymentRange))}
+      ${summaryLine(L.start, escapeHtml(summary.startDate))}
+      ${summaryLine(L.ready, escapeHtml(summary.readyRange))}
+      <div style="margin-top:12px;padding-top:12px;border-top:1px solid ${LINE};">
+        ${getDeliveryHtml(order, L)}
+      </div>
+      <p style="margin:12px 0 0;font-size:12px;line-height:1.6;color:${FAINT};">
+        ${L.estimateNote}
       </p>
     </div>
 
     ${
       summary.comment
-        ? `<h2 style="margin:0 0 12px;font-size:13px;letter-spacing:0.12em;text-transform:uppercase;color:#78716c;">Ваш коментар</h2>
-           <p style="margin:0 0 20px;font-size:14px;line-height:1.6;color:#57534e;white-space:pre-wrap;">${escapeHtml(summary.comment)}</p>`
+        ? `${sectionLabel(L.comment)}
+           <p style="margin:0 0 20px;font-size:14px;line-height:1.6;color:${MUTED};white-space:pre-wrap;">${escapeHtml(summary.comment)}</p>`
         : ""
     }
 
-    <h2 style="margin:0 0 12px;font-size:13px;letter-spacing:0.12em;text-transform:uppercase;color:#78716c;">
-      Ваші мірки
-    </h2>
+    ${sectionLabel(L.measurements)}
     ${measurementsHtml}
   `;
 
-  return emailShell(`Запит на пошиття № ${orderIdShort} прийнято`, body);
+  return emailShell(L.customTitle(orderIdShort), body, lang);
 };
 
 /**
@@ -365,9 +401,10 @@ export const sendOrderConfirmationEmail = async (order: any) => {
 
   const isCustomOrder = order.orderType === "custom";
   const orderIdShort = getOrderIdShort(order.id);
+  const L = EMAIL_COPY[emailLang(order)];
   const subject = isCustomOrder
-    ? `K.I.RICH — запит на пошиття № ${orderIdShort}`
-    : `K.I.RICH — замовлення № ${orderIdShort} підтверджено`;
+    ? L.customSubject(orderIdShort)
+    : L.readySubject(orderIdShort);
 
   const html = isCustomOrder
     ? buildCustomOrderEmailHtml(order)
@@ -407,13 +444,13 @@ export const sendLoginCodeEmail = async (email: string, code: string) => {
 
   const html = emailShell(
     "Вхід до особистого кабінету",
-    `<p style="margin:0 0 20px;font-size:14px;line-height:1.6;color:#57534e;">
+    `<p style="margin:0 0 20px;font-size:14px;line-height:1.6;color:${MUTED};">
        Ваш код для входу — введіть його на сторінці «Мої замовлення». Код діє 10 хвилин.
      </p>
-     <p style="margin:0 0 20px;text-align:center;font-size:36px;font-weight:700;letter-spacing:0.35em;color:#1c1917;">
+     <p style="margin:0 0 20px;text-align:center;font-family:${SERIF};font-size:42px;font-weight:500;letter-spacing:0.4em;color:${ACCENT};">
        ${escapeHtml(code)}
      </p>
-     <p style="margin:0;font-size:12px;line-height:1.6;color:#78716c;">
+     <p style="margin:0;font-size:12px;line-height:1.6;color:${FAINT};">
        Якщо ви не просили код — просто проігноруйте цей лист.
      </p>`,
   );
@@ -438,18 +475,19 @@ export const sendMeasurementsReminderEmail = async (order: any) => {
   const apiKey = process.env.RESEND_API_KEY;
   if (!apiKey || !order?.email || !order?.accessToken) return;
 
+  const L = EMAIL_COPY[emailLang(order)];
   const html = emailShell(
-    "Час зняти мірки",
-    `<p style="margin:0 0 16px;font-size:15px;line-height:1.6;">
-       Вітаємо, <strong>${escapeHtml(order.firstName)}</strong>!
+    L.reminderTitle,
+    `<p style="margin:0 0 16px;font-size:15px;line-height:1.6;color:${INK};">
+       ${L.reminderGreeting(escapeHtml(order.firstName))}
      </p>
-     <p style="margin:0 0 24px;font-size:14px;line-height:1.6;color:#57534e;">
-       Наближається початок пошиття вашого замовлення. Щоб почати вчасно, потрібні
-       актуальні мірки — заповніть бланк в особистому кабінеті.
+     <p style="margin:0 0 24px;font-size:14px;line-height:1.6;color:${MUTED};">
+       ${L.reminderBody}
      </p>
      <div style="margin:0 0 8px;text-align:center;">
-       <a href="${escapeHtml(cabinetUrl(order.accessToken))}" style="display:inline-block;padding:14px 28px;border-radius:12px;background:#1c1917;color:#ffffff;font-size:14px;font-weight:600;text-decoration:none;">Заповнити мірки</a>
+       ${ctaButton(escapeHtml(cabinetUrl(order.accessToken)), L.reminderBtn)}
      </div>`,
+    emailLang(order),
   );
 
   try {
@@ -457,7 +495,7 @@ export const sendMeasurementsReminderEmail = async (order: any) => {
     const { error } = await resend.emails.send({
       from: process.env.EMAIL_FROM || "K.I.RICH <onboarding@resend.dev>",
       to: [order.email],
-      subject: "K.I.RICH — час зняти мірки",
+      subject: `K.I.RICH — ${L.reminderTitle}`,
       html,
       replyTo: process.env.EMAIL_REPLY_TO || "kirich.sewing.studio@gmail.com",
     });

@@ -5,10 +5,9 @@ import { updateQuantity, removeFromCart } from "../../store/cartSlice";
 import { Breadcrumbs } from "../../components/Breadcrumbs/Breadcrumbs";
 import type { CartItem } from "../../store/cartSlice";
 
-import { IoTrashOutline } from "react-icons/io5";
-import { HiMinus, HiPlus, HiArrowRight } from "react-icons/hi";
 import { useProductName } from "../../utils/useLocalizedProduct";
 import { useCartMoney } from "../../hooks/useFormattedPrice";
+import { LuArrowRight, LuMinus, LuPlus, LuTrash2 } from "react-icons/lu";
 
 export const CartPage: React.FC = () => {
   const navigate = useNavigate();
@@ -113,7 +112,7 @@ export const CartPage: React.FC = () => {
                         className="text-stone-400 hover:text-red-500 transition-colors p-2 -mr-2"
                         type="button"
                       >
-                        <IoTrashOutline size={20} />
+                        <LuTrash2 size={20} />
                       </button>
                     </div>
 
@@ -140,7 +139,7 @@ export const CartPage: React.FC = () => {
                           className="text-stone-400 hover:text-stone-900 transition-colors"
                           type="button"
                         >
-                          <HiMinus size={14} />
+                          <LuMinus size={14} />
                         </button>
                         <span className="text-sm font-semibold text-stone-900 w-4 text-center select-none">
                           {item.quantity}
@@ -150,7 +149,7 @@ export const CartPage: React.FC = () => {
                           className="text-stone-400 hover:text-stone-900 transition-colors"
                           type="button"
                         >
-                          <HiPlus size={14} />
+                          <LuPlus size={14} />
                         </button>
                       </div>
 
@@ -202,10 +201,10 @@ export const CartPage: React.FC = () => {
               <button
                 onClick={handleCheckout}
                 disabled={cartItems.length === 0}
-                className="w-full rounded-2xl bg-stone-900 px-8 py-4 text-sm font-semibold uppercase tracking-widest text-white hover:bg-stone-800 transition-all duration-300 active:scale-95 flex items-center justify-center gap-2 group disabled:opacity-50 disabled:pointer-events-none"
+                  className="w-full btn-ember rounded-2xl px-8 py-4 text-sm font-semibold uppercase tracking-widest duration-300 active:scale-95 flex items-center justify-center gap-2 group disabled:opacity-50 disabled:pointer-events-none"
               >
                 {t("cart.checkout")}
-                <HiArrowRight
+                <LuArrowRight
                   size={16}
                   className="group-hover:translate-x-1 transition-transform duration-300"
                 />

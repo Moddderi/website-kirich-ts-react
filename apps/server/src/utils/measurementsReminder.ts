@@ -1,6 +1,6 @@
 import { sendTelegramText } from "./telegram.js";
 import { sendMeasurementsReminderEmail } from "./email.js";
-import { cabinetUrl } from "./links.js";
+import { cabinetUrlForTelegram } from "./links.js";
 
 /** Notifies the studio (Telegram) and the client (e-mail, if Resend works). */
 export const notifyMeasurementsRequested = async (order: any) => {
@@ -8,7 +8,7 @@ export const notifyMeasurementsRequested = async (order: any) => {
   const contact = order.socialUsername
     ? `${String(order.communicationMethod ?? "").toUpperCase()} ${order.socialUsername}`
     : order.phone;
-  const link = order.accessToken ? cabinetUrl(order.accessToken) : "";
+  const link = order.accessToken ? cabinetUrlForTelegram(order.accessToken) : "";
 
   await sendTelegramText(
     `✂️ Час зняти мірки: ${name}\n` +

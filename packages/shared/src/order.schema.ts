@@ -83,6 +83,13 @@ export const customOrderSchema = checkoutFieldsSchema.extend({
   tailoringTypes: z
     .array(z.enum(["body", "jacket", "pants", "suit"]))
     .min(1, "Оберіть хоча б один виріб"),
+  /** How many of each garment (defaults to 1). Suit is always treated as 1. */
+  tailoringQuantities: z
+    .record(
+      z.enum(["body", "jacket", "pants", "suit"]),
+      z.number().int().min(1).max(5),
+    )
+    .optional(),
   items: z.array(orderItemSchema),
 });
 

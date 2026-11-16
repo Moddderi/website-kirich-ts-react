@@ -35,7 +35,7 @@ export const PrepaymentPage = () => {
     <main className="grow pb-32">
       <div className="mx-auto max-w-3xl px-6 lg:px-8 animate-reveal-up">
         <div className="mb-12 text-center">
-          <span className="rounded-full bg-stone-900 px-3 py-1 text-[10px] font-semibold uppercase tracking-widest text-white shadow-sm border border-stone-800 mb-6 inline-block">
+          <span className="rounded-full border border-accent/40 bg-accent/10 px-3 py-1 text-[10px] font-semibold uppercase tracking-widest text-accent mb-6 inline-block">
             {t("prepayment.stepLabel")}
           </span>
           <h1 className="text-4xl sm:text-5xl font-semibold tracking-tighter text-stone-900 mb-6">
@@ -84,7 +84,7 @@ export const PrepaymentPage = () => {
           </section>
 
           {/* Prepayment */}
-          <section className="rounded-4xl bg-stone-900 p-7 text-white shadow-xl sm:p-9">
+          <section className="palette-original rounded-4xl border border-white/10 bg-stone-900 p-7 text-white shadow-xl sm:p-9">
             <p className="text-[10px] font-semibold uppercase tracking-widest text-stone-400">
               {t("prepayment.prepaymentTitle", { percent })}
             </p>
@@ -148,7 +148,7 @@ export const PrepaymentPage = () => {
             <button
               type="button"
               onClick={() => navigate("/individual-tailoring/checkout")}
-              className="rounded-2xl bg-stone-900 px-10 py-4 text-sm font-semibold text-white shadow-lg shadow-stone-900/20 transition-all hover:bg-stone-800 active:scale-[0.98]"
+                className="btn-ember rounded-2xl px-10 py-4 text-sm font-semibold active:scale-[0.98]"
             >
               {t("prepayment.continue")}
             </button>

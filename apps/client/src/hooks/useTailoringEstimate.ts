@@ -3,9 +3,10 @@ import { useTranslation } from "react-i18next";
 import {
   calcTailoringEstimate,
   canStartOn,
+  expandTailoringTypes,
   formatConvertedPrice,
   pickWorkDays,
-  sumWorkDays,
+  sumWorkDaysForSelection,
   todayISO,
   type MeasurementType,
 } from "@project/shared";
@@ -69,23 +70,33 @@ export const useScheduleFormat = () => {
  */
 export const useTailoringEstimate = (typesOverride?: MeasurementType[]) => {
   const storeTypes = useAppSelector((state) => state.tailoring.types);
+  const quantities = useAppSelector((state) => state.tailoring.quantities);
   const programs = useAppSelector((state) => state.tailoring.programs);
   const currency = useAppSelector((state) => state.currency.code);
   const chosenStart = useAppSelector((state) => state.tailoring.startDate);
 
   const types = typesOverride ?? storeTypes;
+  const expandedTypes = useMemo(
+    () => expandTailoringTypes(types, quantities),
+    [types, quantities],
+  );
 
   const workDaysQuery = useWorkDaysTable();
   const workDays = useMemo(
     () => pickWorkDays(workDaysQuery.data, types, programs),
     [workDaysQuery.data, types, programs],
   );
-  const totalWorkDays = sumWorkDays(workDays);
+  const totalWorkDays = sumWorkDaysForSelection(
+    workDaysQuery.data,
+    types,
+    programs,
+    quantities,
+  );
 
   // The start date must leave room for the whole order
   const windowDays = useMemo(
-    () => Math.ceil(calcTailoringEstimate(types, "UAH", null).leadDaysMin),
-    [types],
+    () => Math.ceil(calcTailoringEstimate(expandedTypes, "UAH", null).leadDaysMin),
+    [expandedTypes],
   );
   const availability = useAvailability(
     { days: windowDays, workDays: totalWorkDays },
@@ -112,8 +123,8 @@ export const useTailoringEstimate = (typesOverride?: MeasurementType[]) => {
   const isCustomStart = chosenValid && chosenStart !== nearestStart;
 
   const estimate = useMemo(
-    () => calcTailoringEstimate(types, currency, startDate, workDays),
-    [types, currency, startDate, workDays],
+    () => calcTailoringEstimate(expandedTypes, currency, startDate, workDays),
+    [expandedTypes, currency, startDate, workDays],
   );
 
   const formatRange = useMemo(

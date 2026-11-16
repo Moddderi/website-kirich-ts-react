@@ -12,7 +12,7 @@ import { submitCabinetMeasurements, useCabinetOrder } from "../../api/cabinetApi
 import { MeasurementsForm } from "../../components/MeasurementsForm/MeasurementsForm";
 import { saveCabinetToken } from "../../utils/cabinetStorage";
 import { useFormatDate } from "../../hooks/useTailoringEstimate";
-import { IoCheckmark } from "react-icons/io5";
+import { LuCheck } from "react-icons/lu";
 
 export const OrderCabinetPage = () => {
   const { t } = useTranslation();
@@ -21,7 +21,6 @@ export const OrderCabinetPage = () => {
   const { data: order, isLoading, isError } = useCabinetOrder(token);
   const queryClient = useQueryClient();
   const [unit, setUnit] = useState<MeasurementUnit>("cm");
-  const [justSent, setJustSent] = useState(false);
 
   // Remember the link on this device → the header cabinet icon opens it directly
   useEffect(() => {
@@ -33,7 +32,6 @@ export const OrderCabinetPage = () => {
       submitCabinetMeasurements(token as string, { unit, values }),
     onSuccess: (updated) => {
       queryClient.setQueryData(["cabinet", token], updated);
-      setJustSent(true);
     },
   });
 
@@ -56,7 +54,7 @@ export const OrderCabinetPage = () => {
         </p>
         <Link
           to="/my-orders"
-          className="rounded-2xl bg-stone-900 px-6 py-3 text-xs font-semibold uppercase tracking-widest text-white transition-all hover:bg-stone-700 active:scale-95"
+            className="btn-ember rounded-2xl px-6 py-3 text-xs font-semibold uppercase tracking-widest active:scale-95"
         >
           {t("cabinet.findOrder")}
         </Link>
@@ -65,19 +63,23 @@ export const OrderCabinetPage = () => {
   }
 
   const currentIndex = CABINET_STAGES.indexOf(order.stage);
+  const subtitleKey =
+    order.measurements.submitted && order.stage === "measurements"
+      ? "cabinet.stageDesc.measurementsDone"
+      : (`cabinet.stageDesc.${order.stage}` as const);
 
   return (
     <main className="grow pt-12 pb-28">
       <div className="mx-auto max-w-6xl px-6 lg:px-8 animate-reveal-up">
         <div className="mx-auto mb-12 max-w-2xl text-center">
-          <span className="mb-6 inline-block rounded-full border border-stone-800 bg-stone-900 px-3 py-1 text-[10px] font-semibold uppercase tracking-widest text-white shadow-sm">
+          <span className="mb-6 inline-block rounded-full border border-accent/40 bg-accent/10 px-3 py-1 text-[10px] font-semibold uppercase tracking-widest text-accent">
             {t("cabinet.label", { number: order.number })}
           </span>
           <h1 className="mb-4 text-4xl font-semibold tracking-tighter text-stone-900 sm:text-5xl">
             {t("cabinet.title", { name: order.firstName })}
           </h1>
           <p className="text-base font-medium leading-relaxed text-stone-500">
-            {t(`cabinet.stageDesc.${order.stage}`)}
+            {t(subtitleKey)}
           </p>
           <Link
             to="/my-orders?list=1"
@@ -89,7 +91,7 @@ export const OrderCabinetPage = () => {
 
         {order.measurements.needed && (
           <section className="mx-auto mb-12 max-w-4xl">
-            <div className="mb-8 rounded-4xl bg-stone-900 p-7 text-white shadow-xl">
+            <div className="palette-original mb-8 rounded-4xl border border-white/10 bg-stone-900 p-7 text-white shadow-xl">
               <p className="text-[10px] font-semibold uppercase tracking-widest text-stone-400">
                 {t("cabinet.measurementsTitle")}
               </p>
@@ -111,11 +113,18 @@ export const OrderCabinetPage = () => {
           </section>
         )}
 
-        {justSent && !order.measurements.needed && (
-          <div className="mx-auto mb-10 max-w-3xl rounded-4xl border border-emerald-200 bg-emerald-50 p-7 text-center shadow-sm">
-            <p className="text-sm font-semibold text-emerald-900">
+        {order.measurements.submitted && (
+          <div className="mx-auto mb-10 max-w-3xl rounded-4xl border border-accent/30 bg-accent/10 p-7 text-center shadow-sm">
+            <p className="text-sm font-semibold text-stone-900">
               {t("cabinet.measurementsSent")}
             </p>
+            {order.measurements.submittedAt && (
+              <p className="mt-2 text-xs font-medium text-stone-600">
+                {t("cabinet.measurementsSentAt", {
+                  date: formatDate(order.measurements.submittedAt.slice(0, 10)),
+                })}
+              </p>
+            )}
           </div>
         )}
 
@@ -137,20 +146,20 @@ export const OrderCabinetPage = () => {
                       <span
                         aria-hidden="true"
                         className={`absolute left-[15px] top-8 h-[calc(100%-2rem)] w-px ${
-                          done ? "bg-stone-900" : "bg-stone-200"
+                          done ? "bg-accent" : "bg-stone-200"
                         }`}
                       />
                     )}
                     <span
                       className={`relative z-10 flex h-8 w-8 shrink-0 items-center justify-center rounded-full border text-xs font-semibold ${
                         done
-                          ? "border-stone-900 bg-stone-900 text-white"
+                          ? "border-accent bg-accent text-[#fff]"
                           : active
-                            ? "border-stone-900 bg-white text-stone-900 ring-4 ring-stone-900/10"
+                            ? "border-accent bg-white text-accent ring-4 ring-accent/20"
                             : "border-stone-200 bg-white text-stone-300"
                       }`}
                     >
-                      {done ? <IoCheckmark size={16} /> : index + 1}
+                      {done ? <LuCheck size={16} /> : index + 1}
                     </span>
                     <div className="pt-1">
                       <p
@@ -174,7 +183,7 @@ export const OrderCabinetPage = () => {
 
           {/* Details */}
           <aside className="mt-8 space-y-5 lg:col-span-5 lg:mt-0">
-            <div className="rounded-4xl bg-stone-900 p-7 text-white shadow-xl">
+            <div className="palette-original rounded-4xl border border-white/10 bg-stone-900 p-7 text-white shadow-xl">
               <p className="text-[10px] font-semibold uppercase tracking-widest text-stone-400">
                 {t("cabinet.startLabel")}
               </p>
@@ -217,6 +226,7 @@ export const OrderCabinetPage = () => {
                   >
                     <span className="font-semibold text-stone-900">
                       {t(`selectType.${garment.type}`)}
+                      {garment.quantity > 1 ? ` × ${garment.quantity}` : ""}
                     </span>
                     <span className="text-xs font-semibold text-stone-500">
                       {garment.program}

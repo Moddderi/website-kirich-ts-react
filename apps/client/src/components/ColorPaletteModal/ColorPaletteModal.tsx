@@ -1,8 +1,8 @@
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { IoMdClose } from "react-icons/io";
 import { Portal } from "../shared/Portal/Portal";
 import { FULL_COLOR_PALETTE } from "../../constants/colorPalette";
+import { LuX } from "react-icons/lu";
 
 interface ColorPaletteModalProps {
   isOpen: boolean;
@@ -19,17 +19,17 @@ export const ColorPaletteModal = ({
 
   return (
     <Portal>
-      <div className="fixed inset-0 z-100 flex items-center justify-center p-4 bg-stone-900/50 backdrop-blur-sm animate-fade-in">
+      <div className="fixed inset-0 z-100 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in">
         <div className="absolute inset-0" onClick={onClose} />
 
-        <div className="relative z-10 w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-4xl sm:rounded-[2.5rem] bg-stone-900 p-6 sm:p-10 shadow-2xl border border-stone-700/60 animate-reveal-up">
+        <div className="palette-original relative z-10 w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-4xl sm:rounded-4xl bg-stone-900 p-6 sm:p-10 shadow-2xl border border-stone-700/60 animate-reveal-up">
           <button
             type="button"
             onClick={onClose}
             className="absolute top-5 right-5 sm:top-6 sm:right-6 p-2 rounded-full text-stone-400 hover:text-white hover:bg-white/10 transition-colors"
             aria-label="Close"
           >
-            <IoMdClose size={22} />
+            <LuX size={22} />
           </button>
 
           <div className="text-center mb-8 pr-6">

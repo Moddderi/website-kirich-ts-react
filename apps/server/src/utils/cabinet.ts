@@ -84,16 +84,25 @@ export const buildCabinetOrder = async (order: any): Promise<CabinetOrder> => {
 
   const types: string[] = Array.isArray(estimate.types) ? estimate.types : [];
   const programs: Record<string, "ST" | "LAT"> = estimate.programs ?? {};
+  const quantities = (estimate.quantities ?? {}) as Record<string, number>;
   const stage = info?.stage ?? "new";
 
   const measurementsSubmitted = !estimate.measurementsPending;
+  const measurementsSubmittedAt =
+    typeof estimate.measurementsSubmittedAt === "string"
+      ? estimate.measurementsSubmittedAt
+      : null;
 
   return {
     number: info?.number ?? String(plain.id).split("-")[0].toUpperCase(),
     firstName: plain.firstName,
     createdAt: new Date(plain.createdAt).toISOString(),
     stage,
-    garments: types.map((type) => ({ type, program: programs[type] ?? "ST" })),
+    garments: types.map((type) => ({
+      type,
+      program: programs[type] ?? "ST",
+      quantity: Math.max(1, Math.floor(quantities[type] ?? 1)),
+    })),
     dates: {
       start: info?.start ?? estimate.startDate ?? null,
       readyTo: info?.end ?? estimate.readyTo ?? null,
@@ -102,6 +111,7 @@ export const buildCabinetOrder = async (order: any): Promise<CabinetOrder> => {
     measurements: {
       needed: stage === "measurements" && !measurementsSubmitted,
       submitted: measurementsSubmitted,
+      submittedAt: measurementsSubmittedAt,
     },
     live: Boolean(info),
   };

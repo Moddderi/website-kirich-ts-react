@@ -2,6 +2,8 @@ import {
   PREPAYMENT_RATE,
   TAILORING_GARMENTS,
   calcTailoringEstimate,
+  clampGarmentQty,
+  expandTailoringTypes,
   formatConvertedPrice,
   isCurrency,
   type Currency,
@@ -79,9 +81,13 @@ export const buildCustomOrderSummary = (order: any): CustomOrderSummary => {
       .filter(isTailoringType);
   }
 
+  const quantities = (order.estimate?.quantities ?? {}) as Partial<
+    Record<MeasurementType, number>
+  >;
+  const expanded = expandTailoringTypes(types, quantities);
   const startDate: string | null = order.estimate?.startDate ?? null;
   const estimate = calcTailoringEstimate(
-    types,
+    expanded,
     currency,
     startDate,
     order.estimate?.workDays ?? null,
@@ -90,16 +96,24 @@ export const buildCustomOrderSummary = (order: any): CustomOrderSummary => {
   return {
     currency,
     types,
-    lines: estimate.items.map((item) => ({
-      type: item.type,
-      ...TAILORING_TYPE_META[item.type],
-      // "Штани · LAT" — program is chosen per garment on the site
-      label: order.estimate?.programs?.[item.type]
-        ? `${TAILORING_TYPE_META[item.type].label} · ${order.estimate.programs[item.type]}`
-        : TAILORING_TYPE_META[item.type].label,
-      priceRange: range(item.priceFrom, item.priceTo, currency),
-      leadDays: daysRange(item.leadDaysMin, item.leadDaysMax),
-    })),
+    lines: types.map((type) => {
+      const qty = clampGarmentQty(quantities[type]);
+      const itemsOfType = estimate.items.filter((item) => item.type === type);
+      const priceFrom = itemsOfType.reduce((acc, item) => acc + item.priceFrom, 0);
+      const priceTo = itemsOfType.reduce((acc, item) => acc + item.priceTo, 0);
+      const leadMin = itemsOfType.reduce((acc, item) => acc + item.leadDaysMin, 0);
+      const leadMax = itemsOfType.reduce((acc, item) => acc + item.leadDaysMax, 0);
+      const baseLabel = order.estimate?.programs?.[type]
+        ? `${TAILORING_TYPE_META[type].label} · ${order.estimate.programs[type]}`
+        : TAILORING_TYPE_META[type].label;
+      return {
+        type,
+        ...TAILORING_TYPE_META[type],
+        label: qty > 1 ? `${baseLabel} × ${qty}` : baseLabel,
+        priceRange: range(priceFrom, priceTo, currency),
+        leadDays: daysRange(leadMin, leadMax),
+      };
+    }),
     priceRange: range(estimate.priceFrom, estimate.priceTo, currency),
     prepaymentRange: range(
       estimate.prepaymentFrom,

@@ -8,8 +8,6 @@ import axios from "axios";
 import { useAppDispatch, useAppSelector } from "../../store/store";
 import { clearCart } from "../../store/cartSlice";
 import { clearTailoring } from "../../store/tailoringSlice";
-import { IoIosArrowForward } from "react-icons/io";
-import { FaTelegramPlane, FaInstagram, FaWhatsapp } from "react-icons/fa";
 import { createOrder } from "../../api/orderApi";
 import { useCartMoney } from "../../hooks/useFormattedPrice";
 import {
@@ -25,6 +23,7 @@ import {
   NovaPoshtaIcon,
   UkrposhtaIcon,
 } from "../../components/DeliveryIcons/DeliveryIcons";
+import { LuChevronRight, LuInstagram, LuMessageCircle, LuSend } from "react-icons/lu";
 
 export const CheckoutPage = () => {
   const navigate = useNavigate();
@@ -40,6 +39,7 @@ export const CheckoutPage = () => {
   const displayCurrency = useAppSelector((state) => state.currency.code);
   const {
     types: tailoringTypes,
+    quantities: tailoringQuantities,
     programs: tailoringPrograms,
     measurements,
     measurementUnit,
@@ -149,6 +149,9 @@ export const CheckoutPage = () => {
         orderType: "custom",
         displayCurrency,
         tailoringTypes,
+        tailoringQuantities: Object.fromEntries(
+          tailoringTypes.map((type) => [type, tailoringQuantities[type] ?? 1]),
+        ),
         preferredStartDate: estimate.startDate ?? undefined,
         tailoringPrograms: Object.fromEntries(
           tailoringTypes.map((type) => [type, tailoringPrograms[type] ?? "ST"]),
@@ -236,7 +239,7 @@ export const CheckoutPage = () => {
                 : t("checkout.titleReady")}
             </h1>
             {orderType === "custom" && (
-              <span className="self-start rounded-full bg-stone-900 px-3 py-1 text-[10px] font-semibold uppercase tracking-widest text-white shadow-sm border border-stone-800 shrink-0">
+              <span className="self-start rounded-full border border-accent/40 bg-accent/10 px-3 py-1 text-[10px] font-semibold uppercase tracking-widest text-accent shrink-0">
                 {t("checkout.customBadge")}
               </span>
             )}
@@ -259,7 +262,7 @@ export const CheckoutPage = () => {
                     className={`block w-full rounded-xl border-0 bg-white py-3.5 px-4 text-sm font-medium text-stone-900 shadow-sm ring-1 ring-inset transition-all placeholder:text-stone-400 focus:ring-2 ${
                       errors.firstName
                         ? "ring-red-500 focus:ring-red-500"
-                        : "ring-stone-200 focus:ring-stone-900"
+                        : "ring-stone-200 focus:ring-accent/70"
                     }`}
                     placeholder={t("checkout.firstNamePlaceholder")}
                   />
@@ -280,7 +283,7 @@ export const CheckoutPage = () => {
                     className={`block w-full rounded-xl border-0 bg-white py-3.5 px-4 text-sm font-medium text-stone-900 shadow-sm ring-1 ring-inset transition-all placeholder:text-stone-400 focus:ring-2 ${
                       errors.lastName
                         ? "ring-red-500 focus:ring-red-500"
-                        : "ring-stone-200 focus:ring-stone-900"
+                        : "ring-stone-200 focus:ring-accent/70"
                     }`}
                     placeholder={t("checkout.lastNamePlaceholder")}
                   />
@@ -301,7 +304,7 @@ export const CheckoutPage = () => {
                     className={`block w-full rounded-xl border-0 bg-white py-3.5 px-4 text-sm font-medium text-stone-900 shadow-sm ring-1 ring-inset transition-all placeholder:text-stone-400 focus:ring-2 ${
                       errors.phone
                         ? "ring-red-500 focus:ring-red-500"
-                        : "ring-stone-200 focus:ring-stone-900"
+                        : "ring-stone-200 focus:ring-accent/70"
                     }`}
                     placeholder="+380000000000"
                   />
@@ -322,7 +325,7 @@ export const CheckoutPage = () => {
                     className={`block w-full rounded-xl border-0 bg-white py-3.5 px-4 text-sm font-medium text-stone-900 shadow-sm ring-1 ring-inset transition-all placeholder:text-stone-400 focus:ring-2 ${
                       errors.email
                         ? "ring-red-500 focus:ring-red-500"
-                        : "ring-stone-200 focus:ring-stone-900"
+                        : "ring-stone-200 focus:ring-accent/70"
                     }`}
                     placeholder="your@email.com"
                   />
@@ -331,6 +334,9 @@ export const CheckoutPage = () => {
                       {errors.email.message}
                     </p>
                   )}
+                  <p className="mt-2 text-xs font-medium leading-relaxed text-stone-500">
+                    {t("checkout.emailNote")}
+                  </p>
                 </div>
               </div>
 
@@ -347,7 +353,7 @@ export const CheckoutPage = () => {
                   <label
                     className={`flex items-center gap-3 p-3.5 rounded-xl border-2 cursor-pointer transition-all ${
                       communicationMethod === "telegram"
-                        ? "border-stone-900 bg-stone-50"
+                        ? "border-accent bg-accent/10"
                         : "border-stone-200 bg-white"
                     }`}
                   >
@@ -357,7 +363,7 @@ export const CheckoutPage = () => {
                       {...register("communicationMethod")}
                       className="h-4 w-4 text-stone-900 accent-stone-900"
                     />
-                    <FaTelegramPlane size={16} className="text-[#0088cc]" />
+                    <LuSend size={16} className="text-stone-700" />
                     <span className="text-sm font-semibold text-stone-900">
                       Telegram
                     </span>
@@ -366,7 +372,7 @@ export const CheckoutPage = () => {
                   <label
                     className={`flex items-center gap-3 p-3.5 rounded-xl border-2 cursor-pointer transition-all ${
                       communicationMethod === "instagram"
-                        ? "border-stone-900 bg-stone-50"
+                        ? "border-accent bg-accent/10"
                         : "border-stone-200 bg-white"
                     }`}
                   >
@@ -376,7 +382,7 @@ export const CheckoutPage = () => {
                       {...register("communicationMethod")}
                       className="h-4 w-4 text-stone-900 accent-stone-900"
                     />
-                    <FaInstagram size={16} className="text-[#e1306c]" />
+                    <LuInstagram size={16} className="text-stone-700" />
                     <span className="text-sm font-semibold text-stone-900">
                       Instagram
                     </span>
@@ -385,7 +391,7 @@ export const CheckoutPage = () => {
                   <label
                     className={`flex items-center gap-3 p-3.5 rounded-xl border-2 cursor-pointer transition-all ${
                       communicationMethod === "whatsapp"
-                        ? "border-stone-900 bg-stone-50"
+                        ? "border-accent bg-accent/10"
                         : "border-stone-200 bg-white"
                     }`}
                   >
@@ -395,7 +401,7 @@ export const CheckoutPage = () => {
                       {...register("communicationMethod")}
                       className="h-4 w-4 text-stone-900 accent-stone-900"
                     />
-                    <FaWhatsapp size={16} className="text-[#25d366]" />
+                    <LuMessageCircle size={16} className="text-stone-700" />
                     <span className="text-sm font-semibold text-stone-900">
                       WhatsApp
                     </span>
@@ -426,7 +432,7 @@ export const CheckoutPage = () => {
                       } ${
                         errors.socialUsername
                           ? "ring-red-500 focus:ring-red-500"
-                          : "ring-stone-200 focus:ring-stone-900"
+                          : "ring-stone-200 focus:ring-accent/70"
                       }`}
                       placeholder={
                         communicationMethod === "whatsapp"
@@ -453,7 +459,7 @@ export const CheckoutPage = () => {
                 <label
                   className={`flex items-center gap-3 p-4 rounded-xl border-2 cursor-pointer transition-all ${
                     deliveryMethod === "nova_poshta"
-                      ? "border-stone-900 bg-stone-50"
+                      ? "border-accent bg-accent/10"
                       : "border-stone-200 bg-white"
                   }`}
                 >
@@ -471,7 +477,7 @@ export const CheckoutPage = () => {
                 <label
                   className={`flex items-center gap-3 p-4 rounded-xl border-2 cursor-pointer transition-all ${
                     deliveryMethod === "ukrposhta"
-                      ? "border-stone-900 bg-stone-50"
+                      ? "border-accent bg-accent/10"
                       : "border-stone-200 bg-white"
                   }`}
                 >
@@ -489,7 +495,7 @@ export const CheckoutPage = () => {
                 <label
                   className={`flex items-center gap-3 p-4 rounded-xl border-2 cursor-pointer transition-all ${
                     deliveryMethod === "pickup"
-                      ? "border-stone-900 bg-stone-50"
+                      ? "border-accent bg-accent/10"
                       : "border-stone-200 bg-white"
                   }`}
                 >
@@ -518,7 +524,7 @@ export const CheckoutPage = () => {
                       className={`block w-full rounded-xl border-0 bg-white py-3.5 px-4 text-sm font-medium text-stone-900 shadow-sm ring-1 ring-inset transition-all placeholder:text-stone-400 focus:ring-2 ${
                         errors.city
                           ? "ring-red-500 focus:ring-red-500"
-                          : "ring-stone-200 focus:ring-stone-900"
+                          : "ring-stone-200 focus:ring-accent/70"
                       }`}
                       placeholder={t("checkout.cityPlaceholder")}
                     />
@@ -538,7 +544,7 @@ export const CheckoutPage = () => {
                       className={`block w-full rounded-xl border-0 bg-white py-3.5 px-4 text-sm font-medium text-stone-900 shadow-sm ring-1 ring-inset transition-all placeholder:text-stone-400 focus:ring-2 ${
                         errors.warehouse
                           ? "ring-red-500 focus:ring-red-500"
-                          : "ring-stone-200 focus:ring-stone-900"
+                          : "ring-stone-200 focus:ring-accent/70"
                       }`}
                       placeholder={t("checkout.warehousePlaceholder")}
                     />
@@ -568,7 +574,7 @@ export const CheckoutPage = () => {
                   className={`block w-full resize-y rounded-xl border-0 bg-white py-3.5 px-4 text-sm font-medium text-stone-900 shadow-sm ring-1 ring-inset transition-all placeholder:text-stone-400 focus:ring-2 ${
                     errors.comment
                       ? "ring-red-500 focus:ring-red-500"
-                      : "ring-stone-200 focus:ring-stone-900"
+                      : "ring-stone-200 focus:ring-accent/70"
                   }`}
                 />
                 {errors.comment && (
@@ -683,7 +689,7 @@ export const CheckoutPage = () => {
 
               {orderType === "custom" && (
                 <div className="mb-6 space-y-3">
-                  <div className="flex flex-wrap justify-between gap-2 rounded-2xl bg-stone-900 px-5 py-4 text-white">
+                  <div className="palette-original flex flex-wrap justify-between gap-2 rounded-2xl bg-stone-900 px-5 py-4 text-white">
                     <span className="text-xs font-semibold uppercase tracking-widest text-stone-300">
                       {t("checkout.prepaymentLine", {
                         percent: Math.round(PREPAYMENT_RATE * 100),
@@ -724,11 +730,11 @@ export const CheckoutPage = () => {
                   (orderType === "ready-made" && cartItems.length === 0) ||
                   isSubmitting
                 }
-                className="w-full rounded-2xl bg-stone-900 px-8 py-4 text-sm font-semibold uppercase tracking-widest text-white hover:bg-stone-800 transition-all duration-300 active:scale-95 flex items-center justify-center gap-2 group disabled:opacity-50 disabled:pointer-events-none"
+                  className="w-full btn-ember rounded-2xl px-8 py-4 text-sm font-semibold uppercase tracking-widest duration-300 active:scale-95 flex items-center justify-center gap-2 group disabled:opacity-50 disabled:pointer-events-none"
               >
                 {isSubmitting ? t("checkout.processing") : t("checkout.confirmOrder")}
                 {!isSubmitting && (
-                  <IoIosArrowForward
+                  <LuChevronRight
                     size={16}
                     className="group-hover:translate-x-1 transition-transform"
                   />

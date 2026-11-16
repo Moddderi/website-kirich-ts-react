@@ -2,13 +2,12 @@ import React from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
-import { IoIosArrowForward } from "react-icons/io";
-import { GoHome } from "react-icons/go";
 import {
   findProductInListCache,
   productQueryOptions,
 } from "../../api/productQueries";
 import { useProductName } from "../../utils/useLocalizedProduct";
+import { LuChevronRight, LuHouse } from "react-icons/lu";
 
 export const Breadcrumbs: React.FC = () => {
   const location = useLocation();
@@ -66,7 +65,7 @@ export const Breadcrumbs: React.FC = () => {
   return (
     <nav className="flex items-center gap-2 mb-10 text-xs font-medium text-stone-500 select-none flex-wrap">
       <Link to="/" className="flex items-center gap-1 hover:text-stone-900">
-        <GoHome size={14} className="text-stone-900" />
+        <LuHouse size={14} className="text-accent" />
         {t("breadcrumbs.home")}
       </Link>
 
@@ -84,7 +83,7 @@ export const Breadcrumbs: React.FC = () => {
 
             return (
               <React.Fragment key={step.path}>
-                <IoIosArrowForward className="text-stone-400 shrink-0" />
+                <LuChevronRight className="text-stone-400 shrink-0" />
                 {isActive ? (
                   <span className="font-semibold text-stone-900">
                     {step.label}
@@ -113,7 +112,7 @@ export const Breadcrumbs: React.FC = () => {
 
             return (
               <React.Fragment key={to}>
-                <IoIosArrowForward className="text-stone-400 shrink-0" />
+                <LuChevronRight className="text-stone-400 shrink-0" />
                 {isLast ? (
                   <span className="font-semibold text-stone-900">{label}</span>
                 ) : (

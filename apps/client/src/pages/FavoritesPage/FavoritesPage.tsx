@@ -10,10 +10,9 @@ import { addToCart } from "../../store/cartSlice";
 import { Breadcrumbs } from "../../components/Breadcrumbs/Breadcrumbs";
 import type { Product } from "@project/shared";
 
-import { IoHeartDislikeOutline } from "react-icons/io5";
-import { HiOutlineShoppingBag } from "react-icons/hi";
 import { useProductName } from "../../utils/useLocalizedProduct";
 import { useFormattedPrice } from "../../hooks/useFormattedPrice";
+import { LuHeartOff, LuShoppingBag } from "react-icons/lu";
 
 export const FavoritesPage: React.FC = () => {
   const navigate = useNavigate();
@@ -130,7 +129,7 @@ export const FavoritesPage: React.FC = () => {
                         type="button"
                         title={t("favorites.removeFromFavorites")}
                       >
-                        <IoHeartDislikeOutline size={20} />
+                        <LuHeartOff size={20} />
                       </button>
                     </div>
 
@@ -144,7 +143,7 @@ export const FavoritesPage: React.FC = () => {
                     onClick={() => handleMoveToCart(item)}
                     className="w-full rounded-xl border border-stone-900 bg-stone-900 py-3 px-6 text-xs font-semibold uppercase tracking-wider text-white hover:bg-white hover:text-stone-900 transition-all duration-300 flex items-center justify-center gap-2 group/btn active:scale-95"
                   >
-                    <HiOutlineShoppingBag
+                    <LuShoppingBag
                       size={16}
                       className="text-white group-hover/btn:text-stone-900 transition-colors"
                     />

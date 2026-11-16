@@ -15,12 +15,13 @@ const PageFallback = () => (
 export function App() {
   return (
     <div
-      className="notranslate bg-beige-50 text-stone-900 font-sans antialiased selection:bg-stone-900 selection:text-beige-50 flex flex-col min-h-screen relative overflow-x-hidden"
+      className="notranslate bg-beige-50 text-stone-900 font-sans antialiased flex flex-col min-h-screen relative overflow-x-hidden"
       translate="no"
     >
       <Header />
 
-      <main>
+      <main className="relative">
+        <div aria-hidden className="page-glow" />
         <Suspense fallback={<PageFallback />}>
           <Outlet />
         </Suspense>

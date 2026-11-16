@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { FaPenRuler } from "react-icons/fa6";
+import { LuRuler } from "react-icons/lu";
 
 export const IndividualTailoringPage = () => {
   const { t } = useTranslation();
@@ -9,7 +9,7 @@ export const IndividualTailoringPage = () => {
   return (
     <div className="w-full flex flex-col items-center p-2">
       {/* Основная карточка с анимацией появления */}
-      <div className="relative w-full max-w-2xl bg-stone-950 text-white rounded-[2rem] border border-stone-800 shadow-2xl flex flex-col p-8 sm:p-12 cursor-default overflow-hidden animate-reveal-up">
+      <div className="palette-original relative w-full max-w-2xl bg-stone-950 text-white rounded-4xl border border-stone-800 shadow-2xl flex flex-col p-8 sm:p-12 cursor-default overflow-hidden animate-reveal-up">
         {/* Декоративные элементы */}
         <div className="absolute inset-0 bg-grid-pattern-dark mask-image:linear-gradient(to_bottom,rgba(255,255,255,0.05),transparent) pointer-events-none"></div>
         <div className="absolute top-0 right-0 h-96 w-96 rounded-full bg-gradient-to-bl from-beige-300/10 to-transparent blur-[80px] animate-pulse-glow pointer-events-none"></div>
@@ -18,7 +18,7 @@ export const IndividualTailoringPage = () => {
           {/* Заголовок с задержкой */}
           <div className="flex items-center gap-3 mb-10 animate-reveal-up [animation-delay:200ms] opacity-0 [animation-fill-mode:forwards]">
             <div className="relative flex h-10 w-10 items-center justify-center rounded-xl bg-white/10 backdrop-blur-md border border-white/20">
-              <FaPenRuler size={16} />
+              <LuRuler size={16} />
             </div>
             <div>
               <h2 className="text-xl font-semibold tracking-tight text-white">

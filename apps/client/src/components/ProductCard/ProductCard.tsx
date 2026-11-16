@@ -10,8 +10,8 @@ import { ProductImage } from "../shared/ProductImage/ProductImage";
 import { useProductName } from "../../utils/useLocalizedProduct";
 import { useFormattedPrice } from "../../hooks/useFormattedPrice";
 
-import { IoHeart, IoHeartOutline } from "react-icons/io5";
 import { useTranslation } from "react-i18next";
+import { LuHeart } from "react-icons/lu";
 
 interface ProductCardProps {
   product: Product;
@@ -101,12 +101,12 @@ export const ProductCard = ({
           >
             {isFavorite ? (
               <>
-                <IoHeart size={16} className="text-red-500" />
+                <LuHeart size={16} className="fill-current text-red-500" />
                 {t("productCard.remove")}
               </>
             ) : (
               <>
-                <IoHeartOutline size={16} />
+                <LuHeart size={16} />
                 {t("productCard.like")}
               </>
             )}
