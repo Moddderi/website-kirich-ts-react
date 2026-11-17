@@ -141,12 +141,9 @@ export const FavoritesPage: React.FC = () => {
                   {/* Кнопка добавления в корзину */}
                   <button
                     onClick={() => handleMoveToCart(item)}
-                    className="w-full rounded-xl border border-stone-900 bg-stone-900 py-3 px-6 text-xs font-semibold uppercase tracking-wider text-white hover:bg-white hover:text-stone-900 transition-all duration-300 flex items-center justify-center gap-2 group/btn active:scale-95"
+                    className="btn-ember flex w-full items-center justify-center gap-2 rounded-xl px-6 py-3 text-xs font-semibold uppercase tracking-wider active:scale-95"
                   >
-                    <LuShoppingBag
-                      size={16}
-                      className="text-white group-hover/btn:text-stone-900 transition-colors"
-                    />
+                    <LuShoppingBag size={16} />
                     {t("favorites.toCart")}
                   </button>
                 </div>

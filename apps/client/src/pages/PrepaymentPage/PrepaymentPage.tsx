@@ -1,13 +1,16 @@
 import { Link, Navigate, useNavigate } from "react-router-dom";
 import { getTailoringProduct, isFarOrder } from "@project/shared";
 import { useTranslation } from "react-i18next";
-import { PREPAYMENT_RATE } from "@project/shared";
+import { PREPAYMENT_RATE, prepaymentWithReadyAccessories } from "@project/shared";
 import {
   useFormatDate,
   useScheduleFormat,
   useTailoringEstimate,
 } from "../../hooks/useTailoringEstimate";
 import { useAppSelector } from "../../store/store";
+import { useReadyAccessories } from "../../hooks/useReadyAccessories";
+import { useCartMoney } from "../../hooks/useFormattedPrice";
+import { useProductName } from "../../utils/useLocalizedProduct";
 
 export const PrepaymentPage = () => {
   const { t } = useTranslation();
@@ -16,6 +19,10 @@ export const PrepaymentPage = () => {
   const schedule = useScheduleFormat();
   const programs = useAppSelector((state) => state.tailoring.programs);
   const { estimate, formatRange, types } = useTailoringEstimate();
+  const { selected: readySelected, totalDisplay: accessoriesTotal } =
+    useReadyAccessories();
+  const { formatLine } = useCartMoney();
+  const getProductName = useProductName();
   const hasMeasurements = useAppSelector(
     (state) => Object.keys(state.tailoring.measurements).length > 0,
   );
@@ -30,6 +37,7 @@ export const PrepaymentPage = () => {
 
   const percent = Math.round(PREPAYMENT_RATE * 100);
   const pending = t("prepayment.pending");
+  const prepayment = prepaymentWithReadyAccessories(estimate, accessoriesTotal);
 
   return (
     <main className="grow pb-32">
@@ -82,6 +90,25 @@ export const PrepaymentPage = () => {
                   </p>
                 </li>
               ))}
+              {readySelected.map((line) => (
+                <li
+                  key={`acc-${line.productId}`}
+                  className="flex items-baseline justify-between gap-4 py-3"
+                >
+                  <div>
+                    <p className="text-sm font-semibold text-stone-900">
+                      {getProductName(line.product)}
+                      {line.quantity > 1 ? ` × ${line.quantity}` : ""}
+                    </p>
+                    <p className="text-xs font-medium text-stone-500">
+                      {t("selectType.readyInStock")}
+                    </p>
+                  </div>
+                  <p className="whitespace-nowrap text-sm font-semibold text-stone-900">
+                    {formatLine(line.priceUah, line.quantity)}
+                  </p>
+                </li>
+              ))}
             </ul>
 
             <div className="mt-5 flex items-baseline justify-between gap-4 border-t border-stone-200 pt-5">
@@ -89,9 +116,17 @@ export const PrepaymentPage = () => {
                 {t("prepayment.priceTitle")}
               </span>
               <span className="text-xl font-semibold text-stone-900">
-                {formatRange(estimate.priceFrom, estimate.priceTo)}
+                {formatRange(
+                  estimate.priceFrom + accessoriesTotal,
+                  estimate.priceTo + accessoriesTotal,
+                )}
               </span>
             </div>
+            {readySelected.length > 0 && (
+              <p className="mt-3 text-xs font-medium leading-relaxed text-stone-500">
+                {t("prepayment.accessoriesNote")}
+              </p>
+            )}
           </section>
 
           {/* Prepayment */}
@@ -100,7 +135,7 @@ export const PrepaymentPage = () => {
               {t("prepayment.prepaymentTitle", { percent })}
             </p>
             <p className="mt-3 text-3xl font-semibold tracking-tight">
-              {formatRange(estimate.prepaymentFrom, estimate.prepaymentTo)}
+              {formatRange(prepayment.from, prepayment.to)}
             </p>
             <p className="mt-3 text-sm font-medium leading-relaxed text-stone-300">
               {t("prepayment.prepaymentDesc")}

@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { getOrderById } from "../../api/orderApi";
 import { useCartMoney } from "../../hooks/useFormattedPrice";
+import { CertificateAppliedBanner } from "../../components/CertificateAppliedBanner/CertificateAppliedBanner";
 
 interface OrderItem {
   id?: string;
@@ -36,9 +37,12 @@ export const OrderSuccessPage = () => {
   const location = useLocation();
 
   // Personal cabinet link (individual tailoring), passed from the checkout
-  const accessToken =
-    (location.state as { accessToken?: string | null } | null)?.accessToken ??
-    null;
+  const successState = location.state as {
+    accessToken?: string | null;
+    certificate?: { code: string; discountUah: number } | null;
+  } | null;
+  const accessToken = successState?.accessToken ?? null;
+  const certificateFromState = successState?.certificate ?? null;
 
   // Перевіряємо, чи ми знаходимось на сторінці успіху пошиття
   const isCustomTailoring = location.pathname.includes(
@@ -115,6 +119,15 @@ export const OrderSuccessPage = () => {
           <p className="text-lg font-medium text-stone-500 max-w-lg mb-8 leading-relaxed">
             {t("orderSuccess.customMessage")}
           </p>
+
+          {certificateFromState && (
+            <div className="mb-8 w-full max-w-md">
+              <CertificateAppliedBanner
+                code={certificateFromState.code}
+                discountUah={certificateFromState.discountUah}
+              />
+            </div>
+          )}
 
           {accessToken && (
             <Link

@@ -35,6 +35,10 @@ export const loadOrderCabinetPage = () =>
   import("../pages/OrderCabinetPage/OrderCabinetPage");
 export const loadFindOrderPage = () =>
   import("../pages/FindOrderPage/FindOrderPage");
+export const loadGiftCertificatePage = () =>
+  import("../pages/GiftCertificatePage/GiftCertificatePage");
+export const loadGiftCertificateSuccessPage = () =>
+  import("../pages/GiftCertificatePage/GiftCertificateSuccessPage");
 
 export const CatalogPage = lazy(() =>
   loadCatalogPage().then((m) => ({ default: m.CatalogPage })),
@@ -87,13 +91,22 @@ export const FindOrderPage = lazy(() =>
   loadFindOrderPage().then((m) => ({ default: m.FindOrderPage })),
 );
 
+export const GiftCertificatePage = lazy(() =>
+  loadGiftCertificatePage().then((m) => ({ default: m.GiftCertificatePage })),
+);
+export const GiftCertificateSuccessPage = lazy(() =>
+  loadGiftCertificateSuccessPage().then((m) => ({
+    default: m.GiftCertificateSuccessPage,
+  })),
+);
+
 /** Warm up the most likely next pages once the browser is idle. */
 export const preloadLikelyPages = () => {
   const run = () => {
+    void loadProductPage();
+    void loadCartPage();
     if (CATALOG_ENABLED) {
       void loadCatalogPage();
-      void loadProductPage();
-      void loadCartPage();
     } else {
       void loadSelectTypePage();
       void loadIndividualTailoringPage();

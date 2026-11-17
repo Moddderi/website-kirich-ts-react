@@ -6,6 +6,8 @@ import {
   clampGarmentQty,
   clampLineQty,
   expandTailoringTypes,
+  convertFromUah,
+  formatConvertedPrice,
   formatDisplayPriceFrom,
   formatSiteCatalogLineLabelUk,
   isCurrency,
@@ -53,6 +55,8 @@ export interface CustomOrderSummary {
   priceRange: string;
   prepaymentRange: string;
   prepaymentPercent: number;
+  /** In-stock accessories are paid in full and added on top of the 30% tailoring prepayment. */
+  includesReadyAccessories?: boolean;
   leadDays: string;
   startDate: string;
   readyRange: string;
@@ -66,6 +70,59 @@ const daysRange = (min: number, max: number) => {
   const a = Math.ceil(min);
   const b = Math.ceil(max);
   return a === b ? `${a} дн.` : `${a}–${b} дн.`;
+};
+
+interface ReadyAccessoryRow {
+  name: string;
+  quantity: number;
+  priceUah: number;
+}
+
+const readReadyAccessories = (order: { estimate?: { readyAccessories?: unknown } }): ReadyAccessoryRow[] => {
+  const raw = order.estimate?.readyAccessories;
+  if (!Array.isArray(raw)) return [];
+  return raw.flatMap((row) => {
+    if (!row || typeof row !== "object") return [];
+    const item = row as { name?: unknown; quantity?: unknown; priceUah?: unknown };
+    if (typeof item.name !== "string" || !item.name.trim()) return [];
+    const priceUah = Number(item.priceUah);
+    if (!Number.isFinite(priceUah)) return [];
+    const quantity = Math.min(5, Math.max(1, Math.floor(Number(item.quantity) || 1)));
+    return [{ name: item.name.trim(), quantity, priceUah }];
+  });
+};
+
+const withReadyAccessories = (
+  summary: CustomOrderSummary,
+  extras: ReadyAccessoryRow[],
+  currency: Currency,
+  priceFrom: number,
+  prepayFrom: number,
+): CustomOrderSummary => {
+  if (extras.length === 0) return summary;
+  const extraTotal = extras.reduce(
+    (sum, item) => sum + convertFromUah(item.priceUah, currency) * item.quantity,
+    0,
+  );
+  return {
+    ...summary,
+    includesReadyAccessories: true,
+    lines: [
+      ...summary.lines,
+      ...extras.map((item) => ({
+        type: "jacket" as MeasurementType,
+        label: item.quantity > 1 ? `${item.name} × ${item.quantity}` : item.name,
+        category: "Аксесуар",
+        priceRange: formatConvertedPrice(
+          convertFromUah(item.priceUah, currency) * item.quantity,
+          currency,
+        ),
+        leadDays: "в наявності",
+      })),
+    ],
+    priceRange: range(priceFrom + extraTotal, priceFrom + extraTotal, currency),
+    prepaymentRange: range(prepayFrom + extraTotal, prepayFrom + extraTotal, currency),
+  };
 };
 
 /** Builds a display-ready summary of an individual tailoring order (Telegram / email). */
@@ -94,7 +151,7 @@ export const buildCustomOrderSummary = (order: any): CustomOrderSummary => {
       ...new Set(estimate.items.map((item) => item.type)),
     ] as MeasurementType[];
 
-    return {
+    const catalogSummary: CustomOrderSummary = {
       currency,
       types,
       lines: catalogLines.map((line: TailoringLine) => {
@@ -128,6 +185,13 @@ export const buildCustomOrderSummary = (order: any): CustomOrderSummary => {
         : "уточнюється менеджером",
       comment: typeof order.comment === "string" ? order.comment.trim() : "",
     };
+    return withReadyAccessories(
+      catalogSummary,
+      readReadyAccessories(order),
+      currency,
+      estimate.priceFrom,
+      estimate.prepaymentFrom,
+    );
   }
 
   let types: MeasurementType[] = Array.isArray(order.estimate?.types)
@@ -153,7 +217,7 @@ export const buildCustomOrderSummary = (order: any): CustomOrderSummary => {
     order.estimate?.workDays ?? null,
   );
 
-  return {
+  const legacySummary: CustomOrderSummary = {
     currency,
     types,
     lines: types.map((type) => {
@@ -188,4 +252,11 @@ export const buildCustomOrderSummary = (order: any): CustomOrderSummary => {
       : "уточнюється менеджером",
     comment: typeof order.comment === "string" ? order.comment.trim() : "",
   };
+  return withReadyAccessories(
+    legacySummary,
+    readReadyAccessories(order),
+    currency,
+    estimate.priceFrom,
+    estimate.prepaymentFrom,
+  );
 };

@@ -237,9 +237,13 @@ export const FindOrderPage = () => {
                     </p>
                   </div>
                   <p className="mt-2 text-sm font-medium text-stone-600">
-                    {order.garments
-                      .map((g) => `${t(`selectType.${g.type}`)} · ${g.program}`)
-                      .join(", ")}
+                    {[
+                      ...order.garments.map((g) =>
+                        g.label ??
+                        `${t(`selectType.${g.type}`)}${g.quantity > 1 ? ` × ${g.quantity}` : ""} · ${g.program}`,
+                      ),
+                      ...(order.accessories ?? []),
+                    ].join(", ")}
                   </p>
                   {order.start && (
                     <p className="mt-1 text-xs font-medium text-stone-500">

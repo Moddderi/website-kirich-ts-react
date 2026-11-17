@@ -6,6 +6,7 @@ import {
   LuClock,
   LuCrown,
   LuGem,
+  LuGift,
   LuMapPin,
   LuRuler,
   LuTruck,
@@ -66,6 +67,13 @@ const Word = ({
     {"\u00A0"}
   </span>
 );
+
+const scrollToHomeGifts = () => {
+  document.getElementById("home-gifts")?.scrollIntoView({
+    behavior: "smooth",
+    block: "start",
+  });
+};
 
 export const HeroSection = () => {
   const { t } = useTranslation();
@@ -131,7 +139,7 @@ export const HeroSection = () => {
             {t("main.heroDescription")}
           </p>
 
-          <div className="animate-reveal-up delay-700 mt-10 flex flex-col items-stretch gap-3 sm:flex-row sm:items-center sm:justify-center lg:justify-start">
+          <div className="animate-reveal-up delay-700 mt-10 flex flex-col items-stretch gap-3 sm:flex-row sm:items-center sm:justify-center lg:items-start lg:justify-start">
             <Link
               to="/individual-tailoring"
               className="btn-ember group inline-flex items-center justify-center gap-3 rounded-full px-8 py-4 text-sm font-semibold">
@@ -157,6 +165,21 @@ export const HeroSection = () => {
                 {t("main.processKicker")}
               </a>
             )}
+          </div>
+          <div className="animate-reveal-up delay-700 mt-3 flex justify-center lg:justify-start">
+            <button
+              type="button"
+              onClick={scrollToHomeGifts}
+              className="group inline-flex w-full items-center justify-center gap-2.5 rounded-full border border-accent/40 bg-linear-to-r from-accent/8 to-transparent px-8 py-4 text-sm font-semibold text-stone-900 shadow-sm transition hover:border-accent/70 hover:from-accent/15 sm:w-auto"
+            >
+              <LuGift
+                size={18}
+                strokeWidth={1.8}
+                className="text-accent transition-transform group-hover:scale-110"
+                aria-hidden
+              />
+              {t("main.giftsScrollCta")}
+            </button>
           </div>
 
           <ul className="animate-reveal-up delay-700 mx-auto mt-12 grid max-w-xl grid-cols-2 gap-x-6 gap-y-4 text-left lg:mx-0">

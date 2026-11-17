@@ -1,4 +1,5 @@
 import {
+  ELECTRONIC_CERTIFICATE_CODE_PATTERN,
   MEASUREMENT_LABELS_UK,
   MEASUREMENT_UNIT_LABELS,
   todayISO,
@@ -7,6 +8,8 @@ import {
   type TailoringProgram,
   type WorkDaysTable,
 } from "@project/shared";
+import db from "../models/index.js";
+import { normalizeElectronicCertificateCode } from "./certificateCode.js";
 import {
   isNotionConfigured,
   normalizeNotionId,
@@ -174,12 +177,39 @@ export const pageTitle = (page: any): string => {
 const normalizeName = (value: string) =>
   value.toLowerCase().replace(/\s+/g, " ").trim();
 
+/** Link [DB] Замовлення «Сертифікат» → page in [DB] Сертифікати. */
+export const resolveCertificateNotionPageId = async (
+  code: string,
+): Promise<string | null> => {
+  const raw = code.trim();
+  if (!raw) return null;
+  const upper = normalizeElectronicCertificateCode(raw);
+
+  if (ELECTRONIC_CERTIFICATE_CODE_PATTERN.test(upper)) {
+    const cert = await db.GiftCertificate.findOne({
+      where: { electronicCode: upper },
+      attributes: ["notionPageId"],
+    });
+    return cert?.notionPageId ?? null;
+  }
+
+  const legacy = Number.parseInt(raw, 10);
+  if (!Number.isInteger(legacy)) return null;
+  const cert = await db.GiftCertificate.findOne({
+    where: { number: legacy },
+    attributes: ["notionPageId"],
+  });
+  return cert?.notionPageId ?? null;
+};
+
 /* --------------------------------- Clients -------------------------------- */
 
 const CONTACT_SELECT_NAME: Record<string, string> = {
   telegram: "telegram",
   instagram: "instagram",
   whatsapp: "whatsapp",
+  viber: "viber",
+  signal: "signal",
 };
 
 const findOrCreateClient = async (
@@ -436,6 +466,17 @@ const buildBody = (order: any) => {
     bullet(
       `Передоплата ${summary.prepaymentPercent}%: ${summary.prepaymentRange}`,
     ),
+    ...(order.certificateCode
+      ? [
+          bullet(
+            `Сертифікат: ${order.certificateCode}${
+              order.certificateDiscountUah != null
+                ? ` (−${Number(order.certificateDiscountUah)} грн)`
+                : ""
+            }`,
+          ),
+        ]
+      : []),
     bullet(`Старт: ${summary.startDate}`),
     bullet(`Готовність: ${summary.readyRange}`),
     paragraph(
@@ -745,6 +786,16 @@ export const createNotionOrder = async (
   if (clientProp?.relation) {
     const clientId = await findOrCreateClient(clientProp.relation.database_id, order);
     props[clientProp.name] = { relation: [{ id: clientId }] };
+  }
+
+  const certificateProp = findProp(schema, ["relation"], /сертифікат|certificate/i);
+  if (certificateProp?.relation && order.certificateCode) {
+    const certPageId = await resolveCertificateNotionPageId(
+      String(order.certificateCode),
+    );
+    if (certPageId && certPageId !== "dry-run-page-id") {
+      props[certificateProp.name] = { relation: [{ id: certPageId }] };
+    }
   }
 
   // Coarse catalog choice is in the page body — manager links detailed [DB] Прайс rows manually.

@@ -13,6 +13,7 @@ import { appendNotionBlocks, buildMeasurementBlocks } from "../utils/notionOrder
 import { sendTelegramText } from "../utils/telegram.js";
 import {
   MEASUREMENT_UNIT_LABELS,
+  buildCabinetGarments,
   getMeasurementSchemaForTypes,
   type MeasurementType,
 } from "@project/shared";
@@ -123,8 +124,14 @@ router.get("/session/orders", async (req, res) => {
         token: o.accessToken,
         number: String(o.id).split("-")[0].toUpperCase(),
         createdAt: o.createdAt,
-        garments: (Array.isArray(o.estimate?.types) ? o.estimate.types : []).map(
-          (type: string) => ({ type, program: o.estimate?.programs?.[type] ?? "ST" }),
+        garments: buildCabinetGarments(o.estimate ?? {}),
+        accessories: (Array.isArray(o.estimate?.readyAccessories)
+          ? o.estimate.readyAccessories
+          : []
+        ).flatMap((row: { name?: unknown; quantity?: unknown }) =>
+          typeof row?.name === "string" && row.name.trim()
+            ? [`${row.name.trim()}${Number(row.quantity) > 1 ? ` × ${Math.floor(Number(row.quantity))}` : ""}`]
+            : [],
         ),
         start: o.estimate?.startDate ?? null,
         readyTo: o.estimate?.readyTo ?? null,

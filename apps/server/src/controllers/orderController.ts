@@ -29,9 +29,15 @@ export const createOrderController = async (
     });
   } catch (error: any) {
     console.error("Помилка при створенні замовлення на бекенді:", error);
-    res.status(500).json({
+    const clientMessage =
+      typeof error?.message === "string" ? error.message : "";
+    const isClientError =
+      clientMessage.includes("сертифікат") ||
+      clientMessage.includes("Сертифікат") ||
+      clientMessage.includes("аксесуар");
+    res.status(isClientError ? 400 : 500).json({
       success: false,
-      message: "Внутрішня помилка сервера",
+      message: isClientError ? clientMessage : "Внутрішня помилка сервера",
       error: error.message,
     });
   }

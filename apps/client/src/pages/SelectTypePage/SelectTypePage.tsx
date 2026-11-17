@@ -9,6 +9,9 @@ import {
   toggleCatalogLine,
 } from "../../store/tailoringSlice";
 import { CurrencySwitcher } from "../../components/CurrencySwitcher/CurrencySwitcher";
+import { ReadyAccessoriesPicker } from "../../components/ReadyAccessoriesPicker/ReadyAccessoriesPicker";
+import { useReadyAccessories } from "../../hooks/useReadyAccessories";
+import { useProductName } from "../../utils/useLocalizedProduct";
 import {
   convertFromUah,
   formatConvertedPrice,
@@ -38,6 +41,9 @@ export const SelectTypePage = () => {
   const currency = useAppSelector((state) => state.currency.code);
   const { estimate, formatRange, catalogLeadDays, workDaysTable } =
     useTailoringEstimate();
+  const { selected: readySelected, totalDisplay: accessoriesTotal } =
+    useReadyAccessories();
+  const getProductName = useProductName();
   const schedule = useScheduleFormat();
 
   const products =
@@ -338,6 +344,8 @@ export const SelectTypePage = () => {
           </div>
         )}
 
+        <ReadyAccessoriesPicker />
+
         <p className="mx-auto mt-8 max-sm:mt-4 max-w-2xl text-center text-xs font-medium text-stone-400 leading-relaxed">
           {t("selectType.programHint")}
         </p>
@@ -350,7 +358,7 @@ export const SelectTypePage = () => {
             <p className="text-[10px] font-semibold uppercase tracking-widest text-stone-400">
               {t("selectType.summaryTitle")}
             </p>
-            {hasSelection ? (
+            {hasSelection || readySelected.length > 0 ? (
               <>
                 <ul
                   className="mt-1 max-h-28 space-y-0.5 overflow-y-auto pr-1 max-sm:max-h-16"
@@ -364,11 +372,23 @@ export const SelectTypePage = () => {
                       {lineSummaryLabel(line.productId, line.quantity)}
                     </li>
                   ))}
+                  {readySelected.map((line) => (
+                    <li
+                      key={`acc-${line.productId}`}
+                      className="break-words text-sm font-semibold leading-snug text-stone-900 max-sm:text-xs"
+                    >
+                      {getProductName(line.product)}
+                      {line.quantity > 1 ? ` ×${line.quantity}` : ""}
+                    </li>
+                  ))}
                 </ul>
                 <p className="mt-1 text-sm font-semibold text-stone-900 max-sm:text-xs sm:mt-1.5">
                   <span className="font-medium text-stone-500">
                     {t("selectType.total")}{" "}
-                    {formatRange(estimate.priceFrom, estimate.priceTo)}
+                    {formatRange(
+                      estimate.priceFrom + accessoriesTotal,
+                      estimate.priceTo + accessoriesTotal,
+                    )}
                   </span>
                 </p>
               </>

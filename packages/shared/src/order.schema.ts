@@ -1,32 +1,11 @@
 import { z } from "zod";
 import { customMeasurementsSchema } from "./measurements.schema.js";
+import { isRedemptionCertificateCode } from "./certificate.schema.js";
+import { checkoutFieldsSchema } from "./checkoutFields.schema.js";
+
+export { checkoutFieldsSchema } from "./checkoutFields.schema.js";
 
 export const currencySchema = z.enum(["UAH", "USD", "EUR"]);
-
-// 1. Базовый объект полей формы
-export const checkoutFieldsSchema = z.object({
-  firstName: z.string().min(2, "Ім'я має містити мінімум 2 символи"),
-  lastName: z.string().min(2, "Прізвище має містити мінімум 2 символи"),
-  phone: z
-    .string()
-    .regex(
-      /^\+?3?8?(0\d{9})$/,
-      "Невірний формат телефону (наприклад: +380991234567)",
-    ),
-  email: z.string().email("Введіть коректну електронну адресу"),
-  deliveryMethod: z.enum(["nova_poshta", "ukrposhta", "pickup"]),
-  city: z.string().optional(),
-  warehouse: z.string().optional(),
-  paymentMethod: z.enum(["online", "cod"]),
-  communicationMethod: z.enum(["telegram", "instagram", "whatsapp"]),
-  socialUsername: z
-    .string()
-    .min(1, "Будь ласка, вкажіть ваш нікнейм або телефон для зв'язку"),
-  comment: z
-    .string()
-    .max(1000, "Коментар має містити не більше 1000 символів")
-    .optional(),
-});
 
 const isPostalDelivery = (method: string) =>
   method === "nova_poshta" || method === "ukrposhta";
@@ -43,18 +22,41 @@ export const orderItemSchema = z.object({
 });
 
 // 2. Схема с проверкой заполнения города и отделения
-export const checkoutSchema = checkoutFieldsSchema.refine(
-  (data) => {
-    if (isPostalDelivery(data.deliveryMethod)) {
-      return !!data.city && !!data.warehouse;
-    }
-    return true;
-  },
-  {
-    message: "Будь ласка, вкажіть місто та відділення доставки",
-    path: ["city"],
-  },
-);
+export const checkoutSchema = checkoutFieldsSchema
+  .extend({
+    certificateCode: z
+      .string()
+      .trim()
+      .optional()
+      .transform((v) => (v && v.length > 0 ? v : undefined)),
+  })
+  .refine(
+    (data) => {
+      if (
+        data.certificateCode &&
+        !isRedemptionCertificateCode(data.certificateCode)
+      ) {
+        return false;
+      }
+      return true;
+    },
+    {
+      message: "Введіть електронний код (наприклад KIR-7X3M-9P2K)",
+      path: ["certificateCode"],
+    },
+  )
+  .refine(
+    (data) => {
+      if (isPostalDelivery(data.deliveryMethod)) {
+        return !!data.city && !!data.warehouse;
+      }
+      return true;
+    },
+    {
+      message: "Будь ласка, вкажіть місто та відділення доставки",
+      path: ["city"],
+    },
+  );
 
 // 3. Схема для готового замовлення
 export const readyMadeOrderSchema = checkoutFieldsSchema.extend({
@@ -62,6 +64,14 @@ export const readyMadeOrderSchema = checkoutFieldsSchema.extend({
   totalAmount: z.number().positive("Сума замовлення має бути більше 0"),
   status: z.string(),
   displayCurrency: currencySchema.optional().default("UAH"),
+  /** Gift certificate electronic code (or legacy № for old rows). */
+  certificateCode: z
+    .string()
+    .trim()
+    .optional()
+    .refine((v) => !v || isRedemptionCertificateCode(v), {
+      message: "Введіть електронний код (наприклад KIR-7X3M-9P2K)",
+    }),
   items: z.array(orderItemSchema),
 });
 
@@ -85,6 +95,16 @@ export const customOrderSchema = checkoutFieldsSchema.extend({
       }),
     )
     .optional(),
+  /** In-stock accessories (bow tie, belt, tie, magnets) shipped with this tailoring order. */
+  readyAccessories: z
+    .array(
+      z.object({
+        productId: z.string().min(1),
+        quantity: z.number().int().min(1).max(5),
+      }),
+    )
+    .max(12)
+    .optional(),
   /** Start date picked by the client in the calendar (YYYY-MM-DD); validated on the server */
   preferredStartDate: z
     .string()
@@ -100,6 +120,13 @@ export const customOrderSchema = checkoutFieldsSchema.extend({
       z.number().int().min(1).max(5),
     )
     .optional(),
+  certificateCode: z
+    .string()
+    .trim()
+    .optional()
+    .refine((v) => !v || isRedemptionCertificateCode(v), {
+      message: "Введіть електронний код (наприклад KIR-7X3M-9P2K)",
+    }),
   items: z.array(orderItemSchema),
 });
 

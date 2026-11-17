@@ -1,10 +1,11 @@
 import React, { useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import type { Product } from "@project/shared";
 import { SUBTYPE_LABELS } from "@project/shared";
 import { useAppDispatch, useAppSelector } from "../../store/store";
 import { addToCart } from "../../store/cartSlice";
+import { setReadyAccessoryQuantity } from "../../store/tailoringSlice";
 import { toggleFavorite, selectIsFavorite } from "../../store/favoriteSlice";
 import { SizeChartModal } from "../../components/SizeChartModal/SizeChartModal";
 import { ColorPaletteModal } from "../../components/ColorPaletteModal/ColorPaletteModal";
@@ -81,6 +82,14 @@ export const ProductPage: React.FC = () => {
 
   // Проверяем, находится ли текущий товар в избранном
   const isFavorite = useAppSelector(selectIsFavorite(product?.id ?? 0));
+  const readyAccessories = useAppSelector(
+    (state) => state.tailoring.readyAccessories,
+  );
+  const isAccessory = product?.main_category === "accessories";
+  const tailoringQty = isAccessory
+    ? (readyAccessories.find((line) => line.productId === String(product?.id))
+        ?.quantity ?? 0)
+    : 0;
 
   // Безопасное извлечение массива картинок
   const images =
@@ -109,12 +118,22 @@ export const ProductPage: React.FC = () => {
         productCode: product.product_code,
         options: {
           color: colorLabel,
-          size: selectedSize,
+          size: isAccessory ? t("productPage.oneSize") : selectedSize,
         },
       }),
     );
 
     navigate("/cart");
+  };
+
+  const handleAddToTailoring = () => {
+    if (!product || tailoringQty >= 5) return;
+    dispatch(
+      setReadyAccessoryQuantity({
+        productId: String(product.id),
+        quantity: tailoringQty + 1,
+      }),
+    );
   };
 
   // Обработчик добавления/удаления из избранного
@@ -162,7 +181,7 @@ export const ProductPage: React.FC = () => {
       <div className="mb-8">
         <button
           onClick={() => navigate(-1)}
-          className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-stone-600 bg-stone-50 border border-stone-200/60 hover:bg-white hover:border-stone-900 hover:text-stone-900 px-5 py-3.5 rounded-2xl transition-all duration-300 active:scale-95 shadow-xs"
+          className="inline-flex items-center gap-2 rounded-2xl border border-stone-900/15 px-5 py-3.5 text-xs font-semibold uppercase tracking-wider text-stone-600 transition-all duration-300 hover:border-stone-900 hover:text-stone-900 active:scale-95"
         >
           <LuArrowLeft size={16} />
           {t("productPage.backToCatalog")}
@@ -173,9 +192,8 @@ export const ProductPage: React.FC = () => {
         {/* ЛЕВАЯ ЧАСТЬ — ГАЛЕРЕЯ С ПРЕВЬЮ */}
         <div className="lg:col-span-7 flex flex-col gap-4 relative">
           {/* Главное изображение */}
-          <div className="aspect-3/4 w-full overflow-hidden rounded-4xl bg-stone-200 border border-stone-200/60 relative group">
-            <div className="absolute inset-0 bg-stone-300 transition-transform duration-1000">
-              <div className="w-full h-full bg-[linear-gradient(to_right,#e5e5e5_1px,transparent_1px),linear-gradient(to_bottom,#e5e5e5_1px,transparent_1px)] bg-size-[2rem_2rem] mix-blend-multiply opacity-50"></div>
+          <div className="relative aspect-3/4 w-full overflow-hidden rounded-4xl border border-stone-900/10 bg-stone-900/[0.04] group">
+            <div className="absolute inset-0">
               <img
                 className="w-full h-full absolute inset-0 object-cover"
                 src={optimizeCloudinaryUrl(displayImages[activeImageIndex], {
@@ -197,10 +215,10 @@ export const ProductPage: React.FC = () => {
                   <button
                     key={index}
                     onClick={() => setActiveImageIndex(index)}
-                    className={`aspect-3/4 w-full rounded-2xl overflow-hidden bg-stone-200 border-2 relative transition-all ${
+                    className={`relative aspect-3/4 w-full overflow-hidden rounded-2xl border-2 bg-stone-900/[0.04] transition-all ${
                       isActive
-                        ? "border-stone-900 shadow-md"
-                        : "border-transparent hover:border-stone-300 opacity-80 hover:opacity-100"
+                        ? "border-accent"
+                        : "border-transparent opacity-80 hover:border-stone-900/30 hover:opacity-100"
                     }`}
                   >
                     <img
@@ -254,13 +272,15 @@ export const ProductPage: React.FC = () => {
                   <h3 className="text-xs font-semibold uppercase tracking-widest text-stone-900">
                     {t("productPage.baseMaterial")}
                   </h3>
-                  <button
-                    type="button"
-                    onClick={() => setIsPaletteOpen(true)}
-                    className="text-xs font-medium text-stone-500 underline decoration-stone-300 underline-offset-4 hover:text-stone-900 transition-colors"
-                  >
-                    {t("productPage.palette")}
-                  </button>
+                  {!isAccessory && (
+                    <button
+                      type="button"
+                      onClick={() => setIsPaletteOpen(true)}
+                      className="text-xs font-medium text-stone-500 underline decoration-stone-300 underline-offset-4 hover:text-stone-900 transition-colors"
+                    >
+                      {t("productPage.palette")}
+                    </button>
+                  )}
                 </div>
                 <div className="flex flex-wrap gap-4">
                   {AVAILABLE_COLORS.map((color) => {
@@ -298,7 +318,16 @@ export const ProductPage: React.FC = () => {
               </div>
               )}
 
-              {/* ВЫБОР РАЗМЕРА */}
+              {isAccessory ? (
+              <div>
+                <h3 className="text-xs font-semibold uppercase tracking-widest text-stone-900">
+                  {t("productPage.size")}
+                </h3>
+                <p className="mt-3 inline-flex rounded-2xl border border-accent bg-accent px-4 py-3 text-xs font-bold tracking-wider text-[#fff]">
+                  {t("productPage.oneSize")}
+                </p>
+              </div>
+              ) : (
               <div>
                 <div className="flex items-center justify-between mb-5">
                   <h3 className="text-xs font-semibold uppercase tracking-widest text-stone-900">
@@ -313,13 +342,13 @@ export const ProductPage: React.FC = () => {
                   </button>
                 </div>
 
-                <div className="mb-4 inline-flex items-center rounded-full border border-stone-200 bg-stone-100 p-1">
+                <div className="mb-4 inline-flex items-center rounded-full border border-stone-900/15 p-1">
                   <button
                     type="button"
                     onClick={() => handleSizeGroupChange("men")}
                     className={`rounded-full px-4 py-1.5 text-[10px] font-semibold uppercase tracking-widest transition-all ${
                       sizeGroup === "men"
-                        ? "bg-stone-900 text-white shadow-sm"
+                        ? "bg-accent text-[#fff]"
                         : "text-stone-500 hover:text-stone-900"
                     }`}
                   >
@@ -330,7 +359,7 @@ export const ProductPage: React.FC = () => {
                     onClick={() => handleSizeGroupChange("kids")}
                     className={`rounded-full px-4 py-1.5 text-[10px] font-semibold uppercase tracking-widest transition-all ${
                       sizeGroup === "kids"
-                        ? "bg-stone-900 text-white shadow-sm"
+                        ? "bg-accent text-[#fff]"
                         : "text-stone-500 hover:text-stone-900"
                     }`}
                   >
@@ -354,8 +383,8 @@ export const ProductPage: React.FC = () => {
                         onClick={() => setSelectedSize(size)}
                         className={`min-w-14 h-12 rounded-2xl border text-xs font-bold transition-all tracking-wider flex items-center justify-center px-3 active:scale-95 ${
                           isSizeSelected
-                            ? "border-stone-900 bg-stone-900 text-white"
-                            : "border-stone-200 bg-white/50 text-stone-900 hover:border-stone-900 hover:bg-white"
+                            ? "border-accent bg-accent text-[#fff]"
+                            : "border-stone-900/15 text-stone-700 hover:border-stone-900"
                         }`}
                       >
                         {size}
@@ -364,6 +393,7 @@ export const ProductPage: React.FC = () => {
                   })}
                 </div>
               </div>
+              )}
             </div>
 
             {/* КНОПКИ ДЕЙСТВИЯ */}
@@ -383,7 +413,7 @@ export const ProductPage: React.FC = () => {
                 className={`flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border transition-all duration-300 active:scale-95 shadow-sm ${
                   isFavorite
                     ? "border-red-200 bg-red-50 text-red-600 hover:bg-red-100"
-                    : "border-stone-200 bg-white text-stone-400 hover:text-stone-900 hover:border-stone-900"
+                    : "border-stone-900/15 text-stone-500 hover:border-stone-900 hover:text-stone-900"
                 }`}
                 title={isFavorite ? t("productPage.removeFromFavorites") : t("productPage.addToFavorites")}
               >
@@ -394,6 +424,29 @@ export const ProductPage: React.FC = () => {
                 )}
               </button>
             </div>
+
+            {isAccessory && (
+              <div className="mt-3">
+                <button
+                  type="button"
+                  onClick={handleAddToTailoring}
+                  disabled={tailoringQty >= 5}
+                  className="w-full rounded-2xl border border-stone-900 px-8 py-4 text-sm font-semibold uppercase tracking-widest text-stone-900 transition-colors hover:bg-stone-900 hover:text-white disabled:opacity-40"
+                >
+                  {tailoringQty > 0
+                    ? t("productPage.inTailoringOrder", { count: tailoringQty })
+                    : t("productPage.addToTailoring")}
+                </button>
+                {tailoringQty > 0 && (
+                  <Link
+                    to="/individual-tailoring/step-1"
+                    className="mt-3 inline-block text-xs font-semibold text-stone-500 underline underline-offset-4 hover:text-stone-900"
+                  >
+                    {t("productPage.openTailoring")}
+                  </Link>
+                )}
+              </div>
+            )}
 
             {/* ДЕТАЛИ И УХОД */}
             <div className="mt-12 border-t border-stone-200/60 divide-y divide-stone-200/60">
@@ -427,10 +480,12 @@ export const ProductPage: React.FC = () => {
         activeGroup={sizeGroup}
       />
 
-      <ColorPaletteModal
-        isOpen={isPaletteOpen}
-        onClose={() => setIsPaletteOpen(false)}
-      />
+      {!isAccessory && (
+        <ColorPaletteModal
+          isOpen={isPaletteOpen}
+          onClose={() => setIsPaletteOpen(false)}
+        />
+      )}
     </div>
   );
 };

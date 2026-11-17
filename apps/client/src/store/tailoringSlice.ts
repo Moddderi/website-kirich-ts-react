@@ -13,11 +13,18 @@ import {
   type TailoringProgram,
 } from "@project/shared";
 
+export interface ReadyAccessoryLine {
+  productId: string;
+  quantity: number;
+}
+
 interface TailoringState {
   /** UI filter only — does not limit items already in the cart. */
   browseCategory: TailoringCategory | null;
   browseProgram: TailoringProgram | null;
   lines: TailoringLine[];
+  /** In-stock accessories attached to this tailoring order. */
+  readyAccessories: ReadyAccessoryLine[];
   types: MeasurementType[];
   quantities: Partial<Record<MeasurementType, number>>;
   programs: Partial<Record<MeasurementType, TailoringProgram>>;
@@ -31,6 +38,7 @@ const initialState: TailoringState = {
   browseCategory: null,
   browseProgram: null,
   lines: [],
+  readyAccessories: [],
   types: [],
   quantities: {},
   programs: {},
@@ -75,6 +83,25 @@ const tailoringSlice = createSlice({
       state.lines = toggleTailoringLine(state.lines, action.payload);
       syncLegacy(state);
       clearMeasurements(state);
+    },
+    setReadyAccessoryQuantity: (
+      state,
+      action: PayloadAction<{ productId: string; quantity: number }>,
+    ) => {
+      const productId = action.payload.productId;
+      const quantity = Math.min(
+        5,
+        Math.max(0, Math.floor(action.payload.quantity) || 0),
+      );
+      const idx = state.readyAccessories.findIndex(
+        (line) => line.productId === productId,
+      );
+      if (quantity < 1) {
+        if (idx >= 0) state.readyAccessories.splice(idx, 1);
+        return;
+      }
+      if (idx >= 0) state.readyAccessories[idx].quantity = quantity;
+      else state.readyAccessories.push({ productId, quantity });
     },
     setCatalogLineQuantity: (
       state,
@@ -152,6 +179,7 @@ export const {
   setTailoringCategory,
   setOrderProgram,
   toggleCatalogLine,
+  setReadyAccessoryQuantity,
   setCatalogLineQuantity,
   toggleType,
   setGarmentQuantity,

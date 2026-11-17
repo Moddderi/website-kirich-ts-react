@@ -174,7 +174,7 @@ export const MEASUREMENT_CONFIG = {
     ],
   },
   jacket: {
-    label: "Піджак / жилет",
+    label: "Плечові вироби",
     fields: [
       "waist_definition",
       "waist",
@@ -200,7 +200,7 @@ export const MEASUREMENT_CONFIG = {
     ],
   },
   suit: {
-    label: "Костюм",
+    label: "Комплект",
     fields: [
       "waist_definition",
       "waist",
