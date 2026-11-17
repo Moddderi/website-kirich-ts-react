@@ -71,7 +71,7 @@ export const OrderCabinetPage = () => {
 
   return (
     <main className="grow pt-12 pb-28">
-      <div className="mx-auto max-w-6xl px-6 lg:px-8 animate-reveal-up">
+      <div className="mx-auto max-w-6xl px-6 lg:px-8">
         <div className="mx-auto mb-12 max-w-2xl text-center">
           <span className="mb-6 inline-block rounded-full border border-accent/40 bg-accent/10 px-3 py-1 text-[10px] font-semibold uppercase tracking-widest text-accent">
             {t("cabinet.label", { number: order.number })}
@@ -90,7 +90,8 @@ export const OrderCabinetPage = () => {
           </Link>
         </div>
 
-        {order.certificate && (
+        {order.certificate?.code &&
+          Number.isFinite(order.certificate.discountUah) && (
           <section className="mx-auto mb-10 max-w-xl">
             <CertificateAppliedBanner
               code={order.certificate.code}

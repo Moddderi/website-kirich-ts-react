@@ -105,6 +105,8 @@ export const preloadLikelyPages = () => {
   const run = () => {
     void loadProductPage();
     void loadCartPage();
+    void loadFindOrderPage();
+    void loadOrderCabinetPage();
     if (CATALOG_ENABLED) {
       void loadCatalogPage();
     } else {

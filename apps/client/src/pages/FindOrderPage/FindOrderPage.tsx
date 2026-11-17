@@ -64,6 +64,14 @@ export const FindOrderPage = () => {
     const session = getSession();
     if (!session) return;
     let cancelled = false;
+    const timeout = window.setTimeout(() => {
+      if (!cancelled) {
+        clearSession();
+        setStep("email");
+        setError(t("findOrder.error"));
+      }
+    }, 20_000);
+
     getMyOrders(session.token)
       .then((list) => {
         if (cancelled) return;
@@ -77,12 +85,19 @@ export const FindOrderPage = () => {
       })
       .catch((err) => {
         if (axios.isAxiosError(err) && err.response?.status === 401) clearSession();
-        if (!cancelled) setStep("email");
+        if (!cancelled) {
+          setStep("email");
+          setError(t("findOrder.error"));
+        }
+      })
+      .finally(() => {
+        window.clearTimeout(timeout);
       });
     return () => {
       cancelled = true;
+      window.clearTimeout(timeout);
     };
-  }, [navigate, listMode]);
+  }, [navigate, listMode, t]);
 
   const onEmail = async (event: FormEvent) => {
     event.preventDefault();
@@ -129,7 +144,7 @@ export const FindOrderPage = () => {
 
   return (
     <main className="grow pt-12 pb-28">
-      <div className="mx-auto max-w-xl px-6 animate-reveal-up">
+      <div className="mx-auto max-w-xl px-6">
         <div className="mb-10 text-center">
           <h1 className="mb-4 text-4xl font-semibold tracking-tighter text-stone-900 sm:text-5xl">
             {t("findOrder.title")}
