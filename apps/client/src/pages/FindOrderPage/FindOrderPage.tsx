@@ -240,7 +240,7 @@ export const FindOrderPage = () => {
                     {[
                       ...order.garments.map((g) =>
                         g.label ??
-                        `${t(`selectType.${g.type}`)}${g.quantity > 1 ? ` × ${g.quantity}` : ""} · ${g.program}`,
+                        `${t(`selectType.${g.type}`)}${(g.quantity ?? 1) > 1 ? ` × ${g.quantity}` : ""} · ${g.program}`,
                       ),
                       ...(order.accessories ?? []),
                     ].join(", ")}
