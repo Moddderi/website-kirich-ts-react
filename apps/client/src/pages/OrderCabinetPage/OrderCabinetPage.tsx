@@ -13,6 +13,7 @@ import { MeasurementsForm } from "../../components/MeasurementsForm/Measurements
 import { saveCabinetToken } from "../../utils/cabinetStorage";
 import { useFormatDate } from "../../hooks/useTailoringEstimate";
 import { LuCheck } from "react-icons/lu";
+import { CertificateAppliedBanner } from "../../components/CertificateAppliedBanner/CertificateAppliedBanner";
 
 export const OrderCabinetPage = () => {
   const { t } = useTranslation();
@@ -88,6 +89,15 @@ export const OrderCabinetPage = () => {
             {t("cabinet.allOrders")}
           </Link>
         </div>
+
+        {order.certificate && (
+          <section className="mx-auto mb-10 max-w-xl">
+            <CertificateAppliedBanner
+              code={order.certificate.code}
+              discountUah={order.certificate.discountUah}
+            />
+          </section>
+        )}
 
         {order.measurements.needed && (
           <section className="mx-auto mb-12 max-w-4xl">
@@ -219,17 +229,41 @@ export const OrderCabinetPage = () => {
                 {t("cabinet.garments")}
               </p>
               <ul className="space-y-3">
-                {order.garments.map((garment) => (
+                {order.garments.map((garment, index) => (
                   <li
-                    key={garment.type}
+                    key={garment.productId ?? `${garment.type}-${index}`}
+                    className="text-sm leading-snug"
+                  >
+                    {garment.label ? (
+                      <span className="font-semibold text-stone-900">
+                        {garment.label}
+                      </span>
+                    ) : (
+                      <>
+                        <span className="font-semibold text-stone-900">
+                          {t(`selectType.${garment.type}`)}
+                          {garment.quantity > 1 ? ` × ${garment.quantity}` : ""}
+                        </span>
+                        <span className="mt-0.5 block text-xs font-semibold text-stone-500">
+                          {garment.program === "LAT"
+                            ? t("selectType.programLAT")
+                            : t("selectType.programST")}
+                        </span>
+                      </>
+                    )}
+                  </li>
+                ))}
+                {order.accessories.map((item) => (
+                  <li
+                    key={item.name}
                     className="flex items-baseline justify-between gap-4 text-sm"
                   >
                     <span className="font-semibold text-stone-900">
-                      {t(`selectType.${garment.type}`)}
-                      {garment.quantity > 1 ? ` × ${garment.quantity}` : ""}
+                      {item.name}
+                      {item.quantity > 1 ? ` × ${item.quantity}` : ""}
                     </span>
                     <span className="text-xs font-semibold text-stone-500">
-                      {garment.program}
+                      {t("cabinet.accessoryTag")}
                     </span>
                   </li>
                 ))}

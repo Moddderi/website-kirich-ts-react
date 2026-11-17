@@ -79,6 +79,9 @@ export const DeliveryAndPaymentPage: React.FC = () => {
               <p className="text-xs">
                 {t("deliveryAndPayment.restPayment")}
               </p>
+              <p className="text-xs font-medium text-white">
+                {t("deliveryAndPayment.noReturn")}
+              </p>
             </div>
           </div>
         </section>

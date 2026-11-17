@@ -1,5 +1,9 @@
 import crypto from "node:crypto";
-import type { CabinetOrder, CabinetStage } from "@project/shared";
+import {
+  buildCabinetGarments,
+  type CabinetOrder,
+  type CabinetStage,
+} from "@project/shared";
 import { isNotionConfigured } from "./notionAvailability.js";
 import { notionRequest } from "./notionOrders.js";
 
@@ -82,9 +86,6 @@ export const buildCabinetOrder = async (order: any): Promise<CabinetOrder> => {
     }
   }
 
-  const types: string[] = Array.isArray(estimate.types) ? estimate.types : [];
-  const programs: Record<string, "ST" | "LAT"> = estimate.programs ?? {};
-  const quantities = (estimate.quantities ?? {}) as Record<string, number>;
   const stage = info?.stage ?? "new";
 
   const measurementsSubmitted = !estimate.measurementsPending;
@@ -98,11 +99,18 @@ export const buildCabinetOrder = async (order: any): Promise<CabinetOrder> => {
     firstName: plain.firstName,
     createdAt: new Date(plain.createdAt).toISOString(),
     stage,
-    garments: types.map((type) => ({
-      type,
-      program: programs[type] ?? "ST",
-      quantity: Math.max(1, Math.floor(quantities[type] ?? 1)),
-    })),
+    garments: buildCabinetGarments(estimate),
+    accessories: Array.isArray(estimate.readyAccessories)
+      ? estimate.readyAccessories.flatMap((row: { name?: unknown; quantity?: unknown }) => {
+          if (!row || typeof row.name !== "string" || !row.name.trim()) return [];
+          return [
+            {
+              name: row.name.trim(),
+              quantity: Math.min(5, Math.max(1, Math.floor(Number(row.quantity) || 1))),
+            },
+          ];
+        })
+      : [],
     dates: {
       start: info?.start ?? estimate.startDate ?? null,
       readyTo: info?.end ?? estimate.readyTo ?? null,
@@ -113,6 +121,13 @@ export const buildCabinetOrder = async (order: any): Promise<CabinetOrder> => {
       submitted: measurementsSubmitted,
       submittedAt: measurementsSubmittedAt,
     },
+    certificate:
+      plain.certificateCode && plain.certificateDiscountUah != null
+        ? {
+            code: String(plain.certificateCode),
+            discountUah: Number(plain.certificateDiscountUah),
+          }
+        : null,
     live: Boolean(info),
   };
 };

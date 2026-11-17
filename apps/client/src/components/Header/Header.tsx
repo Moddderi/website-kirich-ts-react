@@ -150,18 +150,14 @@ export const Header = () => {
                 ))}
               </button>
 
-              {CATALOG_ENABLED && (
-                <>
-                  <Link to="/favorite" className={ICON_CLASS} aria-label={t("header.favorites")}>
-                    <LuHeart size={21} strokeWidth={1.6} />
-                    <Badge count={favoriteItems.length} />
-                  </Link>
-                  <Link to="/cart" className={ICON_CLASS} aria-label={t("header.cart")}>
-                    <LuShoppingBag size={21} strokeWidth={1.6} />
-                    <Badge count={totalItemsCount} />
-                  </Link>
-                </>
-              )}
+              <Link to="/favorite" className={ICON_CLASS} aria-label={t("header.favorites")}>
+                <LuHeart size={21} strokeWidth={1.6} />
+                <Badge count={favoriteItems.length} />
+              </Link>
+              <Link to="/cart" className={ICON_CLASS} aria-label={t("header.cart")}>
+                <LuShoppingBag size={21} strokeWidth={1.6} />
+                <Badge count={totalItemsCount} />
+              </Link>
 
               <Link
                 to={cabinetPath}

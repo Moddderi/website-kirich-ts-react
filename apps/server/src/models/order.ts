@@ -36,6 +36,9 @@ class Order extends Model<
   declare notionPageId: CreationOptional<string | null>;
   declare measurementsRequestedAt: CreationOptional<Date | null>;
 
+  declare certificateCode: CreationOptional<string | null>;
+  declare certificateDiscountUah: CreationOptional<number | null>;
+
   declare createdAt: CreationOptional<Date>;
   declare updatedAt: CreationOptional<Date>;
 
@@ -126,6 +129,14 @@ export default (sequelize: Sequelize) => {
       },
       measurementsRequestedAt: {
         type: DataTypes.DATE,
+        allowNull: true,
+      },
+      certificateCode: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
+      certificateDiscountUah: {
+        type: DataTypes.DECIMAL(10, 2),
         allowNull: true,
       },
       createdAt: DataTypes.DATE,

@@ -1,16 +1,15 @@
+import "./loadEnv.js";
 import express from "express";
 import cors from "cors";
-import dotenv from "dotenv";
 import productRoutes from "./routes/productRoutes.js";
 import orderRoutes from "./routes/orderRoutes.js";
 import availabilityRoutes from "./routes/availabilityRoutes.js";
 import cabinetRoutes from "./routes/cabinetRoutes.js";
 import jobRoutes from "./routes/jobRoutes.js";
 import tailoringRoutes from "./routes/tailoringRoutes.js";
+import certificateRoutes from "./routes/certificateRoutes.js";
 import { startScheduler } from "./jobs/scheduler.js";
 import { ensureCatalogLeadDaysSynced } from "./utils/catalogLeadDaysStore.js";
-
-dotenv.config();
 
 const app = express();
 
@@ -24,6 +23,7 @@ app.use("/api/availability", availabilityRoutes);
 app.use("/api/my-order", cabinetRoutes);
 app.use("/api/jobs", jobRoutes);
 app.use("/api/tailoring", tailoringRoutes);
+app.use("/api/certificates", certificateRoutes);
 
 const PORT = process.env.PORT || 5005;
 app.listen(PORT, () => {

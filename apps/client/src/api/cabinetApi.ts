@@ -42,7 +42,8 @@ export interface CabinetOrderSummary {
   token: string;
   number: string;
   createdAt: string;
-  garments: Array<{ type: string; program: string }>;
+  garments: Array<{ type: string; program: string; quantity?: number; label?: string }>;
+  accessories?: string[];
   start: string | null;
   readyTo: string | null;
 }

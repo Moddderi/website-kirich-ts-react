@@ -82,6 +82,10 @@ const getCommunicationLabel = (method?: string | null, lang: EmailLang = "uk") =
       return "Instagram";
     case "whatsapp":
       return "WhatsApp";
+    case "viber":
+      return "Viber";
+    case "signal":
+      return "Signal";
     default:
       return en ? "Not specified" : "Не вказано";
   }
@@ -123,7 +127,37 @@ const FAINT = "#71717a";
 const LINE = "#262626";
 const PANEL = "#141414";
 const ACCENT = "#c4414d";
+const CERT_GREEN_BG = "#ecfdf5";
+const CERT_GREEN_BORDER = "#6ee7b7";
+const CERT_GREEN_INK = "#065f46";
+const CERT_GREEN_MUTED = "#047857";
 const SERIF = "Georgia,'Times New Roman',serif";
+
+const buildCertificateEmailBanner = (
+  order: {
+    certificateCode?: string | null;
+    certificateDiscountUah?: number | null;
+  },
+  lang: EmailLang,
+) => {
+  if (!order.certificateCode || order.certificateDiscountUah == null) return "";
+  const code = String(order.certificateCode);
+  const displayCode = /^KIR-/.test(code) ? code : `№${code}`;
+  const amount = Number(order.certificateDiscountUah).toLocaleString(
+    lang === "en" ? "en-GB" : "uk-UA",
+  );
+  const title = lang === "en" ? "Gift certificate applied" : "Сертифікат застосовано";
+  const line =
+    lang === "en"
+      ? `Discount of ${amount} ₴ applied to your order`
+      : `Знижку ${amount} ₴ враховано в замовленні`;
+  const codeLabel = lang === "en" ? "Code" : "Код";
+  return `<div style="margin:0 0 24px;padding:18px 20px;border-radius:16px;background:${CERT_GREEN_BG};border:1px solid ${CERT_GREEN_BORDER};">
+    <p style="margin:0 0 6px;font-size:11px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:${CERT_GREEN_MUTED};">${title}</p>
+    <p style="margin:0 0 4px;font-size:15px;font-weight:600;color:${CERT_GREEN_INK};">${escapeHtml(line)}</p>
+    <p style="margin:0;font-size:13px;color:${CERT_GREEN_MUTED};">${codeLabel}: <span style="font-family:ui-monospace,monospace;">${escapeHtml(displayCode)}</span></p>
+  </div>`;
+};
 
 const emailShell = (title: string, bodyHtml: string, lang: EmailLang = "uk") => {
   const L = EMAIL_COPY[lang];
@@ -233,6 +267,8 @@ const buildReadyMadeEmailHtml = (order: any) => {
       ${order.socialUsername ? `(${escapeHtml(String(order.socialUsername))})` : ""}.
     </p>
 
+    ${buildCertificateEmailBanner(order, lang)}
+
     ${sectionLabel("Деталі замовлення")}
     <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
       ${itemsHtml}
@@ -337,6 +373,8 @@ const buildCustomOrderEmailHtml = (order: any) => {
       )}
     </p>
 
+    ${buildCertificateEmailBanner(order, lang)}
+
     ${
       order.accessToken
         ? `<div style="margin:0 0 24px;padding:22px;border-radius:16px;background:${PANEL};border:1px solid ${LINE};text-align:center;">
@@ -354,6 +392,11 @@ const buildCustomOrderEmailHtml = (order: any) => {
     <div style="margin:0 0 20px;padding:16px 18px;border-radius:16px;background:${PANEL};border:1px solid ${LINE};">
       ${summaryLine(L.estimate, escapeHtml(summary.priceRange))}
       ${summaryLine(L.prepayment(summary.prepaymentPercent), escapeHtml(summary.prepaymentRange))}
+      ${
+        summary.includesReadyAccessories
+          ? `<p style="margin:0 0 6px;font-size:12px;line-height:1.5;color:${FAINT};">${L.accessoriesNote}</p>`
+          : ""
+      }
       ${summaryLine(L.start, escapeHtml(summary.startDate))}
       ${summaryLine(L.ready, escapeHtml(summary.readyRange))}
       <div style="margin-top:12px;padding-top:12px;border-top:1px solid ${LINE};">
@@ -382,6 +425,86 @@ const buildCustomOrderEmailHtml = (order: any) => {
  * Відправляє клієнту лист-підтвердження замовлення через Resend.
  * Не кидає помилку назовні — замовлення вже збережене в БД.
  */
+export const sendGiftCertificateEmail = async (cert: {
+  email: string;
+  firstName: string;
+  lastName: string;
+  phone: string;
+  number: number;
+  electronicCode: string;
+  amountUah: number;
+  validUntil: string;
+  buyerLabel: string;
+  paymentMethod: "online" | "cod";
+  communicationMethod: string;
+  socialUsername: string;
+  physicalDeliveryNote?: string;
+}) => {
+  const apiKey = process.env.RESEND_API_KEY;
+  const from =
+    process.env.EMAIL_FROM || "K.I.RICH <onboarding@resend.dev>";
+
+  if (!apiKey) {
+    console.warn("⚠️ RESEND_API_KEY не знайдено — лист про сертифікат не відправлено.");
+    return;
+  }
+  if (!cert.email?.trim()) return;
+
+  const via = getCommunicationLabel(cert.communicationMethod, "uk");
+  const handle = cert.socialUsername?.trim()
+    ? ` (@${cert.socialUsername.replace(/^@/, "")})`
+    : "";
+  const pay = "Оплата онлайн (менеджер надішле реквізити)";
+
+  const body = `
+    <p style="margin:0 0 16px;font-size:15px;line-height:1.65;color:${INK};">
+      ${escapeHtml(cert.firstName)}, дякуємо! Заявку на подарунковий сертифікат прийнято.
+    </p>
+    <p style="margin:0 0 20px;font-size:14px;line-height:1.65;color:${MUTED};">
+      Менеджер зв’яжеться з вами через <strong style="color:${INK};">${escapeHtml(via)}</strong>${escapeHtml(handle)}
+      для підтвердження оплати. Після зарахування коштів сертифікат стане <strong style="color:${INK};">активним</strong>.
+    </p>
+  ${sectionLabel("Ваш сертифікат")}
+    <p style="margin:0 0 8px;font-size:14px;color:${MUTED};"><strong style="color:${INK};">Номер:</strong>
+      <span style="font-family:${SERIF};font-size:22px;color:${ACCENT};"> ${cert.number}</span></p>
+    <p style="margin:0 0 8px;font-size:14px;color:${MUTED};"><strong style="color:${INK};">Електронний код для сайту:</strong>
+      <span style="font-family:ui-monospace,monospace;font-size:18px;letter-spacing:0.04em;color:${INK};"> ${escapeHtml(cert.electronicCode)}</span></p>
+    <p style="margin:0 0 8px;font-size:14px;color:${MUTED};"><strong style="color:${INK};">Номінал:</strong> ${Number(cert.amountUah).toLocaleString("uk-UA")} ₴</p>
+    <p style="margin:0 0 8px;font-size:14px;color:${MUTED};"><strong style="color:${INK};">Діє до:</strong> ${escapeHtml(cert.validUntil)}</p>
+    <p style="margin:0 0 8px;font-size:14px;color:${MUTED};"><strong style="color:${INK};">Покупець:</strong> ${escapeHtml(cert.buyerLabel)}</p>
+    <p style="margin:0 0 8px;font-size:14px;color:${MUTED};"><strong style="color:${INK};">Оплата:</strong> ${escapeHtml(pay)}</p>
+    ${
+      cert.physicalDeliveryNote
+        ? `<p style="margin:0 0 20px;font-size:14px;color:${MUTED};"><strong style="color:${INK};">Доставка фізичного сертифіката:</strong> ${escapeHtml(cert.physicalDeliveryNote)}</p>`
+        : ""
+    }
+  ${sectionLabel("Контакти")}
+    <p style="margin:0 0 6px;font-size:14px;color:${MUTED};"><strong style="color:${INK};">Телефон:</strong> ${escapeHtml(cert.phone)}</p>
+    <p style="margin:0;font-size:14px;color:${MUTED};"><strong style="color:${INK};">Email:</strong> ${escapeHtml(cert.email)}</p>
+    <p style="margin:24px 0 0;font-size:13px;line-height:1.6;color:${FAINT};">
+      Збережіть <strong style="color:${MUTED};">електронний код</strong> — його вводять у полі «Подарунковий сертифікат» під час оформлення замовлення на сайті. Номер ${cert.number} — для звернень до менеджера.
+    </p>
+  `;
+
+  const html = emailShell(`Подарунковий сертифікат № ${cert.number}`, body, "uk");
+  const subject = `K.I.RICH — подарунковий сертифікат № ${cert.number}`;
+
+  try {
+    const resend = new Resend(apiKey);
+    const { data, error } = await resend.emails.send({
+      from,
+      to: [cert.email],
+      subject,
+      html,
+      replyTo: process.env.EMAIL_REPLY_TO || "kirich.sewing.studio@gmail.com",
+    });
+    if (error) console.error("❌ Resend (сертифікат):", error);
+    else console.log("✅ Email про сертифікат:", data?.id);
+  } catch (error) {
+    console.error("❌ Не вдалося відправити email про сертифікат:", error);
+  }
+};
+
 export const sendOrderConfirmationEmail = async (order: any) => {
   const apiKey = process.env.RESEND_API_KEY;
   const from =

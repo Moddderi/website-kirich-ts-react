@@ -26,6 +26,7 @@ export const EMAIL_COPY: Record<
     garments: string;
     estimate: string;
     prepayment: (pct: number) => string;
+    accessoriesNote: string;
     start: string;
     ready: string;
     estimateNote: string;
@@ -63,6 +64,8 @@ export const EMAIL_COPY: Record<
     garments: "Обрані вироби",
     estimate: "Орієнтовна вартість",
     prepayment: (pct) => `Передоплата ${pct}%`,
+    accessoriesNote:
+      "Готові аксесуари оплачуються повністю і вже входять у суму передплати.",
     start: "Початок роботи",
     ready: "Орієнтовна готовність",
     estimateNote:
@@ -102,6 +105,8 @@ export const EMAIL_COPY: Record<
     garments: "Selected garments",
     estimate: "Estimated price",
     prepayment: (pct) => `Prepayment ${pct}%`,
+    accessoriesNote:
+      "In-stock accessories are paid in full and are already included in the prepayment.",
     start: "Work starts",
     ready: "Estimated completion",
     estimateNote:

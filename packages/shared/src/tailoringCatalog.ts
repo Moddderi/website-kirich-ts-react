@@ -18,15 +18,20 @@ export interface TailoringProduct {
   id: TailoringProductId;
   category: TailoringCategory;
   program: TailoringProgram;
-  /** For measurement forms (maps to MEASUREMENT_CONFIG). */
+  /**
+   * MEASUREMENT_CONFIG: боді/гольф-боді → body; штани → pants; комплект/фрак → suit;
+   * піджак, жилет, сорочка, футболка, лонгслів (+ аксесуари) → jacket (плечові).
+   */
   measurementType: MeasurementType;
   priceFromUah: number;
   /** If omitted, equals priceFromUah («від …»). */
   priceToUah?: number;
   leadDaysMin: number;
   leadDaysMax: number;
-  /** Selecting this clears other pieces (комплект). */
+  /** Selecting this clears other pieces (комплект), but not accessories. */
   isKit?: boolean;
+  /** Ready add-on (bow tie set). Does not replace garments and needs no measurements when the order already has clothes. */
+  isAccessory?: boolean;
   /** Only made in-studio with fittings (фрак). */
   studioOnly?: boolean;
 }
@@ -72,6 +77,7 @@ export const TAILORING_CATALOG: TailoringProduct[] = [
     priceFromUah: 650,
     leadDaysMin: 0.25,
     leadDaysMax: 0.25,
+    isAccessory: true,
   },
   {
     id: "competition.st.kit",
@@ -98,7 +104,7 @@ export const TAILORING_CATALOG: TailoringProduct[] = [
     id: "competition.lat.shirt",
     category: "competition",
     program: "LAT",
-    measurementType: "body",
+    measurementType: "jacket",
     priceFromUah: 6370,
     leadDaysMin: 2,
     leadDaysMax: 2,
@@ -129,6 +135,7 @@ export const TAILORING_CATALOG: TailoringProduct[] = [
     priceFromUah: 650,
     leadDaysMin: 0.25,
     leadDaysMax: 0.25,
+    isAccessory: true,
   },
   {
     id: "competition.lat.golf_body",
@@ -144,7 +151,7 @@ export const TAILORING_CATALOG: TailoringProduct[] = [
     id: "training.st.tshirt",
     category: "training",
     program: "ST",
-    measurementType: "body",
+    measurementType: "jacket",
     priceFromUah: 3380, // прайс «від 3380» — звірте з прайсом студії
     leadDaysMin: 1,
     leadDaysMax: 1,
@@ -153,7 +160,7 @@ export const TAILORING_CATALOG: TailoringProduct[] = [
     id: "training.st.shirt",
     category: "training",
     program: "ST",
-    measurementType: "body",
+    measurementType: "jacket",
     priceFromUah: 4160,
     leadDaysMin: 1,
     leadDaysMax: 1,
@@ -182,7 +189,7 @@ export const TAILORING_CATALOG: TailoringProduct[] = [
     id: "training.lat.longsleeve",
     category: "training",
     program: "LAT",
-    measurementType: "body",
+    measurementType: "jacket",
     priceFromUah: 3640,
     leadDaysMin: 1,
     leadDaysMax: 1,
@@ -191,7 +198,7 @@ export const TAILORING_CATALOG: TailoringProduct[] = [
     id: "training.lat.tshirt",
     category: "training",
     program: "LAT",
-    measurementType: "body",
+    measurementType: "jacket",
     priceFromUah: 2990,
     leadDaysMin: 1,
     leadDaysMax: 1,
@@ -240,9 +247,22 @@ export interface TailoringLine {
 export const clampLineQty = (n: number) =>
   Math.min(5, Math.max(1, Math.floor(n) || 1));
 
+const accessoryLine = (line: TailoringLine) =>
+  Boolean(getTailoringProduct(line.productId)?.isAccessory);
+
+/**
+ * Measurement forms follow the clothes. Accessories stay in the order but do
+ * not ask for jacket measurements when a garment is already selected.
+ * Accessories-only still falls back to their measurement type.
+ */
+export const linesForMeasurements = (lines: TailoringLine[]): TailoringLine[] => {
+  const garments = lines.filter((line) => !accessoryLine(line));
+  return garments.length > 0 ? garments : lines;
+};
+
 /** Expand lines to measurement types (for forms / legacy estimate paths). */
 export const linesToMeasurementTypes = (lines: TailoringLine[]): MeasurementType[] =>
-  lines.flatMap((line) => {
+  linesForMeasurements(lines).flatMap((line) => {
     const p = getTailoringProduct(line.productId);
     if (!p) return [];
     return Array.from({ length: clampLineQty(line.quantity) }, () => p.measurementType);
@@ -281,13 +301,7 @@ export const toggleTailoringLine = (
   if (product.isKit) {
     next = next.filter((l) => {
       const other = getTailoringProduct(l.productId);
-      if (!other) return true;
-      if (other.isKit) {
-        return !(
-          other.category === product.category &&
-          other.program === product.program
-        );
-      }
+      if (!other || other.isAccessory) return true;
       return !(
         other.category === product.category && other.program === product.program
       );
@@ -295,14 +309,16 @@ export const toggleTailoringLine = (
     return [...next, { productId, quantity: 1 }];
   }
 
-  next = next.filter((l) => {
-    const other = getTailoringProduct(l.productId);
-    return !(
-      other?.isKit &&
-      other.category === product.category &&
-      other.program === product.program
-    );
-  });
+  if (!product.isAccessory) {
+    next = next.filter((l) => {
+      const other = getTailoringProduct(l.productId);
+      return !(
+        other?.isKit &&
+        other.category === product.category &&
+        other.program === product.program
+      );
+    });
+  }
   return [...next, { productId, quantity: 1 }];
 };
 
@@ -350,10 +366,11 @@ export const deriveLegacyTailoringState = (
   quantities: Partial<Record<MeasurementType, number>>;
   programs: Partial<Record<MeasurementType, TailoringProgram>>;
 } => {
-  const types = uniqueMeasurementTypes(lines);
+  const measured = linesForMeasurements(lines);
+  const types = uniqueMeasurementTypes(measured);
   const quantities: Partial<Record<MeasurementType, number>> = {};
   const programs: Partial<Record<MeasurementType, TailoringProgram>> = {};
-  for (const line of lines) {
+  for (const line of measured) {
     const p = getTailoringProduct(line.productId);
     if (!p) continue;
     quantities[p.measurementType] =
@@ -412,13 +429,32 @@ export const calcTailoringLinesEstimate = (
     ? addWorkDaysISO(startDate, Math.max(1, Math.ceil(leadDaysMax)) - 1)
     : null;
 
+  let garmentPriceFrom = 0;
+  let garmentPriceTo = 0;
+  let accessoryPriceFrom = 0;
+  let accessoryPriceTo = 0;
+  for (const item of items) {
+    const catalog = item.productId
+      ? getTailoringProduct(item.productId)
+      : undefined;
+    if (catalog?.isAccessory) {
+      accessoryPriceFrom += item.priceFrom;
+      accessoryPriceTo += item.priceTo;
+    } else {
+      garmentPriceFrom += item.priceFrom;
+      garmentPriceTo += item.priceTo;
+    }
+  }
+
   return {
     currency,
     items,
     priceFrom,
     priceTo,
-    prepaymentFrom: roundTo10(priceFrom * PREPAYMENT_RATE),
-    prepaymentTo: roundTo10(priceTo * PREPAYMENT_RATE),
+    prepaymentFrom:
+      roundTo10(garmentPriceFrom * PREPAYMENT_RATE) + accessoryPriceFrom,
+    prepaymentTo:
+      roundTo10(garmentPriceTo * PREPAYMENT_RATE) + accessoryPriceTo,
     leadDaysMin,
     leadDaysMax,
     startDate,

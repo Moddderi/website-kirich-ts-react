@@ -1,5 +1,4 @@
 import { lazy, Suspense } from "react";
-import { CATALOG_ENABLED } from "../../constants/features";
 import { HeroSection } from "./sections/HeroSection";
 import { StatsStrip } from "./sections/StatsStrip";
 import { WaysSection } from "./sections/WaysSection";
@@ -10,6 +9,7 @@ import { CtaSection } from "./sections/CtaSection";
 import { StickyCta } from "./sections/StickyCta";
 
 const FeaturedProducts = lazy(() => import("./FeaturedProducts"));
+const CertificateSection = lazy(() => import("./CertificateSection"));
 
 const MARQUEE_WORDS = [
   "Ballroom",
@@ -57,11 +57,13 @@ export const MainPage = () => (
     <WhySection />
     <ProcessSection />
 
-    {CATALOG_ENABLED && (
-      <Suspense fallback={null}>
-        <FeaturedProducts />
-      </Suspense>
-    )}
+    <Suspense fallback={null}>
+      <FeaturedProducts />
+    </Suspense>
+
+    <Suspense fallback={null}>
+      <CertificateSection />
+    </Suspense>
 
     <AboutSection />
     <CtaSection />

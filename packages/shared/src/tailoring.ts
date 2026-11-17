@@ -291,6 +291,15 @@ export interface TailoringEstimate {
 
 const roundTo10 = (value: number) => Math.round(value / 10) * 10;
 
+/** Shop accessories attached to a tailoring order: 100% on prepayment, not 30%. */
+export const prepaymentWithReadyAccessories = (
+  estimate: Pick<TailoringEstimate, "prepaymentFrom" | "prepaymentTo">,
+  readyAccessoriesTotal: number,
+) => ({
+  from: estimate.prepaymentFrom + readyAccessoriesTotal,
+  to: estimate.prepaymentTo + readyAccessoriesTotal,
+});
+
 /**
  * All amounts are converted to the display currency PER GARMENT and then summed,
  * so the lines always add up to the total shown to the customer.

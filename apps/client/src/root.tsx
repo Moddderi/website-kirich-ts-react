@@ -27,6 +27,8 @@ import {
   PrivacyPolicyPage,
   OrderCabinetPage,
   FindOrderPage,
+  GiftCertificatePage,
+  GiftCertificateSuccessPage,
   preloadLikelyPages,
 } from "./routes/lazyPages";
 
@@ -57,7 +59,7 @@ export const Root = () => {
               <Route index element={<MainPage />} />
               <Route path="catalog" element={shop(<CatalogPage />)} />
 
-              <Route path="catalog/:id" element={shop(<ProductPage />)} />
+              <Route path="catalog/:id" element={<ProductPage />} />
 
               <Route path="individual-tailoring" element={<TailoringLayout />}>
                 {/* Основная страница "Как это работает" */}
@@ -72,15 +74,14 @@ export const Root = () => {
                 <Route path="order-success" element={<OrderSuccessPage />} />
               </Route>
 
-              <Route path="cart" element={shop(<CartPage />)} />
-              <Route path="favorite" element={shop(<FavoritesPage />)} />
+              <Route path="cart" element={<CartPage />} />
+              <Route path="favorite" element={<FavoritesPage />} />
 
-              <Route path="checkout" element={shop(<CheckoutPage />)} />
+              <Route path="checkout" element={<CheckoutPage />} />
 
-              {/* ИСПРАВЛЕНО: убрали слэш в начале */}
               <Route
                 path="order-success/:orderId"
-                element={shop(<OrderSuccessPage />)}
+                element={<OrderSuccessPage />}
               />
 
               <Route
@@ -92,6 +93,11 @@ export const Root = () => {
               {/* Client cabinet: personal link from the e-mail */}
               <Route path="my-order/:token" element={<OrderCabinetPage />} />
               <Route path="my-orders" element={<FindOrderPage />} />
+              <Route path="gift-certificate" element={<GiftCertificatePage />} />
+              <Route
+                path="gift-certificate/success"
+                element={<GiftCertificateSuccessPage />}
+              />
             </Route>
           </Routes>
           <Analytics />

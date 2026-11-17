@@ -1,26 +1,48 @@
-import { Link } from "react-router-dom";
+import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import { useQuery } from "@tanstack/react-query";
-import { LuArrowRight } from "react-icons/lu";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import type { Product } from "@project/shared";
 import { getProducts } from "../../api/productApi";
+import { prefetchProduct } from "../../api/productQueries";
+import { loadCartPage, loadProductPage } from "../../routes/lazyPages";
 import { ProductCard } from "../../components/ProductCard/ProductCard";
+import { CurrencySwitcher } from "../../components/CurrencySwitcher/CurrencySwitcher";
 import { Reveal } from "../../components/shared/Reveal/Reveal";
+import { HOME_ACCESSORY_CODES } from "../../constants/homeAccessories";
 
-/** Ready-made showcase. Only rendered while CATALOG_ENABLED (see constants/features.ts). */
 export default function FeaturedProducts() {
   const { t } = useTranslation();
 
   const { data } = useQuery({
-    queryKey: ["products", { page: 1, limit: 4, home: true }],
-    queryFn: () => getProducts({ page: 1, limit: 4, search: "" }),
+    queryKey: ["products", { home: "accessories" }],
+    queryFn: () =>
+      getProducts({ main_category: "accessories", page: 1, limit: 24, search: "" }),
     staleTime: 1000 * 60 * 10,
   });
 
-  const items = data?.items?.slice(0, 4) ?? [];
+  const byCode = new Map(
+    (data?.items ?? []).map((item: Product) => [String(item.product_code), item]),
+  );
+  const items = HOME_ACCESSORY_CODES.map((code) => byCode.get(code)).filter(
+    (item): item is Product => Boolean(item),
+  );
+  const queryClient = useQueryClient();
+  const itemIds = items.map((item) => String(item.id || item.product_code)).join(",");
+
+  useEffect(() => {
+    if (!itemIds) return;
+    void loadProductPage();
+    void loadCartPage();
+    for (const id of itemIds.split(",")) {
+      void prefetchProduct(queryClient, id);
+    }
+  }, [itemIds, queryClient]);
 
   return (
-    <section className="mx-auto max-w-7xl px-5 py-20 sm:px-6 lg:px-8 lg:py-28">
+    <section
+      id="home-gifts"
+      className="scroll-mt-24 mx-auto max-w-7xl px-5 py-20 sm:px-6 lg:px-8 lg:py-28"
+    >
       <Reveal className="mb-12 flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.3em] text-beige-600">
@@ -33,41 +55,34 @@ export default function FeaturedProducts() {
             {t("main.featuredSubtitle")}
           </p>
         </div>
-        <Link
-          to="/catalog"
-          className="group inline-flex items-center gap-2 self-start text-sm font-semibold text-stone-900 sm:self-auto"
-        >
-          <span className="border-b border-stone-900/30 pb-0.5 transition-colors group-hover:border-stone-900">
-            {t("main.viewAll")}
-          </span>
-          <LuArrowRight
-            size={18}
-            strokeWidth={1.6}
-            className="transition-transform duration-300 group-hover:translate-x-1"
-          />
-        </Link>
+        <div className="shrink-0 self-start sm:self-end">
+          <CurrencySwitcher />
+        </div>
       </Reveal>
 
       <div className="grid grid-cols-1 gap-x-8 gap-y-14 sm:grid-cols-2 lg:grid-cols-4">
         {items.length > 0
           ? items.map((item: Product, index: number) => (
-              <ProductCard
-                key={item.product_code || item.id}
-                product={item}
-                imageLoading="lazy"
-                enterDelayMs={index * 80}
-              />
+              <Reveal key={item.product_code || item.id} delay={index * 90}>
+                <ProductCard
+                  product={item}
+                  imageLoading="eager"
+                  fetchPriority={index < 2 ? "high" : "auto"}
+                />
+              </Reveal>
             ))
           : [...Array(4)].map((_, i) => (
-              <div key={i}>
-                <div className="relative mb-4 aspect-3/4 overflow-hidden rounded-4xl bg-stone-200">
-                  <div className="image-shimmer absolute inset-0" />
+              <Reveal key={i} delay={i * 90}>
+                <div>
+                  <div className="relative mb-4 aspect-3/4 overflow-hidden rounded-4xl bg-stone-200">
+                    <div className="image-shimmer absolute inset-0" />
+                  </div>
+                  <div className="space-y-2">
+                    <div className="h-4 w-3/4 rounded bg-stone-200" />
+                    <div className="h-4 w-1/2 rounded bg-stone-200" />
+                  </div>
                 </div>
-                <div className="space-y-2">
-                  <div className="h-4 w-3/4 rounded bg-stone-200" />
-                  <div className="h-4 w-1/2 rounded bg-stone-200" />
-                </div>
-              </div>
+              </Reveal>
             ))}
       </div>
     </section>

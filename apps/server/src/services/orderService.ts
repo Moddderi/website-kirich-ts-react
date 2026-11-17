@@ -1,3 +1,4 @@
+import { Op } from "sequelize";
 import {
   TAILORING_GARMENTS,
   addDaysISO,
@@ -27,6 +28,66 @@ import {
 import { createNotionOrder, getWorkDaysTable } from "../utils/notionOrders.js";
 import { generateAccessToken } from "../utils/cabinet.js";
 import { sendOrderConfirmationEmail } from "../utils/email.js";
+import {
+  computeCertificateDiscount,
+  lockCertificateForRedemption,
+  redeemCertificateForOrder,
+} from "./certificateService.js";
+
+interface StoredOrderItem {
+  name: string;
+  quantity: number;
+  price: number;
+  productId?: string | null;
+  color?: string | null;
+  size?: string | null;
+  isAccessory?: boolean;
+}
+
+interface StoredAccessory {
+  productId: number;
+  name: string;
+  quantity: number;
+  priceUah: number;
+}
+
+const resolveReadyAccessories = async (
+  input: Array<{ productId?: string; quantity?: number }> | undefined,
+): Promise<StoredAccessory[]> => {
+  if (!Array.isArray(input) || input.length === 0) return [];
+
+  const merged = new Map<number, number>();
+  for (const row of input) {
+    const id = Number(row?.productId);
+    const qty = Math.min(5, Math.max(1, Math.floor(Number(row?.quantity) || 1)));
+    if (!Number.isInteger(id) || id <= 0) {
+      throw new Error("Некоректний аксесуар у замовленні.");
+    }
+    merged.set(id, Math.min(5, (merged.get(id) ?? 0) + qty));
+  }
+  if (merged.size > 12) {
+    throw new Error("Забагато аксесуарів у замовленні.");
+  }
+
+  const products = await db.Product.findAll({
+    where: { id: { [Op.in]: [...merged.keys()] } },
+  });
+  const byId = new Map(products.map((product: { id: number }) => [product.id, product]));
+
+  return [...merged.entries()].map(([id, quantity]) => {
+    const product = byId.get(id) as
+      | { id: number; name: string; price: number | string; main_category: string }
+      | undefined;
+    if (!product || product.main_category !== "accessories") {
+      throw new Error("До замовлення на пошиття можна додати лише аксесуари.");
+    }
+    const priceUah = Number(product.price);
+    if (!Number.isFinite(priceUah) || priceUah < 0) {
+      throw new Error("Не вдалося визначити ціну аксесуара.");
+    }
+    return { productId: id, name: product.name, quantity, priceUah };
+  });
+};
 
 export const createOrder = async (payload: OrderPayload) => {
   if (!payload.items || !Array.isArray(payload.items)) {
@@ -44,11 +105,7 @@ export const createOrder = async (payload: OrderPayload) => {
     // Price range, prepayment and start date are recomputed here.
     let customEstimate: Record<string, unknown> | null = null;
     let customTotalFrom: number | null = null;
-    let customItems: Array<{
-      name: string;
-      quantity: number;
-      price: number;
-    }> | null = null;
+    let customItems: StoredOrderItem[] | null = null;
 
     if (payload.orderType === "custom") {
       const catalogLines: TailoringLine[] =
@@ -225,6 +282,96 @@ export const createOrder = async (payload: OrderPayload) => {
         measurementsPending: isFarOrder(estimate.startDate),
       };
       }
+
+      const readyAccessories = await resolveReadyAccessories(
+        payload.readyAccessories,
+      );
+      if (readyAccessories.length > 0) {
+        const extrasTotal = readyAccessories.reduce(
+          (sum, item) => sum + item.priceUah * item.quantity,
+          0,
+        );
+        customTotalFrom = (customTotalFrom ?? 0) + extrasTotal;
+        customItems = [
+          ...(customItems ?? []),
+          ...readyAccessories.map((item) => ({
+            name: item.name,
+            quantity: item.quantity,
+            price: item.priceUah,
+            productId: String(item.productId),
+            color: null,
+            size: null,
+            isAccessory: true,
+          })),
+        ];
+        const prev = customEstimate ?? {};
+        customEstimate = {
+          ...prev,
+          readyAccessories,
+          accessoriesTotalUah: extrasTotal,
+          priceFromUah: Number(prev.priceFromUah ?? 0) + extrasTotal,
+          priceToUah: Number(prev.priceToUah ?? 0) + extrasTotal,
+          prepaymentFromUah: Number(prev.prepaymentFromUah ?? 0) + extrasTotal,
+          prepaymentToUah: Number(prev.prepaymentToUah ?? 0) + extrasTotal,
+        };
+      }
+    }
+
+    const grossTotalUah =
+      customTotalFrom ??
+      payload.items.reduce(
+        (sum, item) => sum + Number(item.price) * Number(item.quantity),
+        0,
+      );
+
+    let certificateCode: string | null = null;
+    let certificateDiscountUah: number | null = null;
+    let lockedCertificate: Awaited<
+      ReturnType<typeof lockCertificateForRedemption>
+    > | null = null;
+
+    if (payload.certificateCode?.trim()) {
+      lockedCertificate = await lockCertificateForRedemption(
+        payload.certificateCode.trim(),
+        transaction,
+      );
+      const certAmount = Number(lockedCertificate.amountUah);
+      certificateDiscountUah = computeCertificateDiscount(
+        certAmount,
+        grossTotalUah,
+      );
+      if (certificateDiscountUah <= 0) {
+        throw new Error(
+          "Сума замовлення замала для застосування сертифіката.",
+        );
+      }
+      certificateCode =
+        lockedCertificate.electronicCode ??
+        String(lockedCertificate.number);
+      if (customEstimate && typeof customEstimate === "object") {
+        customEstimate = {
+          ...customEstimate,
+          certificateCode,
+          certificateDiscountUah,
+        };
+      }
+    }
+
+    const netTotalUah = Math.max(
+      0,
+      grossTotalUah - (certificateDiscountUah ?? 0),
+    );
+
+    const fullyCoveredByCertificate =
+      Boolean(certificateCode) && netTotalUah <= 0;
+
+    if (fullyCoveredByCertificate && customEstimate && typeof customEstimate === "object") {
+      customEstimate = {
+        ...customEstimate,
+        fullyCoveredByCertificate: true,
+        certificateCoversAll: true,
+        prepaymentDueUah: 0,
+      };
     }
 
     const order = await db.Order.create(
@@ -245,18 +392,30 @@ export const createOrder = async (payload: OrderPayload) => {
             ? (payload.warehouse ?? null)
             : null,
         paymentMethod: payload.paymentMethod,
-        totalAmount: customTotalFrom ?? payload.totalAmount,
-        status: "pending",
+        totalAmount: netTotalUah,
+        status: fullyCoveredByCertificate ? "confirmed" : "pending",
         orderType: payload.orderType,
         communicationMethod: payload.communicationMethod,
         socialUsername: payload.socialUsername,
         comment: payload.comment?.trim() || null,
         estimate: customEstimate,
+        certificateCode,
+        certificateDiscountUah,
         // Secret link to the client cabinet (individual tailoring only)
         accessToken: payload.orderType === "custom" ? generateAccessToken() : null,
       },
       { transaction },
     );
+
+    if (lockedCertificate && certificateDiscountUah != null) {
+      await redeemCertificateForOrder({
+        cert: lockedCertificate,
+        orderId: order.id,
+        discountUah: certificateDiscountUah,
+        clientName: `${payload.lastName} ${payload.firstName}`,
+        transaction,
+      });
+    }
 
     const orderItemsData = (customItems ?? payload.items).map((item) => ({
       orderId: order.id,
@@ -267,7 +426,8 @@ export const createOrder = async (payload: OrderPayload) => {
       price: item.price,
       color: ("color" in item && item.color) || null,
       size: ("size" in item && item.size) || null,
-      measurements: customMeasurements,
+      measurements:
+        "isAccessory" in item && item.isAccessory ? null : customMeasurements,
     }));
 
     await db.OrderItem.bulkCreate(orderItemsData, { transaction });

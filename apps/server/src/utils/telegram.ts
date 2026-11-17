@@ -60,6 +60,26 @@ const parseMeasurementsPayload = (measurementsData: unknown): { unit: Measuremen
   return { unit: "cm", values };
 };
 
+const MESSENGER_LABEL_UK: Record<string, string> = {
+  telegram: "Telegram",
+  instagram: "Instagram",
+  whatsapp: "WhatsApp",
+  viber: "Viber",
+  signal: "Signal",
+};
+
+/** Label + contact handle for manager notifications (orders, certificates, …). */
+export const describeClientMessenger = (
+  method?: string | null,
+  socialUsername?: string | null,
+) => {
+  const label = method
+    ? (MESSENGER_LABEL_UK[method] ?? method)
+    : "не вказано";
+  const contact = socialUsername?.replace("@", "").trim() || "—";
+  return { label, contact };
+};
+
 /** Plain service message to the managers' chat (errors, notices). Never throws. */
 export const sendTelegramText = async (text: string) => {
   const token = process.env.TELEGRAM_TOKEN;
@@ -130,7 +150,10 @@ export const sendTelegramNotification = async (order: any) => {
       `\n\n📅 *Старт у студії:* ${summary.startDate}\n` +
       `⏳ *Орієнтовна готовність:* ${summary.readyRange}\n` +
       `💰 *Орієнтовна вартість:* ${summary.priceRange}\n` +
-      `💳 *Передоплата ${summary.prepaymentPercent}%:* ${summary.prepaymentRange}\n`;
+      `💳 *Передоплата ${summary.prepaymentPercent}%:* ${summary.prepaymentRange}\n` +
+      (summary.includesReadyAccessories
+        ? `_Аксесуари в наявності оплачуються повністю і вже входять у цю суму._\n`
+        : "");
 
     itemsList += `\n💸 Статус у Notion: «Очікує передплати». Після передоплати змініть його на «В черзі на пошиття».\n`;
     if (order.estimate?.measurementsPending) {
@@ -212,6 +235,12 @@ export const sendTelegramNotification = async (order: any) => {
   } else if (order.communicationMethod === "whatsapp") {
     const cleanPhone = cleanValue.replace(/[^+\d]/g, "");
     clientSocialLink = `[Написати в WhatsApp](https://wa.me/${cleanPhone})`;
+  } else if (order.communicationMethod === "viber") {
+    const cleanPhone = cleanValue.replace(/[^+\d]/g, "");
+    clientSocialLink = `[Написати у Viber](viber://chat?number=${encodeURIComponent(cleanPhone)})`;
+  } else if (order.communicationMethod === "signal") {
+    const cleanPhone = cleanValue.replace(/[^+\d]/g, "");
+    clientSocialLink = cleanPhone ? `Signal: ${cleanPhone}` : "";
   }
 
   const orderIdPrefix = order.id
@@ -244,11 +273,30 @@ export const sendTelegramNotification = async (order: any) => {
 
 📋 *Деталі замовлення:*
 ${itemsList}
+${
+    order.certificateCode
+      ? `\n🎁 *Сертифікат:* ${
+          /^KIR-/.test(String(order.certificateCode))
+            ? `код ${order.certificateCode}`
+            : `№${order.certificateCode}`
+        } (−${Number(order.certificateDiscountUah ?? 0)} грн)`
+      : ""
+  }
+${
+    isCustomOrder &&
+    (order.estimate?.fullyCoveredByCertificate ||
+      (order.certificateCode && Number(order.totalAmount) <= 0))
+      ? "\n✅ *Сертифікат покриває замовлення — передоплата не потрібна, замовлення прийнято*"
+      : ""
+  }
 
 ---
 ${
     isCustomOrder
-      ? "💰 *Точну вартість і передоплату узгодити з клієнтом*"
+      ? order.estimate?.fullyCoveredByCertificate ||
+          (order.certificateCode && Number(order.totalAmount) <= 0)
+        ? "💰 *Уточнити деталі з клієнтом (доплата не очікується, якщо фінал ≤ номіналу сертифіката)*"
+        : "💰 *Точну вартість і передоплату узгодити з клієнтом*"
       : `💰 *Всього до сплати:* *${readyMadeTotal}*`
   }
 `;

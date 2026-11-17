@@ -1,7 +1,10 @@
 import dotenv from "dotenv";
-import { syncCatalogLeadDaysFromNotion } from "../utils/catalogLeadDaysStore.js";
 
 dotenv.config();
+
+const { syncCatalogLeadDaysFromNotion } = await import(
+  "../utils/catalogLeadDaysStore.js"
+);
 
 const main = async () => {
   const data = await syncCatalogLeadDaysFromNotion();
