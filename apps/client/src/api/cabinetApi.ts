@@ -4,11 +4,17 @@ import type { CabinetOrder } from "@project/shared";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5005/api";
 
+const normalizeCabinetOrder = (order: CabinetOrder): CabinetOrder => ({
+  ...order,
+  certificate: order.certificate ?? null,
+});
+
 export const getCabinetOrder = async (token: string): Promise<CabinetOrder> => {
   const { data } = await axios.get<{ success: boolean; data: CabinetOrder }>(
     `${API_URL}/my-order/${encodeURIComponent(token)}`,
+    { timeout: 20_000 },
   );
-  return data.data;
+  return normalizeCabinetOrder(data.data);
 };
 
 /** Order status for the client. No polling: it refreshes when the tab is focused again. */
@@ -34,8 +40,9 @@ export const submitCabinetMeasurements = async (
   const { data } = await axios.post<{ success: boolean; data: CabinetOrder }>(
     `${API_URL}/my-order/${encodeURIComponent(token)}/measurements`,
     payload,
+    { timeout: 20_000 },
   );
-  return data.data;
+  return normalizeCabinetOrder(data.data);
 };
 
 export interface CabinetOrderSummary {
@@ -70,7 +77,10 @@ export const getMyOrders = async (
 ): Promise<CabinetOrderSummary[]> => {
   const { data } = await axios.get<{ data: CabinetOrderSummary[] }>(
     `${API_URL}/my-order/session/orders`,
-    { headers: { Authorization: `Bearer ${sessionToken}` } },
+    {
+      headers: { Authorization: `Bearer ${sessionToken}` },
+      timeout: 20_000,
+    },
   );
   return data.data;
 };

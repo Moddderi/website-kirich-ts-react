@@ -336,6 +336,15 @@ input[type="number"] {
   .animate-reveal-up {
     animation: reveal-up 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
   }
+
+  /* iOS Safari sometimes never applies `forwards` → content stuck at opacity 0 on dark bg */
+  @media (hover: none) and (pointer: coarse) {
+    .animate-reveal-up {
+      animation: none;
+      opacity: 1;
+      transform: none;
+    }
+  }
   .animate-pulse-glow {
     animation: pulse-glow 4s ease-in-out infinite;
   }
