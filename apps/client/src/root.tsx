@@ -10,6 +10,7 @@ import { App } from "./App";
 import { MainPage } from "./pages/MainPage/MainPage";
 import { ScrollToTop } from "./components/shared/ScrollToTop";
 import { store } from "./store/store";
+import { cloudinaryCloudQueryOptions } from "./hooks/useCloudinaryCloud";
 import { TailoringLayout } from "./components/TailoringLayout/TailoringLayout";
 import {
   CatalogPage,
@@ -46,6 +47,8 @@ const queryClient = new QueryClient({
     },
   },
 });
+
+void queryClient.prefetchQuery(cloudinaryCloudQueryOptions);
 
 export const Root = () => {
   return (

@@ -41,7 +41,7 @@ export const CatalogFilters = ({
   const currentSubTypes = getCurrentSubTypes();
 
   return (
-    <div className="opacity-0 animate-reveal-up delay-300 mt-14 w-full flex flex-col items-center gap-5 z-20 relative">
+    <div className="animate-reveal-up delay-300 mt-14 w-full flex flex-col items-center gap-5 z-20 relative">
       {/* ВЕРХНИЙ РЯД: ОСНОВНЫЕ КАТЕГОРИИ */}
       <div className="flex flex-nowrap md:flex-wrap items-center justify-start md:justify-center gap-1.5 p-1.5 rounded-full bg-stone-200/50 backdrop-blur-md border border-stone-200 overflow-x-auto w-full md:w-auto no-scrollbar px-2 md:px-1.5 shadow-[inset_0_1px_4px_rgba(0,0,0,0.02)]">
         <button

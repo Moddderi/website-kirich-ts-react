@@ -30,18 +30,23 @@ export const Reveal = ({
     const el = ref.current;
     if (!el || !supportsObserver) return;
 
+    const fallback = window.setTimeout(() => setVisible(true), 900);
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
           setVisible(true);
           observer.disconnect();
+          window.clearTimeout(fallback);
         }
       },
-      { rootMargin: "0px 0px -8% 0px", threshold: 0.05 },
+      { rootMargin: "0px 0px -6% 0px", threshold: 0.02 },
     );
 
     observer.observe(el);
-    return () => observer.disconnect();
+    return () => {
+      observer.disconnect();
+      window.clearTimeout(fallback);
+    };
   }, []);
 
   return (

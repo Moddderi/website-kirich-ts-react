@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { LuArrowRight, LuClock, LuHourglass } from "react-icons/lu";
-import { HOME_IMAGES } from "../../../constants/homeImages";
+import { useHomeImages } from "../../../constants/homeImages";
 import { CATALOG_ENABLED } from "../../../constants/features";
 import { optimizeCloudinaryUrl } from "../../../utils/cloudinary";
 import { Reveal } from "../../../components/shared/Reveal/Reveal";
@@ -10,12 +10,13 @@ import { SectionHead } from "./SectionHead";
 
 export const WaysSection = () => {
   const { t } = useTranslation();
+  const homeImages = useHomeImages();
 
   const ways = [
     {
       key: "bespoke",
       to: "/individual-tailoring",
-      img: HOME_IMAGES.bespoke,
+      img: homeImages.bespoke,
       title: t("main.bespokeTitle"),
       tag: t("main.absolutePrecision"),
       desc: t("main.individualDesc"),
@@ -30,7 +31,7 @@ export const WaysSection = () => {
     {
       key: "ready",
       to: CATALOG_ENABLED ? "/catalog" : null,
-      img: HOME_IMAGES.ready,
+      img: homeImages.ready,
       title: t("main.readyProducts"),
       tag: CATALOG_ENABLED ? t("main.calibratedGrid") : t("main.comingSoon"),
       desc: CATALOG_ENABLED ? t("main.readyDesc") : t("main.comingSoonDesc"),

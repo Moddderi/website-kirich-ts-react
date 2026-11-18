@@ -28,9 +28,9 @@ module.exports = {
 
     const products = JSON.parse(fs.readFileSync(jsonPath, "utf8"));
     const cloudName = process.env.CLOUDINARY_CLOUD_NAME || "dqe2odzsc";
+    const SHOP_FOLDER = "shop_products";
 
-    // Формируем базовый URL прямо в корень upload, БЕЗ подпапок, как в твоем примере
-    const CLOUD_BASE_URL = `https://res.cloudinary.com/${cloudName}/image/upload/`;
+    const CLOUD_BASE_URL = `https://res.cloudinary.com/${cloudName}/image/upload/${SHOP_FOLDER}/`;
     const DEFAULT_IMAGE = `${CLOUD_BASE_URL}default.jpg`;
 
     console.log("\n=== 🔍 НАЧИНАЕМ СКАНИРОВАНИЕ КОРНЯ CLOUDINARY ===");

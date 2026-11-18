@@ -36,6 +36,7 @@ import {
 } from "../../components/DeliveryIcons/DeliveryIcons";
 import { FaInstagram, FaTelegram, FaViber, FaWhatsapp } from "react-icons/fa6";
 import { LuChevronRight } from "react-icons/lu";
+import { ReferencePhotoUpload } from "../../components/ReferencePhotoUpload/ReferencePhotoUpload";
 import { SiSignal } from "react-icons/si";
 
 const PHONE_CONTACT_METHODS = new Set([
@@ -59,6 +60,7 @@ export const CheckoutPage = () => {
   const { t } = useTranslation();
   const { formatTotal, formatLine } = useCartMoney();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [referenceImageUrls, setReferenceImageUrls] = useState<string[]>([]);
   // After a successful order we clear Redux; don't bounce the user back to step 1.
   const [orderPlaced, setOrderPlaced] = useState(false);
 
@@ -266,6 +268,9 @@ export const CheckoutPage = () => {
           values: measurements,
         },
         items: itemsPayload,
+        ...(referenceImageUrls.length > 0
+          ? { referenceImageUrls }
+          : undefined),
       };
     }
 
@@ -671,6 +676,11 @@ export const CheckoutPage = () => {
                     {errors.comment.message}
                   </p>
                 )}
+                <ReferencePhotoUpload
+                  urls={referenceImageUrls}
+                  onChange={setReferenceImageUrls}
+                  disabled={isSubmitting}
+                />
               </div>
             )}
           </div>

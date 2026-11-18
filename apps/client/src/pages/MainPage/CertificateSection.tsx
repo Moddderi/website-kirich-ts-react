@@ -1,12 +1,13 @@
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { LuArrowRight, LuGift } from "react-icons/lu";
-import { HOME_IMAGES } from "../../constants/homeImages";
+import { useHomeImages } from "../../constants/homeImages";
 import { optimizeCloudinaryUrl } from "../../utils/cloudinary";
 import { Reveal } from "../../components/shared/Reveal/Reveal";
 
 export default function CertificateSection() {
   const { t } = useTranslation();
+  const homeImages = useHomeImages();
 
   return (
     <section className="mx-auto max-w-7xl px-5 py-20 sm:px-6 lg:px-8 lg:py-28">
@@ -27,7 +28,7 @@ export default function CertificateSection() {
               className="relative min-h-[17.5rem] overflow-hidden sm:min-h-[20rem] lg:min-h-full"
             >
               <img
-                src={optimizeCloudinaryUrl(HOME_IMAGES.giftCertificate, {
+                src={optimizeCloudinaryUrl(homeImages.giftCertificate, {
                   width: 960,
                 })}
                 alt=""

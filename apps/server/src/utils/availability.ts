@@ -8,7 +8,11 @@ import {
   type AvailabilityResponse,
   type AvailabilityStatus,
 } from "@project/shared";
-import { fetchNotionRanges, isNotionConfigured } from "./notionAvailability.js";
+import {
+  fetchNotionBlockingEventRanges,
+  fetchNotionRanges,
+  isNotionConfigured,
+} from "./notionAvailability.js";
 
 /**
  * Studio availability: Notion orders DB (automatic) + optional Google Sheet (manual overrides).
@@ -210,9 +214,10 @@ const fetchSheetRanges = async (url: string): Promise<AvailabilityRange[]> => {
 
 /**
  * Sources (any combination):
- *  - Notion orders DB  → automatic workload by order deadlines
- *  - Google Sheet CSV  → manual overrides (vacations, holidays, "closed")
- * Sheet rows are applied on top of Notion (later ranges win).
+ *  - Notion orders DB     → automatic workload by order deadlines
+ *  - [DB] Події/Календар  → rows with «Блокує сайт» (vacation etc.) force busy
+ *  - Google Sheet CSV     → manual overrides
+ * Later ranges win (events last, so they always block the site).
  */
 export const getAvailability = async (
   opts: StartOptions = {},
@@ -226,22 +231,29 @@ export const getAvailability = async (
 
   if (!sheetUrl && !useNotion) return buildResponse([], "unavailable");
 
-  const [notionResult, sheetResult] = await Promise.allSettled([
+  const [notionResult, eventsResult, sheetResult] = await Promise.allSettled([
     useNotion ? fetchNotionRanges() : Promise.resolve<AvailabilityRange[]>([]),
+    useNotion
+      ? fetchNotionBlockingEventRanges()
+      : Promise.resolve<AvailabilityRange[]>([]),
     sheetUrl ? fetchSheetRanges(sheetUrl) : Promise.resolve<AvailabilityRange[]>([]),
   ]);
 
   if (notionResult.status === "rejected") {
     console.error("❌ Не вдалося завантажити Notion:", notionResult.reason);
   }
+  if (eventsResult.status === "rejected") {
+    console.error("❌ Не вдалося завантажити події Notion:", eventsResult.reason);
+  }
   if (sheetResult.status === "rejected") {
     console.error("❌ Не вдалося завантажити таблицю доступності:", sheetResult.reason);
   }
 
   const notionOk = useNotion && notionResult.status === "fulfilled";
+  const eventsOk = useNotion && eventsResult.status === "fulfilled";
   const sheetOk = Boolean(sheetUrl) && sheetResult.status === "fulfilled";
 
-  if (!notionOk && !sheetOk) {
+  if (!notionOk && !eventsOk && !sheetOk) {
     // Prefer stale data over showing nothing
     if (cache) return withStart(cache.data, opts);
     return buildResponse([], "unavailable");
@@ -250,9 +262,10 @@ export const getAvailability = async (
   const ranges = [
     ...(notionOk ? notionResult.value : []),
     ...(sheetOk ? sheetResult.value : []),
+    ...(eventsOk ? eventsResult.value : []),
   ];
 
-  const data = buildResponse(ranges, notionOk ? "notion" : "sheet");
+  const data = buildResponse(ranges, notionOk || eventsOk ? "notion" : "sheet");
   cache = { data, fetchedAt: Date.now() };
   return withStart(data, opts);
 };

@@ -7,3 +7,4 @@ export * from "./src/tailoringCatalog.js";
 export * from "./src/tailoringNotionMap.js";
 export * from "./src/cabinet.js";
 export * from "./src/certificate.schema.js";
+export * from "./src/cloudinaryShop.js";
