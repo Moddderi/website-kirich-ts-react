@@ -125,7 +125,7 @@ export const SelectTypePage = () => {
 
   return (
     <>
-    <section className="animate-reveal-up">
+    <section className="animate-reveal-up pb-4">
       <div className="mx-auto max-w-7xl px-0 sm:px-6">
         <div className="mb-12 max-sm:mb-6 text-center max-w-2xl mx-auto animate-reveal-up [animation-delay:200ms]">
           <span className="rounded-full border border-accent/40 bg-accent/10 px-3 py-1 text-[10px] font-semibold uppercase tracking-widest text-accent mb-6 max-sm:mb-3 inline-block">

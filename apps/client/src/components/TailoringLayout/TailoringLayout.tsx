@@ -22,7 +22,11 @@ export const TailoringLayout = () => {
   return (
     <div
       className={`relative flex w-full flex-col items-stretch ${
-        isWidePage ? "" : "p-4 sm:p-6"
+        isWidePage
+          ? ""
+          : isSelectTypeStep
+            ? "px-4 pt-4 sm:px-6 sm:pt-6 pb-[calc(16rem+env(safe-area-inset-bottom,0px))] sm:pb-[calc(11rem+env(safe-area-inset-bottom,0px))]"
+            : "p-4 sm:p-6"
       }`}
     >
       {showBreadcrumbs && (

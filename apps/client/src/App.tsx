@@ -20,7 +20,7 @@ export function App() {
     <div
       className={`notranslate bg-beige-50 text-stone-900 font-sans antialiased flex flex-col min-h-screen relative overflow-x-hidden ${
         clearStickyBar
-          ? "pb-[calc(11rem+env(safe-area-inset-bottom,0px))] sm:pb-28"
+          ? "pb-[calc(4rem+env(safe-area-inset-bottom,0px))] sm:pb-16"
           : ""
       }`}
       translate="no"
