@@ -8,8 +8,13 @@ export const UAH_TO_FOREIGN_RATE: Record<Exclude<Currency, "UAH">, number> = {
   EUR: 49,
 };
 
-/** Applied after the first rounding step */
-export const CURRENCY_MARKUP = 1.4;
+/** USD: after first round-to-10 step */
+export const USD_MARKUP = 1.4;
+/** @deprecated Use USD_MARKUP — kept for imports */
+export const CURRENCY_MARKUP = USD_MARKUP;
+
+/** EUR: applied before the single round-to-10 step */
+export const EUR_MARKUP = 1.3;
 
 export const CURRENCY_SYMBOLS: Record<Currency, string> = {
   UAH: "₴",
@@ -24,11 +29,8 @@ const roundTo10 = (value: number): number =>
   Math.ceil(value / 10) * 10;
 
 /**
- * Foreign currency conversion:
- * 1. UAH / rate (USD: 40, EUR: 49)
- * 2. round up to nearest 10
- * 3. multiply by 1.4
- * 4. round up to nearest 10 again
+ * USD: UAH / 40 → round up to 10 → ×1.4 → round up to 10.
+ * EUR: UAH / 49 → ×1.3 → round up to 10 (single rounding).
  */
 export const convertFromUah = (amountUah: number, currency: Currency): number => {
   if (currency === "UAH") {
@@ -36,9 +38,13 @@ export const convertFromUah = (amountUah: number, currency: Currency): number =>
   }
 
   const rate = UAH_TO_FOREIGN_RATE[currency];
-  const afterDivision = roundTo10(amountUah / rate);
 
-  return roundTo10(afterDivision * CURRENCY_MARKUP);
+  if (currency === "EUR") {
+    return roundTo10((amountUah / rate) * EUR_MARKUP);
+  }
+
+  const afterDivision = roundTo10(amountUah / rate);
+  return roundTo10(afterDivision * USD_MARKUP);
 };
 
 /** Format an amount that is already in the target currency (no conversion). */
