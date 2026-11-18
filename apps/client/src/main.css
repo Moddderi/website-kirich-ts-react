@@ -112,19 +112,47 @@ input[type="radio"] {
 }
 
 /* === SCROLL REVEAL (IntersectionObserver, see <Reveal />) === */
-.reveal {
+@keyframes scroll-reveal-in {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 20px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes scroll-reveal-in-mobile {
+  from {
+    opacity: 1;
+    transform: translate3d(0, 14px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.reveal:not(.is-visible) {
   opacity: 0;
   transform: translate3d(0, 20px, 0);
-  transition:
-    opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1),
-    transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
-  transition-delay: var(--reveal-delay, 0ms);
-  will-change: opacity, transform;
 }
+
 .reveal.is-visible {
-  opacity: 1;
-  transform: none;
-  will-change: auto;
+  animation: scroll-reveal-in 0.75s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation-delay: var(--reveal-delay, 0ms);
+}
+
+@media (max-width: 767px) {
+  .reveal:not(.is-visible) {
+    opacity: 1;
+    transform: translate3d(0, 14px, 0);
+  }
+  .reveal.is-visible {
+    animation-name: scroll-reveal-in-mobile;
+    animation-duration: 0.65s;
+  }
 }
 
 /* === MARQUEE (transform-only → cheap for the GPU) === */
@@ -156,7 +184,8 @@ input[type="radio"] {
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
-  .reveal,
+  .reveal:not(.is-visible),
+  .reveal.is-visible,
   .animate-reveal-up,
   .page-enter {
     opacity: 1;
