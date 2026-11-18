@@ -16,7 +16,8 @@
       "@project/shared": ["../../packages/shared"] // Ссылка на корень пакета
     }
   },
-  "include": ["src/**/*"], // Только исходники сервера
+  "include": ["src/**/*"],
+  "exclude": ["src/scripts/**/*"],
   "references": [
     { "path": "../../packages/shared" } // Связываем проекты
   ]

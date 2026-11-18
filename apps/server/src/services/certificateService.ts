@@ -213,6 +213,22 @@ const nextCertificateNumber = async (
 export const purchaseGiftCertificate = async (
   payload: GiftCertificatePurchase,
 ) => {
+  // Validated by giftCertificatePurchaseSchema before the controller runs.
+  const {
+    firstName,
+    lastName,
+    phone,
+    email,
+    amountUah,
+    communicationMethod,
+    socialUsername,
+    comment,
+    requestPhysicalDelivery,
+    deliveryMethod,
+    city,
+    warehouse,
+  } = payload;
+
   const transaction = await db.sequelize.transaction();
   let cert: InstanceType<typeof db.GiftCertificate> | null = null;
   let electronicCode = generateElectronicCertificateCode();
@@ -221,10 +237,7 @@ export const purchaseGiftCertificate = async (
     const purchasedAt = todayISO();
     const validUntil = giftCertificateValidityEnd(purchasedAt);
     const number = await nextCertificateNumber(transaction);
-    const buyerLabel = giftCertificateBuyerLabel(
-      payload.firstName,
-      payload.lastName,
-    );
+    const buyerLabel = giftCertificateBuyerLabel(firstName!, lastName!);
 
     for (let attempt = 0; attempt < 8; attempt++) {
       try {
@@ -232,27 +245,27 @@ export const purchaseGiftCertificate = async (
           {
             number,
             electronicCode,
-            amountUah: payload.amountUah,
+            amountUah: amountUah!,
             buyerLabel,
-            purchaserFirstName: payload.firstName,
-            purchaserLastName: payload.lastName,
-            purchaserPhone: payload.phone,
-            purchaserEmail: payload.email,
+            purchaserFirstName: firstName!,
+            purchaserLastName: lastName!,
+            purchaserPhone: phone!,
+            purchaserEmail: email!,
             purchasedAt,
             validUntil,
             status: "inactive",
             communicationMethod: payload.communicationMethod,
             socialUsername: payload.socialUsername,
-            comment: payload.comment?.trim() || null,
-            requestPhysicalDelivery: Boolean(payload.requestPhysicalDelivery),
-            deliveryMethod: payload.requestPhysicalDelivery
-              ? (payload.deliveryMethod ?? null)
+            comment: comment?.trim() || null,
+            requestPhysicalDelivery: Boolean(requestPhysicalDelivery),
+            deliveryMethod: requestPhysicalDelivery
+              ? (deliveryMethod ?? null)
               : null,
-            deliveryCity: payload.requestPhysicalDelivery
-              ? (payload.city?.trim() || null)
+            deliveryCity: requestPhysicalDelivery
+              ? (city?.trim() || null)
               : null,
-            deliveryWarehouse: payload.requestPhysicalDelivery
-              ? (payload.warehouse?.trim() || null)
+            deliveryWarehouse: requestPhysicalDelivery
+              ? (warehouse?.trim() || null)
               : null,
           },
           { transaction },
@@ -289,20 +302,20 @@ export const purchaseGiftCertificate = async (
       ? await createNotionGiftCertificate({
           number: cert.number,
           electronicCode: cert.electronicCode!,
-          amountUah: payload.amountUah,
+          amountUah: amountUah!,
           buyerLabel: cert.buyerLabel,
           purchasedAt,
           validUntil,
-          purchaserFirstName: payload.firstName,
-          purchaserLastName: payload.lastName,
-          purchaserPhone: payload.phone,
-          purchaserEmail: payload.email,
-          comment: payload.comment,
-          physicalDelivery: payload.requestPhysicalDelivery
+          purchaserFirstName: firstName!,
+          purchaserLastName: lastName!,
+          purchaserPhone: phone!,
+          purchaserEmail: email!,
+          comment,
+          physicalDelivery: requestPhysicalDelivery
             ? {
-                method: payload.deliveryMethod!,
-                city: payload.city,
-                warehouse: payload.warehouse,
+                method: deliveryMethod!,
+                city,
+                warehouse,
               }
             : null,
         }).catch((error) => {
@@ -321,25 +334,25 @@ export const purchaseGiftCertificate = async (
     }
 
     const messenger = describeClientMessenger(
-      payload.communicationMethod,
-      payload.socialUsername,
+      communicationMethod!,
+      socialUsername!,
     );
 
     void sendTelegramText(
       `🎁 Новий подарунковий сертифікат №${number}\n` +
         `🔐 Електронний код: ${cert.electronicCode}\n` +
-        `Сума: ${payload.amountUah} грн\n` +
+        `Сума: ${amountUah} грн\n` +
         `Покупець: ${cert.buyerLabel}\n` +
-        `📞 ${payload.phone}\n` +
-        `📧 ${payload.email}\n` +
+        `📞 ${phone}\n` +
+        `📧 ${email}\n` +
         `💬 Куди писати: ${messenger.label}\n` +
         `📲 Контакт: ${messenger.contact}\n` +
         `💳 Оплата: онлайн (менеджер надішле реквізити)\n` +
-        (payload.requestPhysicalDelivery
+        (requestPhysicalDelivery
           ? `📦 Фізичний сертифікат: ${formatPhysicalDeliveryNote({
-              method: payload.deliveryMethod!,
-              city: payload.city,
-              warehouse: payload.warehouse,
+              method: deliveryMethod!,
+              city,
+              warehouse,
             })}\n`
           : "") +
         `Діє до: ${validUntil}\n` +
@@ -347,23 +360,23 @@ export const purchaseGiftCertificate = async (
     );
 
     void sendGiftCertificateEmail({
-      email: payload.email,
-      firstName: payload.firstName,
-      lastName: payload.lastName,
-      phone: payload.phone,
+      email: email!,
+      firstName: firstName!,
+      lastName: lastName!,
+      phone: phone!,
       number: cert.number,
       electronicCode: cert.electronicCode!,
-      amountUah: payload.amountUah,
+      amountUah: amountUah!,
       validUntil,
       buyerLabel: cert.buyerLabel,
       paymentMethod: "online",
-      communicationMethod: payload.communicationMethod,
-      socialUsername: payload.socialUsername,
-      physicalDeliveryNote: payload.requestPhysicalDelivery
+      communicationMethod: communicationMethod!,
+      socialUsername: socialUsername!,
+      physicalDeliveryNote: requestPhysicalDelivery
         ? formatPhysicalDeliveryNote({
-            method: payload.deliveryMethod!,
-            city: payload.city,
-            warehouse: payload.warehouse,
+            method: deliveryMethod!,
+            city,
+            warehouse,
           })
         : undefined,
     });
@@ -372,7 +385,7 @@ export const purchaseGiftCertificate = async (
       id: cert.id,
       number: cert.number,
       electronicCode: cert.electronicCode!,
-      amountUah: payload.amountUah,
+      amountUah: amountUah!,
       validUntil,
       buyerLabel: cert.buyerLabel,
     };
