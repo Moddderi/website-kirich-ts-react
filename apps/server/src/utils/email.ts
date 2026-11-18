@@ -452,6 +452,8 @@ export const sendGiftCertificateEmail = async (cert: {
   paymentMethod: "online" | "cod";
   communicationMethod: string;
   socialUsername: string;
+  cabinetUrl?: string;
+  giftUrl?: string;
   physicalDeliveryNote?: string;
 }) => {
   const apiKey = process.env.RESEND_API_KEY;
@@ -495,6 +497,16 @@ export const sendGiftCertificateEmail = async (cert: {
   ${sectionLabel("Контакти")}
     <p style="margin:0 0 6px;font-size:14px;color:${MUTED};"><strong style="color:${INK};">Телефон:</strong> ${escapeHtml(cert.phone)}</p>
     <p style="margin:0;font-size:14px;color:${MUTED};"><strong style="color:${INK};">Email:</strong> ${escapeHtml(cert.email)}</p>
+    ${
+      cert.cabinetUrl
+        ? `<div style="margin:24px 0 8px;text-align:center;">${ctaButton(escapeHtml(cert.cabinetUrl), "Кабінет сертифіката")}</div>`
+        : ""
+    }
+    ${
+      cert.giftUrl
+        ? `<p style="margin:0 0 8px;font-size:13px;line-height:1.6;color:${MUTED};text-align:center;">Подарункове посилання для одержувача:<br/><a href="${escapeHtml(cert.giftUrl)}" style="color:${ACCENT};word-break:break-all;">${escapeHtml(cert.giftUrl)}</a></p>`
+        : ""
+    }
     <p style="margin:24px 0 0;font-size:13px;line-height:1.6;color:${FAINT};">
       Збережіть <strong style="color:${MUTED};">електронний код</strong> — його вводять у полі «Подарунковий сертифікат» під час оформлення замовлення на сайті. Номер ${cert.number} — для звернень до менеджера.
     </p>

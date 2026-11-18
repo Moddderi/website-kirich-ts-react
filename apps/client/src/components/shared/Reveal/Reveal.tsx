@@ -12,6 +12,13 @@ interface RevealProps {
 const supportsObserver =
   typeof window !== "undefined" && "IntersectionObserver" in window;
 
+const prefersScrollReveal = (): boolean => {
+  if (typeof window === "undefined") return false;
+  if (window.matchMedia("(max-width: 767px)").matches) return false;
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return false;
+  return true;
+};
+
 /**
  * Lightweight scroll-reveal: one IntersectionObserver per block, CSS-only
  * transition (opacity + transform → compositor), observer disconnects after
@@ -24,11 +31,13 @@ export const Reveal = ({
   as: Tag = "div",
 }: RevealProps) => {
   const ref = useRef<HTMLElement | null>(null);
-  const [visible, setVisible] = useState(!supportsObserver);
+  const [visible, setVisible] = useState(
+    !supportsObserver || !prefersScrollReveal(),
+  );
 
   useEffect(() => {
     const el = ref.current;
-    if (!el || !supportsObserver) return;
+    if (!el || !supportsObserver || !prefersScrollReveal()) return;
 
     const fallback = window.setTimeout(() => setVisible(true), 900);
     const observer = new IntersectionObserver(

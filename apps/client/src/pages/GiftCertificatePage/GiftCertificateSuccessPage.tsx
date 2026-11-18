@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { formatPrice } from "@project/shared";
 import { LuCheck, LuCopy } from "react-icons/lu";
 import { useState, type ReactNode } from "react";
+import { GiftCertificateShare } from "../../components/GiftCertificateShare/GiftCertificateShare";
 
 type SuccessState = {
   certificate: {
@@ -11,6 +12,7 @@ type SuccessState = {
     amountUah: number;
     validUntil: string;
     buyerLabel: string;
+    giftShareToken?: string;
   };
 };
 
@@ -24,8 +26,14 @@ export const GiftCertificateSuccessPage = () => {
     return <Navigate to="/gift-certificate" replace />;
   }
 
-  const { number, electronicCode, amountUah, validUntil, buyerLabel } =
-    state.certificate;
+  const {
+    number,
+    electronicCode,
+    amountUah,
+    validUntil,
+    buyerLabel,
+    giftShareToken,
+  } = state.certificate;
 
   const copy = async (value: string, which: "number" | "code") => {
     try {
@@ -93,6 +101,12 @@ export const GiftCertificateSuccessPage = () => {
           </p>
         </div>
       </div>
+
+      {giftShareToken && (
+        <div className="mt-8 text-left">
+          <GiftCertificateShare shareToken={giftShareToken} />
+        </div>
+      )}
 
       <div className="mt-8 rounded-2xl border border-accent/25 bg-accent/5 px-5 py-4 text-left">
         <p className="text-sm font-medium leading-relaxed text-stone-800">

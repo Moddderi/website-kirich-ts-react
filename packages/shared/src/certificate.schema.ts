@@ -121,3 +121,35 @@ export const giftCertificateValidateQuerySchema = z.object({
 export type GiftCertificateValidateQuery = z.infer<
   typeof giftCertificateValidateQuerySchema
 >;
+
+export const GIFT_CERTIFICATE_STATUSES = [
+  "inactive",
+  "active",
+  "used",
+  "expired",
+] as const;
+
+export type GiftCertificateStatus = (typeof GIFT_CERTIFICATE_STATUSES)[number];
+
+/** Buyer cabinet view of a purchased certificate. */
+export type CabinetCertificate = {
+  token: string;
+  giftShareToken: string;
+  number: number;
+  electronicCode: string;
+  amountUah: number;
+  validUntil: string;
+  purchasedAt: string;
+  status: GiftCertificateStatus;
+  buyerLabel: string;
+};
+
+/** Public gift page — no contacts, only what the recipient needs. */
+export type PublicGiftCertificate = {
+  number: number;
+  electronicCode: string;
+  amountUah: number;
+  validUntil: string;
+  status: GiftCertificateStatus;
+  fromName: string;
+};

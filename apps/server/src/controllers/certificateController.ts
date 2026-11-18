@@ -1,5 +1,7 @@
 import type { Request, Response } from "express";
 import {
+  getCabinetCertificateByToken,
+  getPublicGiftCertificateByToken,
   previewCertificateDiscount,
   purchaseGiftCertificate,
 } from "../services/certificateService.js";
@@ -31,6 +33,44 @@ export const validateCertificateController = async (
       valid: false,
       message,
     });
+  }
+};
+
+export const getCabinetCertificateController = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
+  try {
+    const cert = await getCabinetCertificateByToken(String(req.params.token ?? ""));
+    if (!cert) {
+      res.status(404).json({ success: false });
+      return;
+    }
+    res.set("Cache-Control", "no-store");
+    res.json({ success: true, data: cert });
+  } catch (error) {
+    console.error("❌ cabinet certificate:", error);
+    res.status(500).json({ success: false });
+  }
+};
+
+export const getPublicGiftCertificateController = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
+  try {
+    const cert = await getPublicGiftCertificateByToken(
+      String(req.params.shareToken ?? ""),
+    );
+    if (!cert) {
+      res.status(404).json({ success: false });
+      return;
+    }
+    res.set("Cache-Control", "no-store");
+    res.json({ success: true, data: cert });
+  } catch (error) {
+    console.error("❌ gift certificate share:", error);
+    res.status(500).json({ success: false });
   }
 };
 

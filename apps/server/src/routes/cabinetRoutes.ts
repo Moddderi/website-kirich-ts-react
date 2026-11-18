@@ -12,6 +12,11 @@ import {
 import { appendNotionBlocks, buildMeasurementBlocks } from "../utils/notionOrders.js";
 import { sendTelegramText } from "../utils/telegram.js";
 import {
+  ensureCertificateTokens,
+  syncCertificateStatusFromNotion,
+  toCabinetCertificate,
+} from "../services/certificateService.js";
+import {
   MEASUREMENT_UNIT_LABELS,
   buildCabinetGarments,
   getMeasurementSchemaForTypes,
@@ -47,6 +52,28 @@ const findCustomOrders = (email: string) =>
     limit: 20,
   });
 
+const findGiftCertificates = (email: string) =>
+  db.GiftCertificate.findAll({
+    where: { [Op.and]: [where(fn("lower", col("purchaserEmail")), email)] },
+    order: [["createdAt", "DESC"]],
+    limit: 20,
+  });
+
+const countCabinetItems = async (email: string) => {
+  const [orders, certificates] = await Promise.all([
+    db.Order.count({
+      where: {
+        orderType: "custom",
+        [Op.and]: [where(fn("lower", col("email")), email)],
+      },
+    }),
+    db.GiftCertificate.count({
+      where: { [Op.and]: [where(fn("lower", col("purchaserEmail")), email)] },
+    }),
+  ]);
+  return orders + certificates;
+};
+
 /**
  * Login step 1: e-mail → 6-digit code. Always answers the same, so nobody can
  * find out which e-mails have orders. A code is only sent when orders exist.
@@ -57,12 +84,7 @@ router.post("/login/request", async (req, res) => {
 
   if (EMAIL_RE.test(email) && !limited(`req:e:${email}`, 5) && !limited(`req:i:${ip}`, 30)) {
     try {
-      const count = await db.Order.count({
-        where: {
-          orderType: "custom",
-          [Op.and]: [where(fn("lower", col("email")), email)],
-        },
-      });
+      const count = await countCabinetItems(email);
       if (count > 0) void sendLoginCodeEmail(email, createLoginCode(email));
     } catch (error) {
       console.error("❌ login/request:", error);
@@ -107,36 +129,60 @@ router.get("/session/orders", async (req, res) => {
   }
 
   try {
-    const orders: any[] = await findCustomOrders(email);
+    const [orders, certificates] = await Promise.all([
+      findCustomOrders(email),
+      findGiftCertificates(email),
+    ]);
 
-    // Orders made before the cabinet existed have no link yet → issue one now
-    for (const o of orders) {
+    for (const o of orders as any[]) {
       if (!o.accessToken) {
         o.accessToken = generateAccessToken();
         await o.update({ accessToken: o.accessToken });
       }
     }
 
-    res.set("Cache-Control", "no-store");
-    res.json({
-      success: true,
-      data: orders.map((o) => ({
-        token: o.accessToken,
-        number: String(o.id).split("-")[0].toUpperCase(),
-        createdAt: o.createdAt,
-        garments: buildCabinetGarments(o.estimate ?? {}),
-        accessories: (Array.isArray(o.estimate?.readyAccessories)
-          ? o.estimate.readyAccessories
-          : []
-        ).flatMap((row: { name?: unknown; quantity?: unknown }) =>
-          typeof row?.name === "string" && row.name.trim()
-            ? [`${row.name.trim()}${Number(row.quantity) > 1 ? ` × ${Math.floor(Number(row.quantity))}` : ""}`]
-            : [],
-        ),
-        start: o.estimate?.startDate ?? null,
-        readyTo: o.estimate?.readyTo ?? null,
-      })),
+    const certificateItems = [];
+    for (const cert of certificates) {
+      await syncCertificateStatusFromNotion(cert);
+      await ensureCertificateTokens(cert);
+      const view = toCabinetCertificate(cert);
+      certificateItems.push({
+        kind: "certificate" as const,
+        token: view.token,
+        number: String(view.number),
+        createdAt: cert.createdAt,
+        amountUah: view.amountUah,
+        status: view.status,
+        validUntil: view.validUntil,
+      });
+    }
+
+    const orderItems = (orders as any[]).map((o) => ({
+      kind: "order" as const,
+      token: o.accessToken as string,
+      number: String(o.id).split("-")[0].toUpperCase(),
+      createdAt: o.createdAt,
+      garments: buildCabinetGarments(o.estimate ?? {}),
+      accessories: (Array.isArray(o.estimate?.readyAccessories)
+        ? o.estimate.readyAccessories
+        : []
+      ).flatMap((row: { name?: unknown; quantity?: unknown }) =>
+        typeof row?.name === "string" && row.name.trim()
+          ? [`${row.name.trim()}${Number(row.quantity) > 1 ? ` × ${Math.floor(Number(row.quantity))}` : ""}`]
+          : [],
+      ),
+      start: o.estimate?.startDate ?? null,
+      readyTo: o.estimate?.readyTo ?? null,
+    }));
+
+    const data = [...orderItems, ...certificateItems].sort((a, b) => {
+      const ta = new Date(a.createdAt).getTime();
+      const tb = new Date(b.createdAt).getTime();
+      return tb - ta;
     });
+
+    res.set("Cache-Control", "no-store");
+    res.json({ success: true, data });
   } catch (error) {
     console.error("❌ session/orders:", error);
     res.status(500).json({ success: false });
