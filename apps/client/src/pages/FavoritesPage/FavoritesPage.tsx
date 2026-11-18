@@ -8,13 +8,15 @@ import {
 } from "../../store/favoriteSlice";
 import { addToCart } from "../../store/cartSlice";
 import { Breadcrumbs } from "../../components/Breadcrumbs/Breadcrumbs";
-import type { Product } from "@project/shared";
+import { buildShopProductDefaultImageUrl, type Product } from "@project/shared";
+import { useCloudinaryCloud } from "../../hooks/useCloudinaryCloud";
 
 import { useProductName } from "../../utils/useLocalizedProduct";
 import { useFormattedPrice } from "../../hooks/useFormattedPrice";
 import { LuHeartOff, LuShoppingBag } from "react-icons/lu";
 
 export const FavoritesPage: React.FC = () => {
+  const cloudinaryCloud = useCloudinaryCloud();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const { t } = useTranslation();
@@ -46,7 +48,7 @@ export const FavoritesPage: React.FC = () => {
       imageUrl:
         images.length > 0
           ? images
-          : ["https://res.cloudinary.com/dqe2odzsc/image/upload/default.jpg"],
+          : [buildShopProductDefaultImageUrl(cloudinaryCloud)],
       productCode: item.product_code,
       options: {
         color: t("favorites.defaultOption"),
@@ -61,7 +63,7 @@ export const FavoritesPage: React.FC = () => {
   // Вспомогательная функция для отображения первой картинки товара
   const getDisplayImage = (imageUrl: string | string[] | undefined) => {
     if (!imageUrl)
-      return "https://res.cloudinary.com/dqe2odzsc/image/upload/default.jpg";
+      return buildShopProductDefaultImageUrl(cloudinaryCloud);
     return Array.isArray(imageUrl) ? imageUrl[0] : imageUrl;
   };
 

@@ -8,6 +8,9 @@
     "build": "tsc",
     "start": "node --max-old-space-size=128 --max-semi-space-size=2 dist/app.js",
     "sync:catalog-lead-days": "tsx src/scripts/syncCatalogLeadDays.ts",
+    "cloudinary:move-shop-products": "tsx src/scripts/moveShopProductsToCloudinaryFolder.ts",
+    "cloudinary:assign-shop-folder": "tsx src/scripts/assignShopProductsAssetFolder.ts",
+    "notion:sync-accessory-prices": "tsx src/scripts/syncAccessoryPricesFromNotion.ts",
     "db:migrate": "sequelize-cli db:migrate",
     "db:migrate:undo": "sequelize-cli db:migrate:undo"
   },

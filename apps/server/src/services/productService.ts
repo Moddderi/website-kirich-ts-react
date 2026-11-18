@@ -1,8 +1,16 @@
 import db from "../models/index.js";
-import { CATALOG_PAGE_SIZE, FilterInput } from "@project/shared";
+import { CATALOG_PAGE_SIZE, FilterInput, migrateShopImageUrl } from "@project/shared";
 import { Op } from "sequelize";
 
 const { Product } = db;
+
+const withMigratedImageUrls = (product: InstanceType<typeof Product>) => {
+  const plain = product.toJSON() as { imageUrl?: string[] };
+  if (Array.isArray(plain.imageUrl)) {
+    plain.imageUrl = plain.imageUrl.map((u) => migrateShopImageUrl(String(u)));
+  }
+  return plain;
+};
 
 const buildWhereClause = (filters?: FilterInput) => {
   const where: Record<string | symbol, unknown> = {};
@@ -58,7 +66,7 @@ export const getAllProducts = async (filters?: FilterInput) => {
     });
 
     return {
-      items: rows,
+      items: rows.map(withMigratedImageUrls),
       total: count,
       page,
       limit,
@@ -75,7 +83,7 @@ export const getProductById = async (id: string | number) => {
     // Используем встроенный метод Sequelize для поиска по Primary Key (ID)
     const product = await Product.findByPk(id);
 
-    return product;
+    return product ? withMigratedImageUrls(product) : null;
     // Если товар не найден, Sequelize вернет null.
     // Контроллер сам решит, отдавать ли 404 ошибку.
   } catch (error) {

@@ -21,6 +21,7 @@ import {
   buildCustomOrderSummary,
   formatDateUk,
 } from "./tailoringSummary.js";
+import { readReferenceImageUrls } from "./orderReferenceImages.js";
 
 /**
  * Creates the order in the studio's Notion database `[DB] Замовлення`
@@ -340,6 +341,35 @@ const bullet = (text: string) => ({
   type: "bulleted_list_item",
   bulleted_list_item: { rich_text: richText(text) },
 });
+const linkBullet = (label: string, url: string) => ({
+  object: "block",
+  type: "bulleted_list_item",
+  bulleted_list_item: {
+    rich_text: [
+      {
+        type: "text",
+        text: { content: label.slice(0, 1900), link: { url } },
+      },
+    ],
+  },
+});
+
+/** Clickable Cloudinary links for the Notion order page body. */
+export const buildReferenceImageNotionBlocks = (urls: string[]): unknown[] => {
+  if (urls.length === 0) return [];
+  return [
+    heading("Фото-референс"),
+    ...urls.map((url, index) =>
+      linkBullet(
+        urls.length > 1 ? `Відкрити фото ${index + 1}` : "Відкрити фото",
+        url,
+      ),
+    ),
+  ];
+};
+
+export const REFERENCE_PHOTOS_HEADING = "Фото-референс";
+
 const paragraph = (text: string) => ({
   object: "block",
   type: "paragraph",
@@ -495,6 +525,8 @@ const buildBody = (order: any) => {
   if (summary.comment) {
     blocks.push(heading("Коментар клієнта"), paragraph(summary.comment));
   }
+
+  blocks.push(...buildReferenceImageNotionBlocks(readReferenceImageUrls(order)));
 
   blocks.push(
     ...buildMeasurementBlocks(

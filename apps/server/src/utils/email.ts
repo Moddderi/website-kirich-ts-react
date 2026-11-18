@@ -13,6 +13,7 @@ import {
 import { cabinetUrl } from "./links.js";
 import { EMAIL_COPY, emailLang, type EmailLang } from "./emailLocale.js";
 import { buildCustomOrderSummary } from "./tailoringSummary.js";
+import { readReferenceImageUrls } from "./orderReferenceImages.js";
 
 type MeasurementsPayload =
   | Record<string, string>
@@ -413,6 +414,19 @@ const buildCustomOrderEmailHtml = (order: any) => {
            <p style="margin:0 0 20px;font-size:14px;line-height:1.6;color:${MUTED};white-space:pre-wrap;">${escapeHtml(summary.comment)}</p>`
         : ""
     }
+
+    ${(() => {
+      const refs = readReferenceImageUrls(order);
+      if (refs.length === 0) return "";
+      const links = refs
+        .map(
+          (url) =>
+            `<li style="margin:4px 0;"><a href="${escapeHtml(url)}" style="color:#c4414d;text-decoration:none;">${escapeHtml(url)}</a></li>`,
+        )
+        .join("");
+      return `${sectionLabel(lang === "uk" ? "Фото-референс" : "Photo reference")}
+         <ul style="margin:0 0 20px;padding-left:18px;font-size:14px;line-height:1.6;color:${MUTED};">${links}</ul>`;
+    })()}
 
     ${sectionLabel(L.measurements)}
     ${measurementsHtml}

@@ -16,7 +16,7 @@ export const IndividualTailoringPage = () => {
 
         <div className="relative z-20 flex flex-col h-full">
           {/* Заголовок с задержкой */}
-          <div className="flex items-center gap-3 mb-10 animate-reveal-up [animation-delay:200ms] opacity-0 [animation-fill-mode:forwards]">
+          <div className="flex items-center gap-3 mb-10 animate-reveal-up [animation-delay:200ms]">
             <div className="relative flex h-10 w-10 items-center justify-center rounded-xl bg-white/10 backdrop-blur-md border border-white/20">
               <LuRuler size={16} />
             </div>
@@ -61,7 +61,7 @@ export const IndividualTailoringPage = () => {
             ].map((step, idx) => (
               <div
                 key={step.id}
-                className="flex gap-6 items-start group/step animate-reveal-up opacity-0 [animation-fill-mode:forwards]"
+                className="flex gap-6 items-start group/step animate-reveal-up"
                 style={{ animationDelay: `${300 + idx * 100}ms` }}
               >
                 <div className="flex flex-col items-center mt-1">
@@ -85,7 +85,7 @@ export const IndividualTailoringPage = () => {
           </div>
 
           {/* Кнопка действия */}
-          <div className="mt-8 pt-8 border-t border-white/10 flex flex-col sm:flex-row gap-4 animate-reveal-up [animation-delay:600ms] opacity-0 [animation-fill-mode:forwards]">
+          <div className="mt-8 pt-8 border-t border-white/10 flex flex-col sm:flex-row gap-4 animate-reveal-up [animation-delay:600ms]">
             <button
               onClick={() => navigate("/individual-tailoring/step-1")}
               className="flex-1 rounded-xl bg-white px-6 py-4 text-sm font-semibold text-stone-900 hover:scale-[1.02] transition-transform duration-300 text-center"

@@ -13,6 +13,7 @@ import {
 } from "@project/shared";
 import { buildCustomOrderSummary } from "./tailoringSummary.js";
 import { cabinetUrlForTelegram } from "./links.js";
+import { readReferenceImageUrls } from "./orderReferenceImages.js";
 
 type MeasurementsPayload =
   | Record<string, string>
@@ -170,6 +171,14 @@ export const sendTelegramNotification = async (order: any) => {
       itemsList += `\n💬 *Коментар клієнта:*\n${escapeMd(summary.comment)}\n`;
     }
 
+    const refUrls = readReferenceImageUrls(order);
+    if (refUrls.length > 0) {
+      itemsList += `\n🖼 *Фото-референс:*\n`;
+      for (const url of refUrls) {
+        itemsList += `${url}\n`;
+      }
+    }
+
     itemsList += `\n`;
 
     const measurementsData = customItem?.measurements;
@@ -201,6 +210,9 @@ export const sendTelegramNotification = async (order: any) => {
             return `  - *${nameUkr}:* ${value} ${unitLabel}`;
           })
           .join("\n");
+    } else if (order.estimate?.measurementsPending) {
+      itemsList +=
+        `  _Мірок на момент замовлення ще немає — клієнт передасть їх у кабінеті (форма відкриється за 30 днів до старту)._`;
     } else {
       itemsList += `  _Мірки будуть уточнені менеджером особисто_`;
     }

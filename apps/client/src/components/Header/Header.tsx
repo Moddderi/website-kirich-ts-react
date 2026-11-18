@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, NavLink, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { LuHeart, LuMenu, LuShoppingBag, LuUserRound, LuX } from "react-icons/lu";
@@ -26,10 +26,25 @@ const Badge = ({ count }: { count: number }) =>
 
 export const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isClosing, setIsClosing] = useState(false);
+  const closeTimer = useRef<number | null>(null);
   const { t, i18n } = useTranslation();
   const location = useLocation(); // re-render on navigation so the cabinet link stays fresh
 
-  const closeMenu = () => setIsMenuOpen(false);
+  const openMenu = () => {
+    if (closeTimer.current) window.clearTimeout(closeTimer.current);
+    setIsClosing(false);
+    setIsMenuOpen(true);
+  };
+
+  const closeMenu = () => {
+    setIsClosing(true);
+    if (closeTimer.current) window.clearTimeout(closeTimer.current);
+    closeTimer.current = window.setTimeout(() => {
+      setIsMenuOpen(false);
+      setIsClosing(false);
+    }, 220);
+  };
   const toggleLang = () =>
     changeSiteLanguage(i18n.language === "uk" ? "en" : "uk");
 
@@ -49,13 +64,21 @@ export const Header = () => {
   const cabinetPath =
     !getSession() && cabinetToken ? `/my-order/${cabinetToken}` : "/my-orders";
 
-  // Lock page scroll behind the open menu
   useEffect(() => {
-    document.body.style.overflow = isMenuOpen ? "hidden" : "";
-    return () => {
-      document.body.style.overflow = "";
+    if (!isMenuOpen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") closeMenu();
     };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
   }, [isMenuOpen]);
+
+  useEffect(
+    () => () => {
+      if (closeTimer.current) window.clearTimeout(closeTimer.current);
+    },
+    [],
+  );
 
   const desktopLink = ({ isActive }: { isActive: boolean }) =>
     `relative text-[13px] font-semibold uppercase tracking-[0.18em] transition-colors magnetic-link ${
@@ -96,11 +119,11 @@ export const Header = () => {
 
       <nav className="sticky top-0 z-50 border-b border-stone-900/10 bg-beige-50/85 backdrop-blur-md">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="relative flex h-16 items-center justify-between sm:h-[4.5rem]">
+          <div className="relative flex h-16 w-full items-center justify-between sm:h-[4.5rem]">
             <Link
               to="/"
               onClick={closeMenu}
-              className="flex shrink-0 items-center"
+              className="relative z-10 flex shrink-0 items-center"
               aria-label="K.I.RICH POLTAVA"
             >
               <img
@@ -112,7 +135,7 @@ export const Header = () => {
               />
             </Link>
 
-            <div className="absolute left-1/2 top-1/2 hidden -translate-x-1/2 -translate-y-1/2 items-center gap-10 md:flex">
+            <div className="hidden min-w-0 flex-1 items-center justify-center gap-6 md:flex lg:gap-8 xl:absolute xl:left-1/2 xl:top-1/2 xl:z-0 xl:flex-none xl:-translate-x-1/2 xl:-translate-y-1/2 xl:gap-10">
               {CATALOG_ENABLED && (
                 <NavLink to="/catalog" className={desktopLink}>
                   {t("header.catalog")}
@@ -123,10 +146,10 @@ export const Header = () => {
               </NavLink>
             </div>
 
-            <div className="flex items-center gap-0.5 sm:gap-1.5">
+            <div className="relative z-10 flex shrink-0 items-center gap-0.5 sm:gap-1.5">
               <Link
                 to="/individual-tailoring/step-1"
-                className="btn-ember mr-2 hidden items-center rounded-full px-5 py-2 text-xs font-bold uppercase tracking-widest lg:inline-flex"
+                className="btn-ember mr-1 hidden items-center rounded-full px-3 py-2 text-[10px] font-bold uppercase tracking-widest lg:mr-2 lg:inline-flex lg:px-4 lg:text-xs xl:px-5"
               >
                 {t("header.startCta")}
               </Link>
@@ -170,8 +193,9 @@ export const Header = () => {
 
               <button
                 type="button"
-                onClick={() => setIsMenuOpen(true)}
+                onClick={openMenu}
                 aria-label={t("header.menu")}
+                aria-expanded={isMenuOpen}
                 className={`${ICON_CLASS} md:hidden`}
               >
                 <LuMenu size={23} strokeWidth={1.6} />
@@ -183,13 +207,12 @@ export const Header = () => {
 
       {isMenuOpen && (
         <Portal>
-          <div className="fixed inset-0 z-[9999] flex justify-end">
-            <div
-              className="absolute inset-0 bg-stone-950/50"
-              onClick={closeMenu}
-            />
-
-            <div className="palette-original animate-reveal-up relative z-10 flex h-full w-full max-w-full flex-col justify-between overflow-y-auto bg-stone-950 p-6 sm:w-[420px] sm:p-10">
+          <div
+            className={`mobile-menu palette-original fixed inset-0 z-[9999] flex flex-col bg-stone-950/80 backdrop-blur-xl ${
+              isClosing ? "is-closing" : ""
+            }`}
+          >
+            <div className="relative z-10 flex h-full w-full flex-col justify-between overflow-y-auto p-6 sm:ml-auto sm:w-[420px] sm:p-10">
               <div>
                 <div className="mb-10 flex items-center justify-between">
                   <span className="text-[10px] font-semibold uppercase tracking-[0.32em] text-beige-400">
@@ -206,7 +229,11 @@ export const Header = () => {
                 </div>
 
                 <nav className="border-t border-white/10">
-                  <NavLink to="/individual-tailoring" onClick={closeMenu} className={mobileLink}>
+                  <NavLink
+                    to="/individual-tailoring"
+                    onClick={closeMenu}
+                    className={mobileLink}
+                  >
                     {t("header.tailoring")}
                   </NavLink>
                   {CATALOG_ENABLED && (

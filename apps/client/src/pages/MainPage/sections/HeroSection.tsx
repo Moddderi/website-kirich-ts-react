@@ -11,7 +11,7 @@ import {
   LuRuler,
   LuTruck,
 } from "react-icons/lu";
-import { HOME_IMAGES } from "../../../constants/homeImages";
+import { useHomeImages } from "../../../constants/homeImages";
 import { CATALOG_ENABLED } from "../../../constants/features";
 import { optimizeCloudinaryUrl } from "../../../utils/cloudinary";
 import { LivingBg } from "../../../components/fx/LivingBg";
@@ -77,6 +77,7 @@ const scrollToHomeGifts = () => {
 
 export const HeroSection = () => {
   const { t } = useTranslation();
+  const homeImages = useHomeImages();
   const ref = useRef<HTMLElement | null>(null);
 
   const onPointerMove = (e: React.PointerEvent<HTMLElement>) => {
@@ -201,21 +202,21 @@ export const HeroSection = () => {
         <div className="animate-reveal-up delay-300 relative mx-auto w-full max-w-md sm:max-w-lg lg:max-w-none">
           <div className="grid aspect-[5/6] grid-cols-[1.15fr_1fr] grid-rows-2 gap-3 sm:gap-4">
             <Photo
-              src={HOME_IMAGES.heroLeft}
+              src={homeImages.heroLeft}
               alt="K.I.RICH ballroom shirt"
               width={720}
               priority
               className="row-span-2 h-full"
             />
             <Photo
-              src={HOME_IMAGES.heroTopRight}
+              src={homeImages.heroTopRight}
               alt="K.I.RICH ballroom shirt, red"
               width={520}
               priority
               className="h-full"
             />
             <Photo
-              src={HOME_IMAGES.heroBottomRight}
+              src={homeImages.heroBottomRight}
               alt="K.I.RICH ballroom shirt, brown"
               width={520}
               className="h-full"

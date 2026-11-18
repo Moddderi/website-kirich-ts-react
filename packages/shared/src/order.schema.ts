@@ -127,6 +127,8 @@ export const customOrderSchema = checkoutFieldsSchema.extend({
     .refine((v) => !v || isRedemptionCertificateCode(v), {
       message: "Введіть електронний код (наприклад KIR-7X3M-9P2K)",
     }),
+  /** Inspiration photos uploaded before checkout (Cloudinary URLs). */
+  referenceImageUrls: z.array(z.string().url()).max(5).optional(),
   items: z.array(orderItemSchema),
 });
 

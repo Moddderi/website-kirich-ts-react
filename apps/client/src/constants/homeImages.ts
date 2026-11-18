@@ -1,11 +1,33 @@
-const CLOUD = "https://res.cloudinary.com/dqe2odzsc/image/upload";
+import { useMemo } from "react";
+import { buildShopProductImageUrl } from "@project/shared";
+import { useCloudinaryCloud } from "../hooks/useCloudinaryCloud";
 
-/** Studio photos that already live in the Cloudinary root (same ones used by the catalog). */
-export const HOME_IMAGES = {
-  heroLeft: `${CLOUD}/3042-1.jpg`,
-  heroTopRight: `${CLOUD}/3033.jpg`,
-  heroBottomRight: `${CLOUD}/3080.jpg`,
-  bespoke: `${CLOUD}/3081.jpg`,
-  ready: `${CLOUD}/3013.jpg`,
-  giftCertificate: `${CLOUD}/3082.jpg`,
+const HOME_IMAGE_FILES = {
+  heroLeft: "3083.jpg",
+  heroTopRight: "3084.jpg",
+  heroBottomRight: "3080.jpg",
+  bespoke: "3081.jpg",
+  ready: "3013.jpg",
+  giftCertificate: "3082.jpg",
 } as const;
+
+export type HomeImageKey = keyof typeof HOME_IMAGE_FILES;
+export type HomeImages = Record<HomeImageKey, string>;
+
+export const buildHomeImages = (cloudName: string): HomeImages => {
+  const img = (filename: string) =>
+    buildShopProductImageUrl(filename, cloudName);
+  return {
+    heroLeft: img(HOME_IMAGE_FILES.heroLeft),
+    heroTopRight: img(HOME_IMAGE_FILES.heroTopRight),
+    heroBottomRight: img(HOME_IMAGE_FILES.heroBottomRight),
+    bespoke: img(HOME_IMAGE_FILES.bespoke),
+    ready: img(HOME_IMAGE_FILES.ready),
+    giftCertificate: img(HOME_IMAGE_FILES.giftCertificate),
+  };
+};
+
+export const useHomeImages = (): HomeImages => {
+  const cloud = useCloudinaryCloud();
+  return useMemo(() => buildHomeImages(cloud), [cloud]);
+};

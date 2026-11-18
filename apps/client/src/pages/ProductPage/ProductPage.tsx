@@ -2,7 +2,8 @@ import React, { useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import type { Product } from "@project/shared";
-import { SUBTYPE_LABELS } from "@project/shared";
+import { SUBTYPE_LABELS, buildShopProductDefaultImageUrl } from "@project/shared";
+import { useCloudinaryCloud } from "../../hooks/useCloudinaryCloud";
 import { useAppDispatch, useAppSelector } from "../../store/store";
 import { addToCart } from "../../store/cartSlice";
 import { setReadyAccessoryQuantity } from "../../store/tailoringSlice";
@@ -53,6 +54,7 @@ export const ProductPage: React.FC = () => {
   const [activeImageIndex, setActiveImageIndex] = useState<number>(0);
 
   const queryClient = useQueryClient();
+  const cloudinaryCloud = useCloudinaryCloud();
 
   // placeholderData: if the card was already loaded in the catalog, show it
   // immediately and refresh the full record in the background.
@@ -95,7 +97,7 @@ export const ProductPage: React.FC = () => {
   const images =
     product && Array.isArray(product.imageUrl) ? product.imageUrl : [];
   const defaultImage =
-    "https://res.cloudinary.com/dqe2odzsc/image/upload/default.jpg";
+    buildShopProductDefaultImageUrl(cloudinaryCloud);
   const displayImages = images.length > 0 ? images : [defaultImage];
 
   // Обработчик клика «ДОБАВИТЬ В КОРЗИНУ»

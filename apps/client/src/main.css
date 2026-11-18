@@ -114,10 +114,10 @@ input[type="radio"] {
 /* === SCROLL REVEAL (IntersectionObserver, see <Reveal />) === */
 .reveal {
   opacity: 0;
-  transform: translate3d(0, 28px, 0);
+  transform: translate3d(0, 20px, 0);
   transition:
-    opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1),
-    transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+    opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
   transition-delay: var(--reveal-delay, 0ms);
   will-change: opacity, transform;
 }
@@ -280,13 +280,24 @@ input[type="number"] {
 
 /* === KEYFRAMES === */
 @keyframes reveal-up {
-  0% {
+  from {
     opacity: 0;
-    transform: translateY(40px) scale(0.95);
+    transform: translate3d(0, 24px, 0);
   }
-  100% {
+  to {
     opacity: 1;
-    transform: translateY(0) scale(1);
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes page-enter {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 14px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
   }
 }
 
@@ -333,16 +344,24 @@ input[type="number"] {
 
 /* === UTILITIES (анимации как в Tailwind) === */
 @layer utilities {
+  /* `backwards` applies the from-keyframe until start; after end the element
+     stays at its CSS default (visible). Avoids iOS Safari getting stuck at
+     opacity 0 when `forwards` never commits. */
   .animate-reveal-up {
-    animation: reveal-up 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    animation: reveal-up 0.85s cubic-bezier(0.16, 1, 0.3, 1) backwards;
   }
 
-  /* iOS Safari sometimes never applies `forwards` → content stuck at opacity 0 on dark bg */
-  @media (hover: none) and (pointer: coarse) {
+  .page-enter {
+    animation: none;
+  }
+
+  @media (max-width: 767px) {
+    .page-enter {
+      animation: page-enter 0.5s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+    }
+
     .animate-reveal-up {
-      animation: none;
-      opacity: 1;
-      transform: none;
+      animation-duration: 0.65s;
     }
   }
   .animate-pulse-glow {
@@ -364,8 +383,7 @@ input[type="number"] {
   }
 
   .product-card-enter {
-    opacity: 0;
-    animation: product-card-enter 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    animation: product-card-enter 0.45s cubic-bezier(0.16, 1, 0.3, 1) backwards;
   }
 }
 
@@ -446,17 +464,17 @@ svg[stroke="currentColor"][stroke-width="2"] {
 /* Headline: word-by-word blur-in */
 .word-in {
   display: inline-block;
-  opacity: 0;
-  transform: translate3d(0, 0.5em, 0);
-  filter: blur(10px);
-  animation: word-in 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: word-in 0.8s cubic-bezier(0.16, 1, 0.3, 1) backwards;
   animation-delay: var(--d, 0ms);
 }
 @keyframes word-in {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 0.4em, 0);
+  }
   to {
     opacity: 1;
     transform: none;
-    filter: blur(0);
   }
 }
 
@@ -769,5 +787,29 @@ svg[stroke="currentColor"][stroke-width="2"] {
   }
   to {
     background-position: 140% 0;
+  }
+}
+
+/* === MOBILE BURGER: fade over the page (no first-frame black flash) === */
+@keyframes mobile-menu-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+.mobile-menu {
+  animation: mobile-menu-fade 0.38s ease both;
+}
+.mobile-menu.is-closing {
+  animation: mobile-menu-fade 0.22s ease reverse both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mobile-menu,
+  .mobile-menu.is-closing {
+    animation: none;
+    opacity: 1;
   }
 }

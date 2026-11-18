@@ -1,4 +1,5 @@
-import type { Product } from "@project/shared";
+import { buildShopProductDefaultImageUrl, type Product } from "@project/shared";
+import { useCloudinaryCloud } from "../../hooks/useCloudinaryCloud";
 import { Link } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
 import { prefetchProduct } from "../../api/productQueries";
@@ -26,6 +27,7 @@ export const ProductCard = ({
   fetchPriority = "auto",
   enterDelayMs = 0,
 }: ProductCardProps) => {
+  const cloudinaryCloud = useCloudinaryCloud();
   const dispatch = useAppDispatch();
   const { t } = useTranslation();
   const getProductName = useProductName();
@@ -44,7 +46,7 @@ export const ProductCard = ({
   };
 
   const defaultImage = optimizeCloudinaryUrl(
-    "https://res.cloudinary.com/dqe2odzsc/image/upload/default.jpg",
+    buildShopProductDefaultImageUrl(cloudinaryCloud),
   );
 
   const images = Array.isArray(product.imageUrl) ? product.imageUrl : [];

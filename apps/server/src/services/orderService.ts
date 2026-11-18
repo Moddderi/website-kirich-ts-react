@@ -315,6 +315,24 @@ export const createOrder = async (payload: OrderPayload) => {
           prepaymentToUah: Number(prev.prepaymentToUah ?? 0) + extrasTotal,
         };
       }
+
+      const refs = payload.referenceImageUrls;
+      if (
+        customEstimate &&
+        Array.isArray(refs) &&
+        refs.length > 0
+      ) {
+        const safe = refs
+          .filter(
+            (u): u is string =>
+              typeof u === "string" &&
+              /^https:\/\/res\.cloudinary\.com\//i.test(u),
+          )
+          .slice(0, 5);
+        if (safe.length > 0) {
+          customEstimate = { ...customEstimate, referenceImageUrls: safe };
+        }
+      }
     }
 
     const grossTotalUah =

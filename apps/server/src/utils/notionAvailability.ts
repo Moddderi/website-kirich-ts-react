@@ -90,6 +90,8 @@ interface NotionProperty {
   status?: { name?: string } | null;
   select?: { name?: string } | null;
   date?: { start?: string | null; end?: string | null } | null;
+  checkbox?: boolean;
+  title?: Array<{ plain_text?: string }>;
 }
 
 interface NotionPage {
@@ -212,9 +214,11 @@ export const buildRangesFromPeriods = (
   return ranges;
 };
 
-const queryDatabase = async (): Promise<NotionPage[]> => {
+const queryDatabase = async (databaseIdRaw?: string): Promise<NotionPage[]> => {
   const token = (process.env.NOTION_TOKEN as string).trim();
-  const databaseId = normalizeNotionId(process.env.NOTION_DATABASE_ID);
+  const databaseId = normalizeNotionId(
+    databaseIdRaw ?? process.env.NOTION_DATABASE_ID,
+  );
   if (!databaseId) {
     throw new Error(
       "NOTION_DATABASE_ID is not a valid Notion id (expected 32 hex chars)",
@@ -267,6 +271,129 @@ const queryDatabase = async (): Promise<NotionPage[]> => {
   }
 
   return pages;
+};
+
+let eventsDbCache: { id: string | null; at: number } | null = null;
+const EVENTS_DB_TTL_MS = 60 * 60 * 1000;
+
+const pageTitleText = (page: NotionPage): string => {
+  for (const prop of Object.values(page.properties ?? {})) {
+    if (prop.type === "title") {
+      return (prop.title ?? []).map((t) => t.plain_text ?? "").join("").trim();
+    }
+  }
+  return "";
+};
+
+/** [DB] Події / Календар — optional env, otherwise search by title. */
+const resolveEventsDatabaseId = async (): Promise<string | null> => {
+  const fromEnv = normalizeNotionId(process.env.NOTION_EVENTS_DATABASE_ID);
+  if (fromEnv) return fromEnv;
+  if (eventsDbCache && Date.now() - eventsDbCache.at < EVENTS_DB_TTL_MS) {
+    return eventsDbCache.id;
+  }
+
+  const token = (process.env.NOTION_TOKEN as string).trim();
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
+  try {
+    const response = await fetch("https://api.notion.com/v1/search", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Notion-Version": NOTION_VERSION,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        query: "Події",
+        filter: { value: "database", property: "object" },
+        page_size: 20,
+      }),
+      signal: controller.signal,
+    });
+    if (!response.ok) {
+      eventsDbCache = { id: null, at: Date.now() };
+      return null;
+    }
+    const json = (await response.json()) as {
+      results?: Array<{ id: string; title?: Array<{ plain_text?: string }> }>;
+    };
+    const hit = (json.results ?? []).find((db) => {
+      const title = (db.title ?? []).map((t) => t.plain_text ?? "").join("");
+      return /події|календар|events/i.test(title);
+    });
+    const id = hit ? normalizeNotionId(hit.id) : null;
+    eventsDbCache = { id, at: Date.now() };
+    return id;
+  } catch {
+    eventsDbCache = { id: null, at: Date.now() };
+    return null;
+  } finally {
+    clearTimeout(timer);
+  }
+};
+
+/** Compact overlapping busy ranges. */
+const compactBusyRanges = (ranges: AvailabilityRange[]): AvailabilityRange[] => {
+  if (ranges.length === 0) return [];
+  const sorted = [...ranges].sort((a, b) =>
+    a.from === b.from ? a.to.localeCompare(b.to) : a.from.localeCompare(b.from),
+  );
+  const out: AvailabilityRange[] = [{ ...sorted[0] }];
+  for (const next of sorted.slice(1)) {
+    const last = out[out.length - 1];
+    if (next.from <= addDaysISO(last.to, 1)) {
+      if (next.to > last.to) last.to = next.to;
+      continue;
+    }
+    out.push({ ...next });
+  }
+  return out;
+};
+
+/**
+ * Events in [DB] Події / Календар with «Блокує сайт» checked
+ * become busy days on the public calendar (vacation, closed studio, …).
+ */
+export const fetchNotionBlockingEventRanges = async (): Promise<
+  AvailabilityRange[]
+> => {
+  const databaseId = await resolveEventsDatabaseId();
+  if (!databaseId) return [];
+
+  const pages = await queryDatabase(databaseId);
+  const ranges: AvailabilityRange[] = [];
+
+  for (const page of pages) {
+    const props = page.properties ?? {};
+    const blockProp = findProperty(
+      props,
+      process.env.NOTION_PROP_BLOCKS_SITE,
+      ["checkbox"],
+      /блок|block|сайт/i,
+    );
+    if (blockProp?.type === "checkbox" && blockProp.checkbox !== true) continue;
+    if (blockProp?.type !== "checkbox") continue;
+
+    const dateProp = findProperty(
+      props,
+      process.env.NOTION_PROP_EVENT_DATE,
+      ["date"],
+      /дата|date|термін|period/i,
+    );
+    const from = normalizeDate(dateProp?.date?.start);
+    const to = normalizeDate(dateProp?.date?.end) ?? from;
+    if (!from || !to) continue;
+
+    ranges.push({
+      from: from <= to ? from : to,
+      to: from <= to ? to : from,
+      status: "busy",
+      note: pageTitleText(page) || undefined,
+    });
+  }
+
+  return compactBusyRanges(ranges);
 };
 
 /** Public entry: ranges derived from the Notion orders database. Throws on failure. */

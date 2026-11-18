@@ -30,7 +30,9 @@ export function App() {
       <main className="relative">
         <div aria-hidden className="page-glow" />
         <Suspense fallback={<PageFallback />}>
-          <Outlet />
+          <div key={pathname} className="page-enter">
+            <Outlet />
+          </div>
         </Suspense>
       </main>
 
