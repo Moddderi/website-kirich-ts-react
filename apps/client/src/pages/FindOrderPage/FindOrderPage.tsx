@@ -3,11 +3,14 @@ import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import axios from "axios";
 import {
+  cabinetItemHref,
   getMyOrders,
+  isCabinetCertificate,
   requestLoginCode,
   verifyLoginCode,
-  type CabinetOrderSummary,
+  type CabinetListItem,
 } from "../../api/cabinetApi";
+import { formatPrice } from "@project/shared";
 import { useFormatDate } from "../../hooks/useTailoringEstimate";
 import {
   clearSession,
@@ -39,15 +42,16 @@ export const FindOrderPage = () => {
   const [code, setCode] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [orders, setOrders] = useState<CabinetOrderSummary[]>([]);
+  const [orders, setOrders] = useState<CabinetListItem[]>([]);
 
   const showOrders = async (sessionToken: string): Promise<boolean> => {
     try {
       const list = await getMyOrders(sessionToken);
       // A single order opens right away
       if (list.length === 1 && !listMode) {
-        saveCabinetToken(list[0].token);
-        navigate(`/my-order/${list[0].token}`, { replace: true });
+        const only = list[0];
+        if (!isCabinetCertificate(only)) saveCabinetToken(only.token);
+        navigate(cabinetItemHref(only), { replace: true });
         return true;
       }
       setOrders(list);
@@ -76,8 +80,9 @@ export const FindOrderPage = () => {
       .then((list) => {
         if (cancelled) return;
         if (list.length === 1 && !listMode) {
-          saveCabinetToken(list[0].token);
-          navigate(`/my-order/${list[0].token}`, { replace: true });
+          const only = list[0];
+          if (!isCabinetCertificate(only)) saveCabinetToken(only.token);
+          navigate(cabinetItemHref(only), { replace: true });
           return;
         }
         setOrders(list);
@@ -237,33 +242,52 @@ export const FindOrderPage = () => {
                 {t("findOrder.noOrders")}
               </div>
             ) : (
-              orders.map((order) => (
+              orders.map((item) => (
                 <Link
-                  key={order.token}
-                  to={`/my-order/${order.token}`}
+                  key={`${item.kind ?? "order"}-${item.token}`}
+                  to={cabinetItemHref(item)}
                   className="block rounded-4xl border border-stone-200/60 bg-white p-6 shadow-sm transition-all hover:border-stone-900 hover:shadow-md"
                 >
                   <div className="flex items-baseline justify-between gap-4">
                     <p className="text-sm font-semibold text-stone-900">
-                      {t("cabinet.label", { number: order.number })}
+                      {isCabinetCertificate(item)
+                        ? t("certCabinet.label", { number: item.number })
+                        : t("cabinet.label", { number: item.number })}
                     </p>
                     <p className="text-xs font-medium text-stone-400">
-                      {formatDate(order.createdAt.slice(0, 10))}
+                      {formatDate(item.createdAt.slice(0, 10))}
                     </p>
                   </div>
-                  <p className="mt-2 text-sm font-medium text-stone-600">
-                    {[
-                      ...order.garments.map((g) =>
-                        g.label ??
-                        `${t(`selectType.${g.type}`)}${(g.quantity ?? 1) > 1 ? ` × ${g.quantity}` : ""} · ${g.program}`,
-                      ),
-                      ...(order.accessories ?? []),
-                    ].join(", ")}
-                  </p>
-                  {order.start && (
-                    <p className="mt-1 text-xs font-medium text-stone-500">
-                      {t("cabinet.startLabel")}: {formatDate(order.start)}
-                    </p>
+                  {isCabinetCertificate(item) ? (
+                    <>
+                      <p className="mt-2 text-sm font-medium text-stone-600">
+                        {formatPrice(item.amountUah, "UAH")}
+                      </p>
+                      <p className="mt-1 text-xs font-medium text-stone-500">
+                        {t(`certCabinet.status.${item.status}`)}
+                        {" · "}
+                        {t("giftCertificate.successValidUntil", {
+                          date: formatDate(item.validUntil),
+                        })}
+                      </p>
+                    </>
+                  ) : (
+                    <>
+                      <p className="mt-2 text-sm font-medium text-stone-600">
+                        {[
+                          ...item.garments.map((g) =>
+                            g.label ??
+                            `${t(`selectType.${g.type}`)}${(g.quantity ?? 1) > 1 ? ` × ${g.quantity}` : ""} · ${g.program}`,
+                          ),
+                          ...(item.accessories ?? []),
+                        ].join(", ")}
+                      </p>
+                      {item.start && (
+                        <p className="mt-1 text-xs font-medium text-stone-500">
+                          {t("cabinet.startLabel")}: {formatDate(item.start)}
+                        </p>
+                      )}
+                    </>
                   )}
                 </Link>
               ))

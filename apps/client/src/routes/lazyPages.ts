@@ -39,6 +39,10 @@ export const loadGiftCertificatePage = () =>
   import("../pages/GiftCertificatePage/GiftCertificatePage");
 export const loadGiftCertificateSuccessPage = () =>
   import("../pages/GiftCertificatePage/GiftCertificateSuccessPage");
+export const loadGiftCertificateCabinetPage = () =>
+  import("../pages/GiftCertificatePage/GiftCertificateCabinetPage");
+export const loadGiftReceivePage = () =>
+  import("../pages/GiftCertificatePage/GiftReceivePage");
 
 export const CatalogPage = lazy(() =>
   loadCatalogPage().then((m) => ({ default: m.CatalogPage })),
@@ -98,6 +102,14 @@ export const GiftCertificateSuccessPage = lazy(() =>
   loadGiftCertificateSuccessPage().then((m) => ({
     default: m.GiftCertificateSuccessPage,
   })),
+);
+export const GiftCertificateCabinetPage = lazy(() =>
+  loadGiftCertificateCabinetPage().then((m) => ({
+    default: m.GiftCertificateCabinetPage,
+  })),
+);
+export const GiftReceivePage = lazy(() =>
+  loadGiftReceivePage().then((m) => ({ default: m.GiftReceivePage })),
 );
 
 /** Warm up the most likely next pages once the browser is idle. */

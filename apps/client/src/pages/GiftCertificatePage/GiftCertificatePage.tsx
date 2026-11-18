@@ -228,6 +228,11 @@ export const GiftCertificatePage = () => {
                       {errors[name]?.message as string}
                     </p>
                   )}
+                  {name === "email" && (
+                    <p className="mt-2 text-xs font-medium leading-relaxed text-stone-500">
+                      {t("giftCertificate.emailNote")}
+                    </p>
+                  )}
                 </div>
               ))}
             </div>

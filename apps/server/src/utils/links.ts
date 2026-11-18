@@ -11,3 +11,11 @@ export const cabinetUrl = (accessToken: string): string =>
 /** Same URL with `_` encoded — Telegram legacy Markdown breaks on underscores in links. */
 export const cabinetUrlForTelegram = (accessToken: string): string =>
   cabinetUrl(accessToken).replace(/_/g, "%5F");
+
+/** Buyer cabinet for a purchased gift certificate. */
+export const certificateCabinetUrl = (accessToken: string): string =>
+  `${clientUrl()}/my-certificate/${accessToken}`;
+
+/** Public congratulations page the buyer can send as a gift. */
+export const giftShareUrl = (shareToken: string): string =>
+  `${clientUrl()}/gift/${shareToken}`;

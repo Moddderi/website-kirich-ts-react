@@ -46,6 +46,7 @@ export const submitCabinetMeasurements = async (
 };
 
 export interface CabinetOrderSummary {
+  kind?: "order";
   token: string;
   number: string;
   createdAt: string;
@@ -54,6 +55,27 @@ export interface CabinetOrderSummary {
   start: string | null;
   readyTo: string | null;
 }
+
+export interface CabinetCertificateSummary {
+  kind: "certificate";
+  token: string;
+  number: string;
+  createdAt: string;
+  amountUah: number;
+  status: "inactive" | "active" | "used" | "expired";
+  validUntil: string;
+}
+
+export type CabinetListItem = CabinetOrderSummary | CabinetCertificateSummary;
+
+export const isCabinetCertificate = (
+  item: CabinetListItem,
+): item is CabinetCertificateSummary => item.kind === "certificate";
+
+export const cabinetItemHref = (item: CabinetListItem) =>
+  isCabinetCertificate(item)
+    ? `/my-certificate/${item.token}`
+    : `/my-order/${item.token}`;
 
 /** Login step 1: send a 6-digit code to the e-mail (always "succeeds"). */
 export const requestLoginCode = async (email: string): Promise<void> => {
@@ -74,8 +96,8 @@ export const verifyLoginCode = async (
 
 export const getMyOrders = async (
   sessionToken: string,
-): Promise<CabinetOrderSummary[]> => {
-  const { data } = await axios.get<{ data: CabinetOrderSummary[] }>(
+): Promise<CabinetListItem[]> => {
+  const { data } = await axios.get<{ data: CabinetListItem[] }>(
     `${API_URL}/my-order/session/orders`,
     {
       headers: { Authorization: `Bearer ${sessionToken}` },

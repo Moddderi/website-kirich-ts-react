@@ -35,6 +35,8 @@ class GiftCertificate extends Model<
   declare deliveryMethod: CreationOptional<string | null>;
   declare deliveryCity: CreationOptional<string | null>;
   declare deliveryWarehouse: CreationOptional<string | null>;
+  declare accessToken: CreationOptional<string | null>;
+  declare giftShareToken: CreationOptional<string | null>;
   declare createdAt: CreationOptional<Date>;
   declare updatedAt: CreationOptional<Date>;
 }
@@ -76,6 +78,8 @@ export default (sequelize: Sequelize) => {
       deliveryMethod: { type: DataTypes.STRING, allowNull: true },
       deliveryCity: { type: DataTypes.STRING, allowNull: true },
       deliveryWarehouse: { type: DataTypes.STRING, allowNull: true },
+      accessToken: { type: DataTypes.STRING, allowNull: true, unique: true },
+      giftShareToken: { type: DataTypes.STRING, allowNull: true, unique: true },
       createdAt: DataTypes.DATE,
       updatedAt: DataTypes.DATE,
     },

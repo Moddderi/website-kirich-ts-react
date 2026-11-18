@@ -3,7 +3,10 @@ import {
   ELECTRONIC_CERTIFICATE_CODE_PATTERN,
   MIN_GIFT_CERTIFICATE_NUMBER,
   giftCertificateBuyerLabel,
+  type CabinetCertificate,
   type GiftCertificatePurchase,
+  type GiftCertificateStatus,
+  type PublicGiftCertificate,
   todayISO,
 } from "@project/shared";
 import db from "../models/index.js";
@@ -20,6 +23,11 @@ import {
 } from "../utils/notionCertificates.js";
 import { describeClientMessenger, sendTelegramText } from "../utils/telegram.js";
 import { sendGiftCertificateEmail } from "../utils/email.js";
+import { generateAccessToken } from "../utils/cabinet.js";
+import {
+  certificateCabinetUrl,
+  giftShareUrl,
+} from "../utils/links.js";
 
 export type CertificatePreview = {
   number: number;
@@ -31,6 +39,75 @@ export type CertificatePreview = {
 const parseAmount = (value: unknown): number => Number(value);
 
 const isExpired = (validUntil: string, today: string) => validUntil < today;
+
+const displayStatus = (
+  status: string,
+  validUntil: string,
+): GiftCertificateStatus => {
+  if (status === "used") return "used";
+  if (status === "expired" || isExpired(validUntil, todayISO())) return "expired";
+  if (status === "inactive") return "inactive";
+  return "active";
+};
+
+export const ensureCertificateTokens = async (
+  cert: InstanceType<typeof db.GiftCertificate>,
+) => {
+  const patch: { accessToken?: string; giftShareToken?: string } = {};
+  if (!cert.accessToken) patch.accessToken = generateAccessToken();
+  if (!cert.giftShareToken) patch.giftShareToken = generateAccessToken();
+  if (Object.keys(patch).length > 0) {
+    await cert.update(patch);
+  }
+  return cert;
+};
+
+export const toCabinetCertificate = (
+  cert: InstanceType<typeof db.GiftCertificate>,
+): CabinetCertificate => ({
+  token: cert.accessToken!,
+  giftShareToken: cert.giftShareToken!,
+  number: cert.number,
+  electronicCode: cert.electronicCode ?? "",
+  amountUah: parseAmount(cert.amountUah),
+  validUntil: cert.validUntil,
+  purchasedAt: cert.purchasedAt,
+  status: displayStatus(cert.status, cert.validUntil),
+  buyerLabel: cert.buyerLabel,
+});
+
+export const toPublicGiftCertificate = (
+  cert: InstanceType<typeof db.GiftCertificate>,
+): PublicGiftCertificate => ({
+  number: cert.number,
+  electronicCode: cert.electronicCode ?? "",
+  amountUah: parseAmount(cert.amountUah),
+  validUntil: cert.validUntil,
+  status: displayStatus(cert.status, cert.validUntil),
+  fromName: cert.buyerLabel,
+});
+
+export const getCabinetCertificateByToken = async (token: string) => {
+  if (token.length < 20) return null;
+  const cert = await db.GiftCertificate.findOne({
+    where: { accessToken: token },
+  });
+  if (!cert) return null;
+  await syncCertificateStatusFromNotion(cert);
+  await ensureCertificateTokens(cert);
+  return toCabinetCertificate(cert);
+};
+
+export const getPublicGiftCertificateByToken = async (token: string) => {
+  if (token.length < 20) return null;
+  const cert = await db.GiftCertificate.findOne({
+    where: { giftShareToken: token },
+  });
+  if (!cert) return null;
+  await syncCertificateStatusFromNotion(cert);
+  await ensureCertificateTokens(cert);
+  return toPublicGiftCertificate(cert);
+};
 
 const findCertificateByRedemptionCode = async (code: string) => {
   const raw = code.trim();
@@ -62,7 +139,7 @@ const findCertificateByRedemptionCode = async (code: string) => {
 };
 
 /** Reads Notion «Статус» and mirrors it into Neon (manager’s Активний → code works on site). */
-const syncCertificateStatusFromNotion = async (
+export const syncCertificateStatusFromNotion = async (
   cert: InstanceType<typeof db.GiftCertificate>,
 ) => {
   if (!cert.notionPageId) return cert;
@@ -245,6 +322,8 @@ export const purchaseGiftCertificate = async (
           {
             number,
             electronicCode,
+            accessToken: generateAccessToken(),
+            giftShareToken: generateAccessToken(),
             amountUah: amountUah!,
             buyerLabel,
             purchaserFirstName: firstName!,
@@ -359,6 +438,8 @@ export const purchaseGiftCertificate = async (
         `📌 У Notion зараз «Неактивний» — після оплати поставте «Активний» (код на сайті підхопить за ~2 хв).`,
     );
 
+    await ensureCertificateTokens(cert);
+
     void sendGiftCertificateEmail({
       email: email!,
       firstName: firstName!,
@@ -372,6 +453,10 @@ export const purchaseGiftCertificate = async (
       paymentMethod: "online",
       communicationMethod: communicationMethod!,
       socialUsername: socialUsername!,
+      cabinetUrl: cert.accessToken
+        ? certificateCabinetUrl(cert.accessToken)
+        : undefined,
+      giftUrl: cert.giftShareToken ? giftShareUrl(cert.giftShareToken) : undefined,
       physicalDeliveryNote: requestPhysicalDelivery
         ? formatPhysicalDeliveryNote({
             method: deliveryMethod!,
@@ -388,6 +473,8 @@ export const purchaseGiftCertificate = async (
       amountUah: amountUah!,
       validUntil,
       buyerLabel: cert.buyerLabel,
+      accessToken: cert.accessToken!,
+      giftShareToken: cert.giftShareToken!,
     };
   } catch (error) {
     await transaction.rollback();

@@ -30,6 +30,8 @@ import {
   FindOrderPage,
   GiftCertificatePage,
   GiftCertificateSuccessPage,
+  GiftCertificateCabinetPage,
+  GiftReceivePage,
   preloadLikelyPages,
 } from "./routes/lazyPages";
 
@@ -95,7 +97,12 @@ export const Root = () => {
 
               {/* Client cabinet: personal link from the e-mail */}
               <Route path="my-order/:token" element={<OrderCabinetPage />} />
+              <Route
+                path="my-certificate/:token"
+                element={<GiftCertificateCabinetPage />}
+              />
               <Route path="my-orders" element={<FindOrderPage />} />
+              <Route path="gift/:shareToken" element={<GiftReceivePage />} />
               <Route path="gift-certificate" element={<GiftCertificatePage />} />
               <Route
                 path="gift-certificate/success"

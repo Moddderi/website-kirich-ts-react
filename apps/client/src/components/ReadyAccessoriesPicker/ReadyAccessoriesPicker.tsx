@@ -32,7 +32,7 @@ export const ReadyAccessoriesPicker = () => {
 
   return (
     <div className="mx-auto mt-12 max-w-4xl max-sm:mt-8">
-      <p className="mb-2 text-center text-[11px] font-semibold uppercase tracking-widest text-stone-400">
+      <p className="mb-2 text-center text-sm font-semibold uppercase tracking-widest text-accent">
         {t("selectType.readyAccessoriesTitle")}
       </p>
       <p className="mx-auto mb-5 max-w-2xl text-center text-xs font-medium leading-relaxed text-stone-400">

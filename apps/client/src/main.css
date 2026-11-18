@@ -156,9 +156,12 @@ input[type="radio"] {
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
-  .reveal {
+  .reveal,
+  .animate-reveal-up,
+  .page-enter {
     opacity: 1;
     transform: none;
+    animation: none !important;
   }
 }
 
@@ -290,13 +293,24 @@ input[type="number"] {
   }
 }
 
-@keyframes page-enter {
+/* Mobile: never start at opacity 0 (dark pages looked like a black screen). */
+@keyframes reveal-up-mobile-safe {
   from {
-    opacity: 0;
-    transform: translate3d(0, 14px, 0);
+    opacity: 1;
+    transform: translate3d(0, 12px, 0);
   }
   to {
     opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+/* Route shell: transform only — never fade the whole page (iOS nested fade → black screen). */
+@keyframes page-enter {
+  from {
+    transform: translate3d(0, 10px, 0);
+  }
+  to {
     transform: translate3d(0, 0, 0);
   }
 }
@@ -357,11 +371,11 @@ input[type="number"] {
 
   @media (max-width: 767px) {
     .page-enter {
-      animation: page-enter 0.5s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+      animation: page-enter 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
     }
 
     .animate-reveal-up {
-      animation-duration: 0.65s;
+      animation: reveal-up-mobile-safe 0.65s cubic-bezier(0.16, 1, 0.3, 1) both;
     }
   }
   .animate-pulse-glow {
