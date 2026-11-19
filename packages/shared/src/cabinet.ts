@@ -82,7 +82,7 @@ export interface CabinetOrder {
   createdAt: string;
   stage: CabinetStage;
   garments: CabinetGarment[];
-  accessories: Array<{ name: string; quantity: number }>;
+  accessories: Array<{ name: string; quantity: number; size?: string | null }>;
   dates: {
     start: string | null;
     readyTo: string | null;

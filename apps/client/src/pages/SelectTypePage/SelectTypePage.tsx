@@ -12,6 +12,7 @@ import { CurrencySwitcher } from "../../components/CurrencySwitcher/CurrencySwit
 import { ReadyAccessoriesPicker } from "../../components/ReadyAccessoriesPicker/ReadyAccessoriesPicker";
 import { useReadyAccessories } from "../../hooks/useReadyAccessories";
 import { useProductName } from "../../utils/useLocalizedProduct";
+import { accessorySizeLabel } from "../../utils/accessorySizeLabel";
 import {
   convertFromUah,
   formatConvertedPrice,
@@ -374,10 +375,11 @@ export const SelectTypePage = () => {
                   ))}
                   {readySelected.map((line) => (
                     <li
-                      key={`acc-${line.productId}`}
+                      key={`acc-${line.productId}-${line.size ?? ""}`}
                       className="break-words text-sm font-semibold leading-snug text-stone-900 max-sm:text-xs"
                     >
                       {getProductName(line.product)}
+                      {line.size ? `, ${accessorySizeLabel(line.size, t)}` : ""}
                       {line.quantity > 1 ? ` ×${line.quantity}` : ""}
                     </li>
                   ))}

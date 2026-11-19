@@ -7,6 +7,7 @@ import {
   clampLineQty,
   expandTailoringTypes,
   convertFromUah,
+  formatAccessorySize,
   formatConvertedPrice,
   formatDisplayPriceFrom,
   formatSiteCatalogLineLabelUk,
@@ -76,6 +77,7 @@ interface ReadyAccessoryRow {
   name: string;
   quantity: number;
   priceUah: number;
+  size?: string | null;
 }
 
 const readReadyAccessories = (order: { estimate?: { readyAccessories?: unknown } }): ReadyAccessoryRow[] => {
@@ -83,12 +85,18 @@ const readReadyAccessories = (order: { estimate?: { readyAccessories?: unknown }
   if (!Array.isArray(raw)) return [];
   return raw.flatMap((row) => {
     if (!row || typeof row !== "object") return [];
-    const item = row as { name?: unknown; quantity?: unknown; priceUah?: unknown };
+    const item = row as {
+      name?: unknown;
+      quantity?: unknown;
+      priceUah?: unknown;
+      size?: unknown;
+    };
     if (typeof item.name !== "string" || !item.name.trim()) return [];
     const priceUah = Number(item.priceUah);
     if (!Number.isFinite(priceUah)) return [];
     const quantity = Math.min(5, Math.max(1, Math.floor(Number(item.quantity) || 1)));
-    return [{ name: item.name.trim(), quantity, priceUah }];
+    const size = typeof item.size === "string" && item.size.trim() ? item.size.trim() : null;
+    return [{ name: item.name.trim(), quantity, priceUah, size }];
   });
 };
 
@@ -111,7 +119,11 @@ const withReadyAccessories = (
       ...summary.lines,
       ...extras.map((item) => ({
         type: "jacket" as MeasurementType,
-        label: item.quantity > 1 ? `${item.name} × ${item.quantity}` : item.name,
+        label: (() => {
+          const size = formatAccessorySize(item.size, "uk");
+          const named = size ? `${item.name}, ${size}` : item.name;
+          return item.quantity > 1 ? `${named} × ${item.quantity}` : named;
+        })(),
         category: "Аксесуар",
         priceRange: formatConvertedPrice(
           convertFromUah(item.priceUah, currency) * item.quantity,

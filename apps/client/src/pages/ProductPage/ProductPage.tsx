@@ -1,8 +1,12 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import type { Product } from "@project/shared";
-import { SUBTYPE_LABELS, buildShopProductDefaultImageUrl } from "@project/shared";
+import {
+  SUBTYPE_LABELS,
+  buildShopProductDefaultImageUrl,
+  getAccessorySizes,
+} from "@project/shared";
 import { useCloudinaryCloud } from "../../hooks/useCloudinaryCloud";
 import { useAppDispatch, useAppSelector } from "../../store/store";
 import { addToCart } from "../../store/cartSlice";
@@ -26,6 +30,7 @@ import {
 } from "../../constants/sizeCharts";
 import { resolveProductColors } from "../../constants/colorPalette";
 import { LuArrowLeft, LuChevronDown, LuHeart, LuShoppingBag } from "react-icons/lu";
+import { accessorySizeLabel } from "../../utils/accessorySizeLabel";
 
 export const ProductPage: React.FC = () => {
   const { t } = useTranslation();
@@ -88,10 +93,26 @@ export const ProductPage: React.FC = () => {
     (state) => state.tailoring.readyAccessories,
   );
   const isAccessory = product?.main_category === "accessories";
-  const tailoringQty = isAccessory
-    ? (readyAccessories.find((line) => line.productId === String(product?.id))
-        ?.quantity ?? 0)
-    : 0;
+  const accessorySizes = product ? getAccessorySizes(product) : null;
+  const productLines = isAccessory
+    ? readyAccessories.filter((line) => line.productId === String(product?.id))
+    : [];
+  const tailoringQty = productLines.reduce((sum, line) => sum + line.quantity, 0);
+  const selectedAccessorySize =
+    accessorySizes && accessorySizes.includes(selectedSize)
+      ? selectedSize
+      : (accessorySizes?.[0] ?? null);
+  const selectedAccessoryQty = productLines.find(
+    (line) => (line.size ?? null) === selectedAccessorySize,
+  )?.quantity ?? 0;
+
+  useEffect(() => {
+    if (accessorySizes?.length) {
+      setSelectedSize((current) =>
+        accessorySizes.includes(current) ? current : accessorySizes[0],
+      );
+    }
+  }, [accessorySizes]);
 
   // Безопасное извлечение массива картинок
   const images =
@@ -120,7 +141,11 @@ export const ProductPage: React.FC = () => {
         productCode: product.product_code,
         options: {
           color: colorLabel,
-          size: isAccessory ? t("productPage.oneSize") : selectedSize,
+          size: accessorySizes
+            ? accessorySizeLabel(selectedAccessorySize, t)
+            : isAccessory
+              ? t("productPage.oneSize")
+              : selectedSize,
         },
       }),
     );
@@ -129,11 +154,13 @@ export const ProductPage: React.FC = () => {
   };
 
   const handleAddToTailoring = () => {
-    if (!product || tailoringQty >= 5) return;
+    if (!product || selectedAccessoryQty >= 5) return;
+    if (accessorySizes && !selectedAccessorySize) return;
     dispatch(
       setReadyAccessoryQuantity({
         productId: String(product.id),
-        quantity: tailoringQty + 1,
+        quantity: selectedAccessoryQty + 1,
+        size: selectedAccessorySize,
       }),
     );
   };
@@ -325,9 +352,31 @@ export const ProductPage: React.FC = () => {
                 <h3 className="text-xs font-semibold uppercase tracking-widest text-stone-900">
                   {t("productPage.size")}
                 </h3>
-                <p className="mt-3 inline-flex rounded-2xl border border-accent bg-accent px-4 py-3 text-xs font-bold tracking-wider text-[#fff]">
-                  {t("productPage.oneSize")}
-                </p>
+                {accessorySizes ? (
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    {accessorySizes.map((size) => {
+                      const isSizeSelected = selectedAccessorySize === size;
+                      return (
+                        <button
+                          key={size}
+                          type="button"
+                          onClick={() => setSelectedSize(size)}
+                          className={`min-h-12 rounded-2xl border px-4 py-3 text-xs font-bold tracking-wide transition-all active:scale-95 ${
+                            isSizeSelected
+                              ? "border-accent bg-accent text-[#fff]"
+                              : "border-stone-900/15 text-stone-700 hover:border-stone-900"
+                          }`}
+                        >
+                          {accessorySizeLabel(size, t)}
+                        </button>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <p className="mt-3 inline-flex rounded-2xl border border-accent bg-accent px-4 py-3 text-xs font-bold tracking-wider text-[#fff]">
+                    {t("productPage.oneSize")}
+                  </p>
+                )}
               </div>
               ) : (
               <div>
@@ -432,7 +481,7 @@ export const ProductPage: React.FC = () => {
                 <button
                   type="button"
                   onClick={handleAddToTailoring}
-                  disabled={tailoringQty >= 5}
+                  disabled={selectedAccessoryQty >= 5}
                   className="w-full rounded-2xl border border-stone-900 px-8 py-4 text-sm font-semibold uppercase tracking-widest text-stone-900 transition-colors hover:bg-stone-900 hover:text-white disabled:opacity-40"
                 >
                   {tailoringQty > 0

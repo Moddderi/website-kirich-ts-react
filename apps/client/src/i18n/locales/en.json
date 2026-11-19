@@ -104,6 +104,10 @@
     "paletteCustomCta": "Go to Custom Tailoring",
     "size": "Size",
     "oneSize": "One size",
+    "accessorySizes": {
+      "child_40": "Kids (length 40 cm)",
+      "adult_55": "Adult (length 55 cm)"
+    },
     "sizeChart": "Size Chart",
     "addToCart": "Add to Cart",
     "addToTailoring": "Add to tailoring order",

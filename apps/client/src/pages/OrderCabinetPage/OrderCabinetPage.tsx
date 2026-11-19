@@ -8,6 +8,7 @@ import {
   type MeasurementType,
   type MeasurementUnit,
 } from "@project/shared";
+import { accessorySizeLabel } from "../../utils/accessorySizeLabel";
 import { submitCabinetMeasurements, useCabinetOrder } from "../../api/cabinetApi";
 import { MeasurementsForm } from "../../components/MeasurementsForm/MeasurementsForm";
 import { saveCabinetToken } from "../../utils/cabinetStorage";
@@ -256,11 +257,12 @@ export const OrderCabinetPage = () => {
                 ))}
                 {order.accessories.map((item) => (
                   <li
-                    key={item.name}
+                    key={`${item.name}-${item.size ?? ""}`}
                     className="flex items-baseline justify-between gap-4 text-sm"
                   >
                     <span className="font-semibold text-stone-900">
                       {item.name}
+                      {item.size ? `, ${accessorySizeLabel(item.size, t)}` : ""}
                       {item.quantity > 1 ? ` × ${item.quantity}` : ""}
                     </span>
                     <span className="text-xs font-semibold text-stone-500">
