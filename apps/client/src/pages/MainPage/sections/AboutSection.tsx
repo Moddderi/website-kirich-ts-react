@@ -36,7 +36,8 @@ export const AboutSection = () => {
                 {t("main.engineeringTitle")}
               </h2>
               <p className="mt-4 text-sm leading-relaxed text-stone-400 sm:text-base">
-                {t("main.engineeringTagline")}
+                <span className="block">K.I.RICH SEWING STUDIO</span>
+                <span className="mt-2 block">{t("main.engineeringTagline")}</span>
               </p>
             </div>
 
