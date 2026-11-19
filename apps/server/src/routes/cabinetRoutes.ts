@@ -19,6 +19,7 @@ import {
 import {
   MEASUREMENT_UNIT_LABELS,
   buildCabinetGarments,
+  formatAccessorySize,
   getMeasurementSchemaForTypes,
   type MeasurementType,
 } from "@project/shared";
@@ -166,11 +167,15 @@ router.get("/session/orders", async (req, res) => {
       accessories: (Array.isArray(o.estimate?.readyAccessories)
         ? o.estimate.readyAccessories
         : []
-      ).flatMap((row: { name?: unknown; quantity?: unknown }) =>
-        typeof row?.name === "string" && row.name.trim()
-          ? [`${row.name.trim()}${Number(row.quantity) > 1 ? ` × ${Math.floor(Number(row.quantity))}` : ""}`]
-          : [],
-      ),
+      ).flatMap((row: { name?: unknown; quantity?: unknown; size?: unknown }) => {
+        if (typeof row?.name !== "string" || !row.name.trim()) return [];
+        const size =
+          typeof row.size === "string" && row.size.trim()
+            ? formatAccessorySize(row.size.trim(), "uk")
+            : "";
+        const qty = Number(row.quantity) > 1 ? ` × ${Math.floor(Number(row.quantity))}` : "";
+        return [`${row.name.trim()}${size ? `, ${size}` : ""}${qty}`];
+      }),
       start: o.estimate?.startDate ?? null,
       readyTo: o.estimate?.readyTo ?? null,
     }));

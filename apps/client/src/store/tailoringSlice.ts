@@ -16,6 +16,7 @@ import {
 export interface ReadyAccessoryLine {
   productId: string;
   quantity: number;
+  size?: string | null;
 }
 
 interface TailoringState {
@@ -86,22 +87,27 @@ const tailoringSlice = createSlice({
     },
     setReadyAccessoryQuantity: (
       state,
-      action: PayloadAction<{ productId: string; quantity: number }>,
+      action: PayloadAction<{
+        productId: string;
+        quantity: number;
+        size?: string | null;
+      }>,
     ) => {
       const productId = action.payload.productId;
+      const size = action.payload.size?.trim() || null;
       const quantity = Math.min(
         5,
         Math.max(0, Math.floor(action.payload.quantity) || 0),
       );
       const idx = state.readyAccessories.findIndex(
-        (line) => line.productId === productId,
+        (line) => line.productId === productId && (line.size ?? null) === size,
       );
       if (quantity < 1) {
         if (idx >= 0) state.readyAccessories.splice(idx, 1);
         return;
       }
       if (idx >= 0) state.readyAccessories[idx].quantity = quantity;
-      else state.readyAccessories.push({ productId, quantity });
+      else state.readyAccessories.push({ productId, quantity, size });
     },
     setCatalogLineQuantity: (
       state,

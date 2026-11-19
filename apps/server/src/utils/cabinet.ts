@@ -101,12 +101,14 @@ export const buildCabinetOrder = async (order: any): Promise<CabinetOrder> => {
     stage,
     garments: buildCabinetGarments(estimate),
     accessories: Array.isArray(estimate.readyAccessories)
-      ? estimate.readyAccessories.flatMap((row: { name?: unknown; quantity?: unknown }) => {
+      ? estimate.readyAccessories.flatMap(
+          (row: { name?: unknown; quantity?: unknown; size?: unknown }) => {
           if (!row || typeof row.name !== "string" || !row.name.trim()) return [];
           return [
             {
               name: row.name.trim(),
               quantity: Math.min(5, Math.max(1, Math.floor(Number(row.quantity) || 1))),
+              size: typeof row.size === "string" && row.size.trim() ? row.size.trim() : null,
             },
           ];
         })

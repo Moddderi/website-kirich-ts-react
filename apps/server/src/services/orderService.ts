@@ -8,8 +8,10 @@ import {
   clampGarmentQty,
   clampLineQty,
   expandTailoringTypes,
+  formatAccessorySize,
   getTailoringProduct,
   isFarOrder,
+  isValidAccessorySize,
   pickWorkDays,
   sumWorkDaysForSelection,
   todayISO,
@@ -49,43 +51,63 @@ interface StoredAccessory {
   name: string;
   quantity: number;
   priceUah: number;
+  size: string | null;
 }
 
 const resolveReadyAccessories = async (
-  input: Array<{ productId?: string; quantity?: number }> | undefined,
+  input:
+    | Array<{ productId?: string; quantity?: number; size?: string }>
+    | undefined,
 ): Promise<StoredAccessory[]> => {
   if (!Array.isArray(input) || input.length === 0) return [];
 
-  const merged = new Map<number, number>();
+  type AccessoryProduct = {
+    id: number;
+    name: string;
+    name_en?: string | null;
+    price: number | string;
+    main_category: string;
+    sub_type?: string | null;
+  };
+
+  const merged = new Map<string, { id: number; size: string | null; quantity: number }>();
   for (const row of input) {
     const id = Number(row?.productId);
     const qty = Math.min(5, Math.max(1, Math.floor(Number(row?.quantity) || 1)));
     if (!Number.isInteger(id) || id <= 0) {
       throw new Error("Некоректний аксесуар у замовленні.");
     }
-    merged.set(id, Math.min(5, (merged.get(id) ?? 0) + qty));
+    const size = typeof row?.size === "string" && row.size.trim() ? row.size.trim() : null;
+    const key = `${id}::${size ?? ""}`;
+    const prev = merged.get(key);
+    merged.set(key, {
+      id,
+      size,
+      quantity: Math.min(5, (prev?.quantity ?? 0) + qty),
+    });
   }
   if (merged.size > 12) {
     throw new Error("Забагато аксесуарів у замовленні.");
   }
 
   const products = await db.Product.findAll({
-    where: { id: { [Op.in]: [...merged.keys()] } },
+    where: { id: { [Op.in]: [...new Set([...merged.values()].map((row) => row.id))] } },
   });
   const byId = new Map(products.map((product: { id: number }) => [product.id, product]));
 
-  return [...merged.entries()].map(([id, quantity]) => {
-    const product = byId.get(id) as
-      | { id: number; name: string; price: number | string; main_category: string }
-      | undefined;
+  return [...merged.values()].map(({ id, size, quantity }) => {
+    const product = byId.get(id) as AccessoryProduct | undefined;
     if (!product || product.main_category !== "accessories") {
       throw new Error("До замовлення на пошиття можна додати лише аксесуари.");
+    }
+    if (!isValidAccessorySize(product, size)) {
+      throw new Error("Оберіть розмір аксесуара.");
     }
     const priceUah = Number(product.price);
     if (!Number.isFinite(priceUah) || priceUah < 0) {
       throw new Error("Не вдалося визначити ціну аксесуара.");
     }
-    return { productId: id, name: product.name, quantity, priceUah };
+    return { productId: id, name: product.name, quantity, priceUah, size };
   });
 };
 
@@ -300,7 +322,7 @@ export const createOrder = async (payload: OrderPayload) => {
             price: item.priceUah,
             productId: String(item.productId),
             color: null,
-            size: null,
+            size: item.size ? formatAccessorySize(item.size, "uk") : null,
             isAccessory: true,
           })),
         ];

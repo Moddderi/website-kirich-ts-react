@@ -11,6 +11,7 @@ import { useAppSelector } from "../../store/store";
 import { useReadyAccessories } from "../../hooks/useReadyAccessories";
 import { useCartMoney } from "../../hooks/useFormattedPrice";
 import { useProductName } from "../../utils/useLocalizedProduct";
+import { accessorySizeLabel } from "../../utils/accessorySizeLabel";
 
 export const PrepaymentPage = () => {
   const { t } = useTranslation();
@@ -92,12 +93,13 @@ export const PrepaymentPage = () => {
               ))}
               {readySelected.map((line) => (
                 <li
-                  key={`acc-${line.productId}`}
+                  key={`acc-${line.productId}-${line.size ?? ""}`}
                   className="flex items-baseline justify-between gap-4 py-3"
                 >
                   <div>
                     <p className="text-sm font-semibold text-stone-900">
                       {getProductName(line.product)}
+                      {line.size ? `, ${accessorySizeLabel(line.size, t)}` : ""}
                       {line.quantity > 1 ? ` × ${line.quantity}` : ""}
                     </p>
                     <p className="text-xs font-medium text-stone-500">

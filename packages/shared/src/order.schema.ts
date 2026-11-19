@@ -101,6 +101,7 @@ export const customOrderSchema = checkoutFieldsSchema.extend({
       z.object({
         productId: z.string().min(1),
         quantity: z.number().int().min(1).max(5),
+        size: z.string().trim().min(1).max(40).optional(),
       }),
     )
     .max(12)

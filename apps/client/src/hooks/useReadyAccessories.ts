@@ -35,6 +35,7 @@ export const useReadyAccessories = () => {
           {
             productId: line.productId,
             quantity: line.quantity,
+            size: line.size ?? null,
             product,
             priceUah: Number(product.price),
           },

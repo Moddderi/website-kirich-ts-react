@@ -12,6 +12,7 @@ import { createOrder } from "../../api/orderApi";
 import { useCartMoney } from "../../hooks/useFormattedPrice";
 import { useReadyAccessories } from "../../hooks/useReadyAccessories";
 import { useProductName } from "../../utils/useLocalizedProduct";
+import { accessorySizeLabel } from "../../utils/accessorySizeLabel";
 import {
   useFormatDate,
   useScheduleFormat,
@@ -259,6 +260,7 @@ export const CheckoutPage = () => {
             ? readySelected.map((line) => ({
                 productId: line.productId,
                 quantity: line.quantity,
+                ...(line.size ? { size: line.size } : {}),
               }))
             : undefined,
         certificateCode: certificatePayload,
@@ -736,11 +738,12 @@ export const CheckoutPage = () => {
                   ))}
                   {readySelected.map((line) => (
                     <div
-                      key={`acc-${line.productId}`}
+                      key={`acc-${line.productId}-${line.size ?? ""}`}
                       className="flex flex-col gap-1 sm:flex-row sm:justify-between sm:gap-4 text-sm font-medium text-stone-500"
                     >
                       <span className="text-stone-900 font-semibold">
                         {getProductName(line.product)}
+                        {line.size ? `, ${accessorySizeLabel(line.size, t)}` : ""}
                         {line.quantity > 1 ? ` × ${line.quantity}` : ""}
                       </span>
                       <span className="text-stone-900 sm:text-right">
