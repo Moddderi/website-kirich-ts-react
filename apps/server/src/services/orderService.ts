@@ -150,7 +150,7 @@ export const createOrder = async (payload: OrderPayload) => {
         tailoringTypes.length > 0 &&
         tailoringTypes.every((type) => type in TAILORING_GARMENTS);
       if ((!validTypes || !tailoringTypes) && catalogLines.length === 0) {
-        throw new Error("Для індивідуального пошиву потрібно обрати вироби.");
+        throw new Error("Для індивідуального пошиття потрібно обрати вироби.");
       }
 
       const catalogLeadDays = (await loadCatalogLeadDays())?.byProductId ?? null;
@@ -189,7 +189,7 @@ export const createOrder = async (payload: OrderPayload) => {
         customItems = catalogLines.map((line) => {
           const p = getTailoringProduct(line.productId)!;
           return {
-            name: `Індивідуальний пошив: ${line.productId}`,
+            name: `Індивідуальне пошиття: ${line.productId}`,
             quantity: clampLineQty(line.quantity),
             price: p.priceFromUah,
           };
@@ -281,7 +281,7 @@ export const createOrder = async (payload: OrderPayload) => {
 
       customTotalFrom = estimate.priceFrom;
       customItems = tailoringTypes.map((type) => ({
-        name: `Індивідуальний пошив: ${type}`,
+        name: `Індивідуальне пошиття: ${type}`,
         quantity: quantities[type] ?? 1,
         price: TAILORING_GARMENTS[type].priceFromUah,
       }));
@@ -489,7 +489,7 @@ export const createOrder = async (payload: OrderPayload) => {
         // Клієнту на email (Resend)
         void sendOrderConfirmationEmail(orderForNotifications);
 
-        // У Notion (тільки індивідуальний пошив). Не блокує відповідь клієнту:
+        // У Notion (тільки індивідуальне пошиття). Не блокує відповідь клієнту:
         // якщо Notion недоступний — менеджер отримає попередження в Telegram.
         if (fullOrder.orderType === "custom") {
           const shortId = String(fullOrder.id).split("-")[0].toUpperCase();

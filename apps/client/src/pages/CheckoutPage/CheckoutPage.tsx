@@ -217,7 +217,7 @@ export const CheckoutPage = () => {
         : // Prices are recomputed on the server from tailoringTypes.
           tailoringTypes.map((type) => ({
             productId: null,
-            name: `Індивідуальний пошив: ${type}`,
+            name: `Індивідуальне пошиття: ${type}`,
             quantity: 1,
             price: 0,
             color: null,

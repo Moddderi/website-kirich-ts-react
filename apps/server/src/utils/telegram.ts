@@ -141,7 +141,7 @@ export const sendTelegramNotification = async (order: any) => {
     const summary = buildCustomOrderSummary(order);
 
     itemsList =
-      `🧵 *Індивідуальний пошив*\n` +
+      `🧵 *Індивідуальне пошиття*\n` +
       summary.lines
         .map(
           (line) =>
