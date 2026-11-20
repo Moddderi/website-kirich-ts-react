@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 import { Outlet, useLocation } from "react-router-dom";
 import { Header } from "./components/Header/Header";
+import { Seo } from "./components/Seo/Seo";
 import "./main.css";
 import { Footer } from "./components/Footer/Footer";
 
@@ -25,6 +26,7 @@ export function App() {
       }`}
       translate="no"
     >
+      <Seo />
       <Header />
 
       <main className="relative">

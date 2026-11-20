@@ -15,8 +15,7 @@ import { purchaseGiftCertificate } from "../../api/certificateApi";
 import { FaInstagram, FaTelegram, FaViber, FaWhatsapp } from "react-icons/fa6";
 import { LuChevronRight } from "react-icons/lu";
 import { SiSignal } from "react-icons/si";
-import { useHomeImages } from "../../constants/homeImages";
-import { optimizeCloudinaryUrl } from "../../utils/cloudinary";
+import { HOME_IMAGES } from "../../constants/homeImages";
 import {
   NovaPoshtaIcon,
   UkrposhtaIcon,
@@ -61,7 +60,7 @@ const FormCard = ({
 
 export const GiftCertificatePage = () => {
   const { t } = useTranslation();
-  const homeImages = useHomeImages();
+  const homeImages = HOME_IMAGES;
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -159,10 +158,8 @@ export const GiftCertificatePage = () => {
         <div className="min-w-0 space-y-8 lg:col-span-7">
           <div className="overflow-hidden rounded-4xl border border-stone-200/60">
             <img
-              src={optimizeCloudinaryUrl(homeImages.giftCertificate, {
-                width: 800,
-              })}
-              alt=""
+              src={homeImages.giftCertificate}
+              alt={t("giftCertificate.pageTitle")}
               width={800}
               height={600}
               className="aspect-4/3 w-full object-cover"

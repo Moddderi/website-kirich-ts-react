@@ -11,9 +11,8 @@ import {
   LuRuler,
   LuTruck,
 } from "react-icons/lu";
-import { useHomeImages } from "../../../constants/homeImages";
+import { HOME_IMAGES } from "../../../constants/homeImages";
 import { CATALOG_ENABLED } from "../../../constants/features";
-import { optimizeCloudinaryUrl } from "../../../utils/cloudinary";
 import { LivingBg } from "../../../components/fx/LivingBg";
 
 const Photo = ({
@@ -35,7 +34,7 @@ const Photo = ({
     className={`relative overflow-hidden rounded-3xl bg-stone-200 ring-1 ring-stone-900/10 ${className}`}
   >
     <img
-      src={optimizeCloudinaryUrl(src, { width })}
+      src={src}
       alt={alt}
       width={width}
       height={Math.round(width * 1.33)}
@@ -77,7 +76,7 @@ const scrollToHomeGifts = () => {
 
 export const HeroSection = () => {
   const { t } = useTranslation();
-  const homeImages = useHomeImages();
+  const homeImages = HOME_IMAGES;
   const ref = useRef<HTMLElement | null>(null);
 
   const onPointerMove = (e: React.PointerEvent<HTMLElement>) => {

@@ -21,7 +21,7 @@ const MARQUEE_WORDS = [
 ];
 
 export const MainPage = () => (
-  <main className="flex-grow">
+  <div className="flex-grow">
     <HeroSection />
 
     {/* Big outline/solid lettering ticker */}
@@ -68,5 +68,5 @@ export const MainPage = () => (
     <AboutSection />
     <CtaSection />
     <StickyCta />
-  </main>
+  </div>
 );

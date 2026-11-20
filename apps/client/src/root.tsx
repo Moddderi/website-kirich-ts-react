@@ -32,6 +32,7 @@ import {
   GiftCertificateSuccessPage,
   GiftCertificateCabinetPage,
   GiftReceivePage,
+  NotFoundPage,
   preloadLikelyPages,
 } from "./routes/lazyPages";
 
@@ -64,7 +65,7 @@ export const Root = () => {
               <Route index element={<MainPage />} />
               <Route path="catalog" element={shop(<CatalogPage />)} />
 
-              <Route path="catalog/:id" element={<ProductPage />} />
+              <Route path="catalog/:id" element={shop(<ProductPage />)} />
 
               <Route path="individual-tailoring" element={<TailoringLayout />}>
                 {/* Основная страница "Как это работает" */}
@@ -108,6 +109,7 @@ export const Root = () => {
                 path="gift-certificate/success"
                 element={<GiftCertificateSuccessPage />}
               />
+              <Route path="*" element={<NotFoundPage />} />
             </Route>
           </Routes>
           <Analytics />
