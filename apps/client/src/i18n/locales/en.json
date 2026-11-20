@@ -1,4 +1,30 @@
 {
+  "seo": {
+    "homeTitle": "K.I.RICH — men's ballroom wear | custom tailoring",
+    "homeDescription": "K.I.RICH sewing studio — men's ballroom wear and made-to-measure tailoring. Poltava, shipping across Ukraine and worldwide.",
+    "tailoringTitle": "Custom ballroom tailoring | K.I.RICH",
+    "tailoringDescription": "Made-to-measure men's ballroom suits: choose garments, book a studio start date, 30% prepayment. Shipping in Ukraine and worldwide.",
+    "tailoringStartTitle": "Start tailoring | K.I.RICH POLTAVA",
+    "tailoringStartDescription": "Choose garments for a made-to-measure K.I.RICH men's ballroom order.",
+    "giftTitle": "Gift certificate | K.I.RICH POLTAVA",
+    "giftDescription": "A K.I.RICH gift certificate for custom men's ballroom tailoring. Choose a value, receive the code by email.",
+    "deliveryTitle": "Delivery and payment | K.I.RICH POLTAVA",
+    "deliveryDescription": "Nova Poshta, Ukrposhta and EMS shipping. 30% prepayment, the rest when the order is ready.",
+    "privacyTitle": "Privacy policy | K.I.RICH POLTAVA",
+    "privacyDescription": "How K.I.RICH handles personal data of studio clients.",
+    "catalogTitle": "Ballroom wear catalog | K.I.RICH POLTAVA",
+    "catalogDescription": "Ready-to-ship men's ballroom wear from K.I.RICH, delivered in Ukraine and worldwide.",
+    "notFoundTitle": "Page not found | K.I.RICH POLTAVA",
+    "notFoundDescription": "This page does not exist. Return to the K.I.RICH homepage.",
+    "privateTitle": "K.I.RICH POLTAVA",
+    "privateDescription": "Private K.I.RICH client page."
+  },
+  "notFoundPage": {
+    "title": "Page not found",
+    "text": "This address is not on the site. Go home or start a tailoring order.",
+    "home": "Home",
+    "tailoring": "Start tailoring"
+  },
   "pricing": {
     "from": "from {{price}}"
   },

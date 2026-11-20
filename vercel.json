@@ -3,6 +3,20 @@
   "installCommand": "npm install",
   "buildCommand": "npm run vercel-build",
   "outputDirectory": "apps/client/dist",
+  "redirects": [
+    {
+      "source": "/:path*",
+      "has": [{ "type": "host", "value": "www.kirich-sewing-studio.com" }],
+      "destination": "https://kirich-sewing-studio.com/:path*",
+      "permanent": true
+    },
+    {
+      "source": "/:path*",
+      "has": [{ "type": "host", "value": "website-kirich-ts-react.vercel.app" }],
+      "destination": "https://kirich-sewing-studio.com/:path*",
+      "permanent": true
+    }
+  ],
   "rewrites": [
     {
       "source": "/(.*)",

@@ -43,6 +43,8 @@ export const loadGiftCertificateCabinetPage = () =>
   import("../pages/GiftCertificatePage/GiftCertificateCabinetPage");
 export const loadGiftReceivePage = () =>
   import("../pages/GiftCertificatePage/GiftReceivePage");
+export const loadNotFoundPage = () =>
+  import("../pages/NotFoundPage/NotFoundPage");
 
 export const CatalogPage = lazy(() =>
   loadCatalogPage().then((m) => ({ default: m.CatalogPage })),
@@ -110,6 +112,9 @@ export const GiftCertificateCabinetPage = lazy(() =>
 );
 export const GiftReceivePage = lazy(() =>
   loadGiftReceivePage().then((m) => ({ default: m.GiftReceivePage })),
+);
+export const NotFoundPage = lazy(() =>
+  loadNotFoundPage().then((m) => ({ default: m.NotFoundPage })),
 );
 
 /** Warm up the most likely next pages once the browser is idle. */

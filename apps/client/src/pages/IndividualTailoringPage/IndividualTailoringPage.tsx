@@ -21,9 +21,9 @@ export const IndividualTailoringPage = () => {
               <LuRuler size={16} />
             </div>
             <div>
-              <h2 className="text-xl font-semibold tracking-tight text-white">
+              <h1 className="text-xl font-semibold tracking-tight text-white">
                 {t("individualTailoring.howItWorks")}
-              </h2>
+              </h1>
               <p className="text-xs font-medium text-stone-400 mt-1">
                 {t("individualTailoring.processDescription")}
               </p>

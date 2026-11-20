@@ -1,4 +1,4 @@
-const DEFAULT_CLIENT_URL = "https://website-kirich-ts-react.vercel.app";
+const DEFAULT_CLIENT_URL = "https://kirich-sewing-studio.com";
 
 /** Public address of the website (set CLIENT_URL on Railway / in local .env). */
 export const clientUrl = (): string =>

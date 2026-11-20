@@ -1,4 +1,30 @@
 {
+  "seo": {
+    "homeTitle": "K.I.RICH — чоловічий бальний одяг | індивідуальне пошиття",
+    "homeDescription": "K.I.RICH sewing studio — чоловічий бальний одяг та індивідуальний пошив. Полтава, доставка по Україні та світу.",
+    "tailoringTitle": "Індивідуальне пошиття бального одягу | K.I.RICH",
+    "tailoringDescription": "Пошиття чоловічого бального костюма за мірками: вибір виробів, календар студії, передплата 30%. Доставка по Україні та світу.",
+    "tailoringStartTitle": "Почати пошиття | K.I.RICH POLTAVA",
+    "tailoringStartDescription": "Оберіть вироби для індивідуального пошиття чоловічого бального одягу K.I.RICH.",
+    "giftTitle": "Подарунковий сертифікат | K.I.RICH POLTAVA",
+    "giftDescription": "Подарунковий сертифікат K.I.RICH на індивідуальне пошиття чоловічого бального одягу. Номінал на вибір, код на email.",
+    "deliveryTitle": "Доставка та оплата | K.I.RICH POLTAVA",
+    "deliveryDescription": "Доставка Nova Poshta, Укрпошта та EMS. Передплата 30%, решта після готовності замовлення.",
+    "privacyTitle": "Політика безпеки | K.I.RICH POLTAVA",
+    "privacyDescription": "Як K.I.RICH обробляє персональні дані клієнтів студії.",
+    "catalogTitle": "Каталог бального одягу | K.I.RICH POLTAVA",
+    "catalogDescription": "Готовий чоловічий бальний одяг K.I.RICH з доставкою по Україні та світу.",
+    "notFoundTitle": "Сторінку не знайдено | K.I.RICH POLTAVA",
+    "notFoundDescription": "Такої сторінки немає. Поверніться на головну K.I.RICH.",
+    "privateTitle": "K.I.RICH POLTAVA",
+    "privateDescription": "Особиста сторінка клієнта K.I.RICH."
+  },
+  "notFoundPage": {
+    "title": "Сторінку не знайдено",
+    "text": "Такої адреси на сайті немає. Перейдіть на головну або почніть пошиття.",
+    "home": "На головну",
+    "tailoring": "Почати пошиття"
+  },
   "pricing": {
     "from": "від {{price}}"
   },

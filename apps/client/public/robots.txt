@@ -1,0 +1,21 @@
+User-agent: *
+Allow: /
+
+Disallow: /cart
+Disallow: /favorite
+Disallow: /checkout
+Disallow: /my-orders
+Disallow: /my-order/
+Disallow: /my-certificate/
+Disallow: /gift/
+Disallow: /gift-certificate/success
+Disallow: /order-success
+Disallow: /individual-tailoring/step-2
+Disallow: /individual-tailoring/step-3
+Disallow: /individual-tailoring/step-4
+Disallow: /individual-tailoring/checkout
+Disallow: /individual-tailoring/order-success
+Disallow: /catalog
+Disallow: /catalog/
+
+Sitemap: https://kirich-sewing-studio.com/sitemap.xml
