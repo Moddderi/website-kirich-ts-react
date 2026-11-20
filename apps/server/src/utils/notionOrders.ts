@@ -449,7 +449,7 @@ const buildBody = (order: any) => {
     Array.isArray(order.estimate?.lines) && order.estimate.lines.length > 0;
 
   const blocks: unknown[] = [
-    paragraph(`🌐 Замовлення з сайту (індивідуальний пошив) · №${shortId}`),
+    paragraph(`🌐 Замовлення з сайту (індивідуальне пошиття) · №${shortId}`),
     ...(order.accessToken
       ? [
           {
