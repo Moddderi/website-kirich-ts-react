@@ -6,4 +6,4 @@ export const SITE_URL = (
 export const SITE_NAME = "K.I.RICH POLTAVA";
 
 /** Absolute URL for Open Graph / Twitter shares. */
-export const OG_IMAGE_URL = `${SITE_URL}/home/gift-certificate.jpg`;
+export const OG_IMAGE_URL = `${SITE_URL}/og.jpg`;
