@@ -67,13 +67,6 @@ const Word = ({
   </span>
 );
 
-const scrollToHomeGifts = () => {
-  document.getElementById("home-gifts")?.scrollIntoView({
-    behavior: "smooth",
-    block: "start",
-  });
-};
-
 export const HeroSection = () => {
   const { t } = useTranslation();
   const homeImages = HOME_IMAGES;
@@ -167,9 +160,8 @@ export const HeroSection = () => {
             )}
           </div>
           <div className="animate-reveal-up delay-700 mt-3 flex justify-center lg:justify-start">
-            <button
-              type="button"
-              onClick={scrollToHomeGifts}
+            <a
+              href="#home-gifts"
               className="group inline-flex w-full items-center justify-center gap-2.5 rounded-full border border-accent/40 bg-linear-to-r from-accent/8 to-transparent px-8 py-4 text-sm font-semibold text-stone-900 shadow-sm transition hover:border-accent/70 hover:from-accent/15 sm:w-auto"
             >
               <LuGift
@@ -179,7 +171,7 @@ export const HeroSection = () => {
                 aria-hidden
               />
               {t("main.giftsScrollCta")}
-            </button>
+            </a>
           </div>
 
           <ul className="animate-reveal-up delay-700 mx-auto mt-12 grid max-w-xl grid-cols-2 gap-x-6 gap-y-4 text-left lg:mx-0">

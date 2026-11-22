@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useParams, useNavigate, Link } from "react-router-dom";
+import { useParams, useNavigate, Link, Navigate } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import type { Product } from "@project/shared";
 import {
@@ -31,6 +31,7 @@ import {
 import { resolveProductColors } from "../../constants/colorPalette";
 import { LuArrowLeft, LuChevronDown, LuHeart, LuShoppingBag } from "react-icons/lu";
 import { accessorySizeLabel } from "../../utils/accessorySizeLabel";
+import { CATALOG_ENABLED } from "../../constants/features";
 
 export const ProductPage: React.FC = () => {
   const { t } = useTranslation();
@@ -202,6 +203,10 @@ export const ProductPage: React.FC = () => {
         </p>
       </div>
     );
+  }
+
+  if (!CATALOG_ENABLED && product.main_category !== "accessories") {
+    return <Navigate to="/" replace />;
   }
 
   return (

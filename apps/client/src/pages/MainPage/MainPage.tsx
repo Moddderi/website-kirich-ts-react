@@ -57,13 +57,14 @@ export const MainPage = () => (
     <WhySection />
     <ProcessSection />
 
-    <Suspense fallback={null}>
-      <FeaturedProducts />
-    </Suspense>
-
-    <Suspense fallback={null}>
-      <CertificateSection />
-    </Suspense>
+    <div id="home-gifts" className="scroll-mt-24">
+      <Suspense fallback={null}>
+        <FeaturedProducts />
+      </Suspense>
+      <Suspense fallback={null}>
+        <CertificateSection />
+      </Suspense>
+    </div>
 
     <AboutSection />
     <CtaSection />
