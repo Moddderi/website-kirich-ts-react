@@ -39,10 +39,7 @@ export default function FeaturedProducts() {
   }, [itemIds, queryClient]);
 
   return (
-    <section
-      id="home-gifts"
-      className="scroll-mt-24 mx-auto max-w-7xl px-5 py-20 sm:px-6 lg:px-8 lg:py-28"
-    >
+    <section className="mx-auto max-w-7xl px-5 py-20 sm:px-6 lg:px-8 lg:py-28">
       <Reveal className="mb-12 flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.3em] text-beige-600">

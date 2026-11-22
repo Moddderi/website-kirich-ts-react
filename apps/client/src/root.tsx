@@ -38,7 +38,7 @@ import {
 
 preloadLikelyPages();
 
-/** Ready-made shop pages are frozen (see constants/features.ts) → back to the landing page. */
+/** Ready-made catalog listing is frozen. Accessory product pages stay open. */
 const shop = (element: ReactElement) =>
   CATALOG_ENABLED ? element : <Navigate to="/" replace />;
 
@@ -64,8 +64,7 @@ export const Root = () => {
             <Route path="/" element={<App />}>
               <Route index element={<MainPage />} />
               <Route path="catalog" element={shop(<CatalogPage />)} />
-
-              <Route path="catalog/:id" element={shop(<ProductPage />)} />
+              <Route path="catalog/:id" element={<ProductPage />} />
 
               <Route path="individual-tailoring" element={<TailoringLayout />}>
                 {/* Основная страница "Как это работает" */}
