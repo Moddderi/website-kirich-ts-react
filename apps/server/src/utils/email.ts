@@ -641,7 +641,7 @@ export const sendMeasurementsReminderEmail = async (order: any) => {
 
   try {
     const resend = new Resend(apiKey);
-    const { error } = await resend.emails.send({
+    const { data, error } = await resend.emails.send({
       from: process.env.EMAIL_FROM || "K.I.RICH <onboarding@resend.dev>",
       to: [order.email],
       subject: `K.I.RICH — ${L.reminderTitle}`,
@@ -649,6 +649,7 @@ export const sendMeasurementsReminderEmail = async (order: any) => {
       replyTo: process.env.EMAIL_REPLY_TO || "kirich.sewing.studio@gmail.com",
     });
     if (error) console.error("❌ Помилка Resend API:", error);
+    else console.log("✅ Email нагадування про мірки відправлено:", data?.id);
   } catch (error) {
     console.error("❌ Не вдалося відправити нагадування про мірки:", error);
   }
