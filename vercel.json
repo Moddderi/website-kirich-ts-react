@@ -5,6 +5,11 @@
   "outputDirectory": "apps/client/dist",
   "redirects": [
     {
+      "source": "/vite.svg",
+      "destination": "/android-chrome-192.png",
+      "permanent": true
+    },
+    {
       "source": "/:path*",
       "has": [{ "type": "host", "value": "www.kirich-sewing-studio.com" }],
       "destination": "https://kirich-sewing-studio.com/:path*",
@@ -21,6 +26,17 @@
     {
       "source": "/(.*)",
       "destination": "/index.html"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/:file(favicon.ico|favicon.png|favicon-16.png|favicon-32.png|favicon-48.png|apple-touch-icon.png|android-chrome-192.png|android-chrome-512.png)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=86400, stale-while-revalidate=604800"
+        }
+      ]
     }
   ]
 }
